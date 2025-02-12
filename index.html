@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners -->
+  <meta name="description"
+    content="GenMentor: A goal-oriented tutoring system leveraging large language models (LLMs) for personalized learning experiences in educational contexts.">
+  <meta property="og:title" content="GenMentor: LLM-powered & Goal-oriented Tutor" />
+  <meta property="og:description"
+    content="GenMentor is a personalized tutoring system that leverages large language models to optimize learning paths based on individual goals and profiles." />
+  <meta property="og:url" content="https://tianfuwang.tech/genmentor" />
+  <meta property="og:image" content="static/image/genmentor_banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <meta name="twitter:title" content="GenMentor: LLM-powered & Goal-oriented Tutor">
+  <meta name="twitter:description"
+    content="GenMentor optimizes personalized learning through AI, empowering users to achieve their learning goals efficiently.">
+  <!-- <meta name="twitter:image" content="static/images/genmentor_twitter_banner.png"> -->
+  <!-- <meta name="twitter:card" content="summary_large_image"> -->
+  <meta name="keywords" content="AI, Learning Path, Personalized Tutoring, Goal-oriented Learning, GenMentor, LLM">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>GenMentor</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+</head>
+
+<body>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">GenMentor: LLM-powered & Goal-oriented Tutor</h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://www.tianfuwang.tech" target="_blank">Tianfu Wang</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.tianfuwang.tech/gen-mentor" target="_blank">Yi Zhan</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.microsoft.com/en-us/research/people/jialia/" target="_blank">Jianxun
+                  Lian</a><sup>3</sup>
+              </span>
+              <span class="author-block">
+                <a href="https://ppsmk388.github.io/" target="_blank">Zhengyu Hu</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.microsoft.com/en-us/research/people/nicholasyuan/" target="_blank">Nicholas Jing
+                  Yuan</a><sup>2,†</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.microsoft.com/en-us/aprd/aboutus/leadership/qizhang" target="_blank">Qi
+                  Zhang</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.microsoft.com/en-us/research/people/xingx/" target="_blank">Xing
+                  Xie</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.hkust-gz.edu.cn/people/hui-xiong/" target="_blank">Hui Xiong</a><sup>1,†</sup>
+              </span>
+            </div>
+            <div class="is-size-5 publication-authors">
+              <small>
+                <span class="author-block"><sup>1</sup>Hong Kong University of Science and Technology (Guangzhou)</span>
+                <span class="author-block"><sup>2</sup>Microsoft Inc.</span>
+                <span class="author-block"><sup>3</sup>Microsoft Research Asia</span>
+                <span class="eql-cntrb"><br><sup>†</sup>Indicates Corresponding Authors<br></span>
+              </small>
+              <span class="author-block"><b>WWW 2025 (Industry Track) Oral</b></span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/pdf/2501.15749.pdf" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+
+                <!-- <span class="link-block">
+                <a href="static/pdfs/genmentor_supplementary.pdf" target="_blank"
+                class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  <i class="fas fa-file-pdf"></i>
+                </span>
+                <span>Supplementary</span>
+              </a>
+            </span> -->
+
+                <span class="link-block">
+                  <a href="https://gen-mentor.streamlit.app/" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-globe"></i>
+                    </span>
+                    <span>Demo</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://github.com/GeminiLight/gen-mentor" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+
+                <!-- <span class="link-block">
+                <a href="https://arxiv.org/abs/XXXXXX" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span> -->
+
+
+                <!-- video -->
+                <span class="link-block">
+                  <a href="https://www.youtube.com/watch?v=vTdtGZop-Zc" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                    </span>
+                    <span>Video</span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+          </div>
+  </section>
+
+
+  <!-- Teaser video-->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <!-- <video poster="static/images/video_poster.png" id="tree" autoplay controls muted loop height="100%">
+          <source src="static/videos/genmentor_video.mp4" type="video/mp4">
+        </video> -->
+        <!-- image -->
+        <h2 class="subtitle has-text-centered">
+          GenMentor achieves goal-oriented educational experiences by identifying knowledge gaps and tailoring learning
+          paths to
+          meet individual goals with precision.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Image carousel -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="item has-text-centered">
+            <img src="static/images/genmentor_demo_1.png" alt="Goal & Profile Initialization" width="80%"
+              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
+            <!-- </div> -->
+            <h2 class="subtitle has-text-centered">Goal & Profile Initialization</h2>
+          </div>
+          <div class="item has-text-centered">
+            <img src="static/images/genmentor_demo_2.png" alt="Skill Gap Identification" width="80%"
+              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
+            <h2 class="subtitle has-text-centered">Skill Gap Identification</h2>
+          </div>
+          <div class="item has-text-centered">
+            <img src="static/images/genmentor_demo_3.png" alt="Learning Path Scheduling" width="80%"
+              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
+            <h2 class="subtitle has-text-centered">Learning Path Scheduling</h2>
+          </div>
+          <div class="item has-text-centered">
+            <img src="static/images/genmentor_demo_4.png" alt="Learning Content Creation" width="80%"
+              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
+            <h2 class="subtitle has-text-centered">Learning Content Creation</h2>
+          </div>
+          <div class="item has-text-centered">
+            <img src="static/images/genmentor_demo_5.png" alt="Dynamic Learner Profile" width="80%"
+              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
+            <h2 class="subtitle has-text-centered">Dynamic Learner Profile</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Paper abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Intelligent Tutoring Systems (ITSs) have revolutionized education by offering personalized learning
+              experiences.
+              However, as goal-oriented learning, which emphasizes efficiently achieving specific objectives, becomes
+              increasingly important in professional contexts, existing ITSs often struggle to deliver this type of
+              targeted learning experience.
+              In this paper, we propose GenMentor, an LLM-powered multi-agent framework designed to deliver
+              goal-oriented, personalized learning within ITS. GenMentor begins by accurately mapping learners' goals to
+              required skills using a fine-tuned LLM trained on a custom goal-to-skill dataset.
+              After identifying the skill gap, it schedules an efficient learning path using an evolving optimization
+              approach, driven by a comprehensive and dynamic profile of learners' multifaceted status.
+              Additionally, GenMentor tailors learning content with an exploration-drafting-integration mechanism to
+              align with individual learner needs. Extensive automated and human evaluations demonstrate GenMentor's
+              effectiveness in learning guidance and content quality.
+              Furthermore, we have deployed it in practice and also implemented it as an application. Practical human
+              study with professional learners further highlights its effectiveness in goal alignment and resource
+              targeting, leading to enhanced personalization.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Goal-oriented Learning -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">Goal-oriented Learning</h2>
+        </div>
+        <div class="columns is-centered">
+          <div class="column is-three-fifths">
+            <img src="static/images/its-paradigms.png" alt="ITS for Goal-oriented Learning" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Framework Image -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">GenMentor Framework</h2>
+        </div>
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <img src="static/images/genmentor-framework.png" alt="GenMentor Framework" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experiments Results -->
+  <section class="hero is-small is-light">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">Experiments Results</h2>
+        </div>
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <img src="static/images/automated-results.png" alt="LLM-based Automated Evaluation" />
+          </div>
+        </div>
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <img src="static/images/questionnaire-results.png" alt="End-to-end Questionnaire Results" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Video presentation -->
+    <section class="hero is-small is-light">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered has-text-centered">
+            <h2 class="title is-3">Demo Video Presentation</h2>
+          </div>
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <div class="publication-video">
+                <iframe src="https://www.youtube.com/embed/vTdtGZop-Zc" frameborder="0"
+                  allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Paper poster -->
+    <!-- <section class="hero is-small is-light">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title">Poster</h2>
+        <iframe src="static/pdfs/genmentor_poster.pdf" width="100%" height="550"></iframe>
+      </div>
+    </div>
+  </section> -->
+
+
+    <!-- BibTex citation -->
+
+    <section class="section" id="BibTeX">
+      <div class="container is-max-desktop content">
+        <h2 class="title">BibTeX</h2>
+        <pre><code>@inproceedings{www2025genmentor,
+  title={LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System},
+  author={Tianfu Wang, Yi Zhan, Jianxun Lian, Zhengyu Hu, Nicholas Jing Yuan, Qi Zhang, Xing Xie, Hui Xiong},
+  booktitle={ACM Web Conference},
+  year={2025}
+}</code></pre>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="columns is-centered">
+          <div class="column is-8">
+            <div class="content">
+              <p>
+                This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+                  target="_blank">Academic
+                  Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io"
+                  target="_blank">Nerfies</a> project page.
+                <br> <br> This website is licensed under a <a rel="license"
+                  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+                  Commons Attribution-ShareAlike 4.0 International License</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+</body>
+
+</html>
