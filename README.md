@@ -1,11 +1,19 @@
-# GenMentor: LLM-powered Agents for Goal-oriented Learning
+# GenMentor: LLM-powered & Goal-oriented Tutor
+
+<center>
+<a href="https://www.tianfuwang.tech/gen-mentor">Homepage</a> |
+<a href="https://arxiv.org/pdf/2501.15749">Paper</a> |
+<a href="https://gen-mentor.streamlit.app/">Web Demo</a> | <a href="https://youtu.be/vTdtGZop-Zc">Video Preview</a> 
+</center>
+
+---
 
 These are the supplementary resources of our paper "LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System", accepted by WWW 2025 (Industry Track).
 
 In this paper, we propose GenMentor, a large language model (LLM)-powered multi-agent framework designed for goal-oriented learning in Intelligent Tutoring Systems (ITS). This framework emphasizes personalization, adaptive learning, and goal-aligned content delivery, making it a robust solution for professional and lifelong learning scenarios.
 
 > [!NOTE]  
-> We will release more available resources (code and data) in future updates.
+> We will release more available resources (code and data) in future updates, which are still under the internal review process of Microsoft. Stay tuned!
 
 ## 🚀 Demo Version of Web Application
 
