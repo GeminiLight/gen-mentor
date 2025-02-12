@@ -1,10 +1,10 @@
 # GenMentor: LLM-powered & Goal-oriented Tutor
 
 <div align="center">
-  <a href="https://www.tianfuwang.tech/gen-mentor">Homepage</a> |
-  <a href="https://arxiv.org/pdf/2501.15749">Paper</a> |
-  <a href="https://gen-mentor.streamlit.app/">Web Demo</a> |
-  <a href="https://youtu.be/vTdtGZop-Zc">Video Preview</a>
+  <a href="https://www.tianfuwang.tech/gen-mentor">🏠 Homepage</a> &nbsp&nbsp|&nbsp&nbsp
+  <a href="https://arxiv.org/pdf/2501.15749">📄 Paper</a> &nbsp&nbsp|&nbsp&nbsp
+  <a href="https://gen-mentor.streamlit.app/">🌐 Web Demo</a> &nbsp&nbsp|&nbsp&nbsp
+  <a href="https://youtu.be/vTdtGZop-Zc">🎥 Video Preview</a>
 </div>
 
 These are the supplementary resources of our paper "LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System", accepted by WWW 2025 (Industry Track) as an Oral Presentation.
