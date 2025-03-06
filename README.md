@@ -31,7 +31,7 @@ Welcome to explore the demo version of the GenMentor web application:
 [GenMentor Web App](https://gen-mentor.streamlit.app/)
 
 > [!Note]
-> Due to Microsoft's policy, please click [here](mailto:tianfuwang.cs@gmail.com) to send an email to join the whitelist of the GenMentor web application.
+> Due to Microsoft's policy, please click [here](mailto:tianfuwang.cs@gmail.com) to send an email to join the whitelist of the GenMentor demo.
 
 This interactive demo showcases GenMentor's core functionalities, including:
 
