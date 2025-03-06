@@ -39,6 +39,7 @@
   <script src="static/js/bulma-carousel.min.js"></script>
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -261,25 +262,121 @@
     </div>
   </section>
 
+  <!-- Methodology & Framework Architecture -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
 
-  <!-- Framework Image -->
-  <section class="hero is-small">
-    <div class="hero-body">
-      <div class="container">
-        <div class="columns is-centered has-text-centered">
-          <h2 class="title is-3">GenMentor Framework</h2>
+      <div class="columns is-centered">
+        <h2 class="title is-3 has-text-centered">Framework Architecture & Methodology</h2>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-forth-fifths">
+          <img src="static/images/genmentor-framework.png" alt="Learner Profiler Architecture" class="mb-4">
         </div>
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-four-fifths">
-            <img src="static/images/genmentor-framework.png" alt="GenMentor Framework" />
+      </div>
+
+      <div class="columns is-centered">
+        <!-- <div class="column is-four-fifths"> -->
+          <div class="column is-centered">
+          <div class="tabs is-centered is-boxed" id="arch-tabs">
+            <ul>
+              <li class="is-active" data-target="skill-identifier">
+                <a>
+                  <span class="icon is-small"><i class="fas fa-brain"></i></span>
+                  <span>Skill Identifier</span>
+                </a>
+              </li>
+              <li data-target="learner-profiler">
+                <a>
+                  <span class="icon is-small"><i class="fas fa-user-graduate"></i></span>
+                  <span>Learner Profiler</span>
+                </a>
+              </li>
+              <li data-target="content-creator">
+                <a>
+                  <span class="icon is-small"><i class="fas fa-book"></i></span>
+                  <span>Content Creator</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="tab-content">
+            <!-- Skill Identifier Tab -->
+            <div id="skill-identifier" class="tab-pane is-active">
+              <div class="box">
+                <h3 class="title is-4">Skill Gap Identification</h3>
+                <div class="content">
+                  <h4 class="title is-5">Key Features:</h4>
+                  <ul>
+                    <li><strong>CoT-enabled Dataset Construction:</strong> 
+                      <ul>
+                        <li>Custom goal-to-skill dataset built from job postings (mapping main duties to required skills)</li>
+                        <li>Incorporate Chain of Thought (CoT) reasoning tracks for enhanced skill mapping</li>
+                      </ul>
+                    </li>
+                    <li><strong>LLM Fine-tuning:</strong> 
+                      Model trained to map learning goals to required skills with improved goal alignment
+                    </li>
+                    <li><strong>Gap Analysis Process:</strong>
+                      Systematic comparison between required skills and learner's current competencies 
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Learner Profiler Tab -->
+            <div id="learner-profiler" class="tab-pane">
+              <div class="box">
+                <h3 class="title is-4">Adaptive Learner Modeling</h3>
+                <div class="content">
+                  <h4 class="title is-5">Key Features:</h4>
+                  <ul>
+                    <li><strong>Profile Components:</strong>
+                      <ul>
+                        <li>Cognitive Status (S): Tracking learning progress and skill mastery</li>
+                        <li>Learning Preferences (P): Content style and activity type preferences</li>
+                        <li>Behavioral Patterns (B): Usage patterns and engagement metrics</li>
+                      </ul>
+                    </li>
+                    <li><strong>Dynamic Updates:</strong> Continuous profile refinement based on real-time interactions
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content Creator Tab -->
+            <div id="content-creator" class="tab-pane">
+              <div class="box">
+                <h3 class="title is-4">Personalized Resource Delivery</h3>
+                <div class="content">
+                  <h4 class="title is-5">Key Features:</h4>
+                  <ul>
+                    <li><strong>Learning Path Scheduling:</strong> Evolving optimization approach with learner simulator
+                      feedback</li>
+                    <li><strong>Content Creation Process:</strong>
+                      <ul>
+                        <li>Knowledge Exploration: Goal-oriented knowledge point identification</li>
+                        <li>RAG-based Drafting: Integration of retrieved information</li>
+                        <li>Content Refinement: Iterative improvement based on simulated feedback</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
+
   <!-- Experiments Results -->
-  <section class="hero is-small is-light">
+  <section class="hero is-small is-gary">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-centered has-text-centered">
