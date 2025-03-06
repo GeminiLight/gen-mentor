@@ -15,7 +15,7 @@
 ---
 
 > [!IMPORTANT]  
-> :sparkles: Welcome to access the [GenMentor website](https://www.tianfuwang.tech/gen-mentor) to learn more about our work!
+> :sparkles: Welcome to visit the [GenMentor website](https://www.tianfuwang.tech/gen-mentor) to learn more about our work!
 
 These are the supplementary resources of our paper "LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System", accepted by WWW 2025 (Industry Track) as an Oral Presentation.
 
@@ -29,6 +29,9 @@ In this paper, we propose GenMentor, a large language model (LLM)-powered multi-
 Welcome to explore the demo version of the GenMentor web application:
 
 [GenMentor Web App](https://gen-mentor.streamlit.app/)
+
+> [!Note]
+> Due to Microsoft's policy, please click [here](mailto:tianfuwang.cs@gmail.com) to send an email to join the whitelist of the GenMentor web application.
 
 This interactive demo showcases GenMentor's core functionalities, including:
 
