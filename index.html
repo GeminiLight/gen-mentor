@@ -44,6 +44,91 @@
 
 <body>
 
+  <nav class="navbar is-fixed-top is-light" role="navigation" aria-label="main navigation">
+    <div class="container">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+          <img src="static/images/favicon.ico" alt="GenMentor Logo" class="mr-2">
+          <span class="has-text-weight-bold is-size-4">GenMentor</span>
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbarBasic" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="#abstract">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-file-alt"></i>
+              </span>
+              <span>Abstract</span>
+            </span>
+          </a>
+
+          <a class="navbar-item" href="#motivation">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-lightbulb"></i>
+              </span>
+              <span>Motivation</span>
+            </span>
+          </a>
+
+          <a class="navbar-item" href="#framework">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-project-diagram"></i>
+              </span>
+              <span>Framework</span>
+            </span>
+          </a>
+
+          <a class="navbar-item" href="#results">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-chart-bar"></i>
+              </span>
+              <span>Results</span>
+            </span>
+          </a>
+
+          <a class="navbar-item" href="#demo">
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-play-circle"></i>
+              </span>
+              <span>Video</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-primary" href="https://gen-mentor.streamlit.app/" target="_blank" rel="noopener">
+                <span class="icon">
+                  <i class="fas fa-external-link-alt"></i>
+                </span>
+                <span>Try Demo</span>
+              </a>
+              <a class="button is-dark" href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>GitHub</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
   <section class="hero">
     <div class="hero-body">
       <div class="container is-max-desktop">
@@ -216,7 +301,7 @@
 
 
   <!-- Paper abstract -->
-  <section class="section hero is-light">
+  <section class="section hero is-light" id="abstract">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
@@ -247,124 +332,296 @@
   </section>
 
   <!-- Goal-oriented Learning -->
-  <section class="hero is-small">
+  <section class="hero is-small" id="motivation">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-centered has-text-centered">
           <h2 class="title is-3">Goal-oriented Learning</h2>
         </div>
+
+        <!-- Motivation Cards -->
+        <div class="columns is-centered mb-6">
+          <div class="column is-10">
+            <div class="columns is-multiline">
+              <!-- Limitations Card -->
+              <div class="column is-4">
+                <div class="box has-background-white">
+                  <h4 class="title is-6 mb-4">
+                    <span class="icon has-text-warning">
+                      <i class="fas fa-exclamation-triangle"></i>
+                    </span>
+                    Limitations of Traditional ITS
+                  </h4>
+                  <div class="content">
+                    <p>Existing ITSs rely on static curricula and reactive responses, lacking the ability to proactively guide learners toward specific professional objectives.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Challenges Card -->
+              <div class="column is-4">
+                <div class="box has-background-white">
+                  <h4 class="title is-6 mb-4">
+                    <span class="icon has-text-info">
+                      <i class="fas fa-briefcase"></i>
+                    </span>
+                    Professional Learning Needs
+                  </h4>
+                  <div class="content">
+                    <p>Modern professionals acquire targeted skills for specific goals; without clear guidance, their motivation and efficiency may decline.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Solution Card -->
+              <div class="column is-4">
+                <div class="box has-background-white">
+                  <h4 class="title is-6 mb-4">
+                    <span class="icon has-text-success">
+                      <i class="fas fa-bullseye"></i>
+                    </span>
+                    Goal-oriented Learning
+                  </h4>
+                  <div class="content">
+                    <p>Our approach emphasizes efficient goal achievement through personalized skill identification, adaptive learning paths, and targeted content delivery.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Diagram -->
         <div class="columns is-centered">
           <div class="column is-three-fifths">
-            <img src="static/images/its-paradigms.png" alt="ITS for Goal-oriented Learning" />
+            <div class="box">
+              <h4 class="title is-4 has-text-centered mb-4">Evolution of ITS Paradigms</h4>
+              <img src="static/images/its-paradigms.png" alt="ITS for Goal-oriented Learning" />
+              <div class="content mt-4">
+                <div class="tags are-medium is-centered">
+                  <span class="tag is-light">Traditional ITS</span>
+                  <span class="tag is-light"><i class="fas fa-arrow-right mx-2"></i></span>
+                  <span class="tag is-light">LLM-based ITS</span>
+                  <span class="tag is-light"><i class="fas fa-arrow-right mx-2"></i></span>
+                  <span class="tag is-primary">Goal-oriented ITS</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Methodology & Framework Architecture -->
-  <section class="section hero is-light">
-    <div class="container is-max-desktop">
-
+  <!-- GenMentor Framework -->
+  <section class="hero-body is-light" id="framework">
+    <div class="container">
       <div class="columns is-centered">
-        <h2 class="title is-3 has-text-centered">Framework Architecture & Methodology</h2>
+        <h2 class="title is-3 has-text-centered">GenMentor Framework</h2>
       </div>
 
-      <div class="columns is-centered">
-        <div class="column is-forth-fifths">
-          <img src="static/images/genmentor-framework.png" alt="Learner Profiler Architecture" class="mb-4">
+      <!-- Framework Overview -->
+      <div class="columns is-centered mb-6">
+        <div class="column is-10">
+          <div class="box framework-overview">
+            <figure class="image">
+              <img src="static/images/genmentor-framework.png" alt="GenMentor Framework Overview" class="framework-image">
+            </figure>
+          </div>
         </div>
       </div>
 
+      <!-- Component Details -->
       <div class="columns is-centered">
-        <!-- <div class="column is-four-fifths"> -->
-          <div class="column is-centered">
+        <div class="column is-10">
+          <!-- Tabs Navigation -->
           <div class="tabs is-centered is-boxed" id="arch-tabs">
             <ul>
               <li class="is-active" data-target="skill-identifier">
                 <a>
-                  <span class="icon is-small"><i class="fas fa-brain"></i></span>
+                  <span class="icon is-medium"><i class="fas fa-brain"></i></span>
                   <span>Skill Identifier</span>
                 </a>
               </li>
               <li data-target="learner-profiler">
                 <a>
-                  <span class="icon is-small"><i class="fas fa-user-graduate"></i></span>
+                  <span class="icon is-medium"><i class="fas fa-user-graduate"></i></span>
                   <span>Learner Profiler</span>
                 </a>
               </li>
               <li data-target="content-creator">
                 <a>
-                  <span class="icon is-small"><i class="fas fa-book"></i></span>
+                  <span class="icon is-medium"><i class="fas fa-book"></i></span>
                   <span>Content Creator</span>
                 </a>
               </li>
             </ul>
           </div>
 
+          <!-- Tab Content -->
           <div class="tab-content">
             <!-- Skill Identifier Tab -->
             <div id="skill-identifier" class="tab-pane is-active">
-              <div class="box">
-                <h3 class="title is-4">Skill Gap Identification</h3>
+              <div class="box component-box">
+                <div class="component-header">
+                  <span class="icon-wrapper has-background-primary-light">
+                    <i class="fas fa-brain has-text-primary"></i>
+                  </span>
+                  <h3 class="title is-4 has-text-primary-dark">Skill Gap Identification</h3>
+                </div>
                 <div class="content">
-                  <h4 class="title is-5">Key Features:</h4>
-                  <ul>
-                    <li><strong>CoT-enabled Dataset Construction:</strong> 
+                  <div class="feature-grid">
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-info">
+                          <i class="fas fa-database"></i>
+                        </span>
+                        <h4 class="title is-5">Dataset Construction</h4>
+                      </div>
                       <ul>
-                        <li>Custom goal-to-skill dataset built from job postings (mapping main duties to required skills)</li>
-                        <li>Incorporate Chain of Thought (CoT) reasoning tracks for enhanced skill mapping</li>
+                        <li>Custom goal-to-skill dataset</li>
+                        <li>Build from job postings</li>
+                        <li>CoT reasoning tracks</li>
                       </ul>
-                    </li>
-                    <li><strong>LLM Fine-tuning:</strong> 
-                      Model trained to map learning goals to required skills with improved goal alignment
-                    </li>
-                    <li><strong>Gap Analysis Process:</strong>
-                      Systematic comparison between required skills and learner's current competencies 
-                    </li>
-                  </ul>
+                    </div>
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-success">
+                          <i class="fas fa-cogs"></i>
+                        </span>
+                        <h4 class="title is-5">LLM Fine-tuning</h4>
+                      </div>
+                      <ul>
+                        <li>Goal-aligned skill mapping</li>
+                        <li>Improved accuracy & relevance</li>
+                        <li>Enhanced goal alignment</li>
+                      </ul>
+                    </div>
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-warning">
+                          <i class="fas fa-search"></i>
+                        </span>
+                        <h4 class="title is-5">Gap Analysis</h4>
+                      </div>
+                      <ul>
+                        <li>Skill competency assessment</li>
+                        <li>Systematic gap identification</li>
+                        <li>Obtain skill & level gap</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Learner Profiler Tab -->
             <div id="learner-profiler" class="tab-pane">
-              <div class="box">
-                <h3 class="title is-4">Adaptive Learner Modeling</h3>
+              <div class="box component-box">
+                <div class="component-header">
+                  <span class="icon-wrapper has-background-info-light">
+                    <i class="fas fa-user-graduate has-text-info"></i>
+                  </span>
+                  <h3 class="title is-4 has-text-info-dark">Adaptive Learner Modeling</h3>
+                </div>
                 <div class="content">
-                  <h4 class="title is-5">Key Features:</h4>
-                  <ul>
-                    <li><strong>Profile Components:</strong>
+                  <div class="feature-grid">
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-primary">
+                          <i class="fas fa-brain"></i>
+                        </span>
+                        <h4 class="title is-5">Cognitive Status</h4>
+                      </div>
                       <ul>
-                        <li>Cognitive Status (S): Tracking learning progress and skill mastery</li>
-                        <li>Learning Preferences (P): Content style and activity type preferences</li>
-                        <li>Behavioral Patterns (B): Usage patterns and engagement metrics</li>
+                        <li>Learning progress tracking</li>
+                        <li>Skill mastery assessment</li>
+                        <li>Knowledge retention analysis</li>
                       </ul>
-                    </li>
-                    <li><strong>Dynamic Updates:</strong> Continuous profile refinement based on real-time interactions
-                    </li>
-                  </ul>
+                    </div>
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-info">
+                          <i class="fas fa-sliders-h"></i>
+                        </span>
+                        <h4 class="title is-5">Learning Preferences</h4>
+                      </div>
+                      <ul>
+                        <li>Content style preferences</li>
+                        <li>Activity type preferences</li>
+                        <li>Learning pace optimization</li>
+                      </ul>
+                    </div>
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-success">
+                          <i class="fas fa-chart-line"></i>
+                        </span>
+                        <h4 class="title is-5">Behavioral Patterns</h4>
+                      </div>
+                      <ul>
+                        <li>Usage patterns analysis</li>
+                        <li>Engagement metrics tracking</li>
+                        <li>Adaptive feedback system</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Content Creator Tab -->
             <div id="content-creator" class="tab-pane">
-              <div class="box">
-                <h3 class="title is-4">Personalized Resource Delivery</h3>
+              <div class="box component-box">
+                <div class="component-header">
+                  <span class="icon-wrapper has-background-success-light">
+                    <i class="fas fa-book has-text-success"></i>
+                  </span>
+                  <h3 class="title is-4 has-text-success-dark">Personalized Resource Delivery</h3>
+                </div>
                 <div class="content">
-                  <h4 class="title is-5">Key Features:</h4>
-                  <ul>
-                    <li><strong>Learning Path Scheduling:</strong> Evolving optimization approach with learner simulator
-                      feedback</li>
-                    <li><strong>Content Creation Process:</strong>
+                  <div class="feature-grid">
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-primary">
+                          <i class="fas fa-route"></i>
+                        </span>
+                        <h4 class="title is-5">Learning Path</h4>
+                      </div>
                       <ul>
-                        <li>Knowledge Exploration: Goal-oriented knowledge point identification</li>
-                        <li>RAG-based Drafting: Integration of retrieved information</li>
-                        <li>Content Refinement: Iterative improvement based on simulated feedback</li>
+                        <li>Evolving optimization method</li>
+                        <li>Learner simulator feedback</li>
+                        <li>Dynamic path adjustment</li>
                       </ul>
-                    </li>
-                  </ul>
+                    </div>
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-info">
+                          <i class="fas fa-lightbulb"></i>
+                        </span>
+                        <h4 class="title is-5">Knowledge Creation</h4>
+                      </div>
+                      <ul>
+                        <li>Goal-oriented exploration</li>
+                        <li>RAG-based content drafting</li>
+                        <li>Iterative document refinement</li>
+                      </ul>
+                    </div>
+                    <div class="feature-card">
+                      <div class="feature-header">
+                        <span class="icon has-text-success">
+                          <i class="fas fa-sync-alt"></i>
+                        </span>
+                        <h4 class="title is-5">Adaptive Delivery</h4>
+                      </div>
+                      <ul>
+                        <li>Real-time content adaptation</li>
+                        <li>Personalized pacing</li>
+                        <li>Interactive feedback loops</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -376,48 +633,129 @@
 
 
   <!-- Experiments Results -->
-  <section class="hero is-small is-gary">
+  <section class="hero is-small is-gary" id="results">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-centered has-text-centered">
-          <h2 class="title is-3">Experiments Results</h2>
+          <h2 class="title is-3">Experimental Results</h2>
         </div>
-        <div class="columns is-centered">
-          <div class="column is-four-fifths">
-            <img src="static/images/automated-results.png" alt="LLM-based Automated Evaluation" />
-          </div>
-        </div>
-        <div class="columns is-centered">
-          <div class="column is-four-fifths">
-            <img src="static/images/questionnaire-results.png" alt="End-to-end Questionnaire Results" />
-          </div>
-        </div>
-      </div>
-    </div>
 
+        <!-- Detailed Results -->
+        <div class="columns is-centered">
+          <div class="column is-10">
+            <div class="tabs is-centered is-boxed" id="results-tabs">
+              <ul>
+                <li class="is-active" data-target="automated-results">
+                  <a>
+                    <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                    <span>Performance Analysis</span>
+                  </a>
+                </li>
+                <li data-target="human-study">
+                  <a>
+                    <span class="icon"><i class="fas fa-clipboard-check"></i></span>
+                    <span>End-to-end User Study</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-    <!-- Video presentation -->
-    <section class="hero is-small is-light">
-      <div class="hero-body">
-        <div class="container">
-          <div class="columns is-centered has-text-centered">
-            <h2 class="title is-3">Demo Video Presentation</h2>
-          </div>
-          <div class="columns is-centered has-text-centered">
-            <div class="column is-four-fifths">
-              <div class="publication-video">
-                <iframe src="https://www.youtube.com/embed/vTdtGZop-Zc" frameborder="0"
-                  allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <div class="tab-content">
+              <!-- Automated Results Tab -->
+              <div id="automated-results" class="tab-pane is-active">
+                <div class="box">
+                  <img src="static/images/automated-results.png" alt="LLM-based Automated Evaluation" class="mb-4"/>
+                  <div class="content">
+                    <h5 class="title is-5">Key Performance Highlights:</h5>
+                    <div class="columns">
+                      <div class="column">
+                        <p class="has-text-weight-bold">Skill Identification</p>
+                        <ul>
+                          <li>High accuracy in goal-to-skill mapping</li>
+                          <li>Effective gap analysis</li>
+                        </ul>
+                      </div>
+                      <div class="column">
+                        <p class="has-text-weight-bold">Learning Path Quality</p>
+                        <ul>
+                          <li>Optimal progression structure</li>
+                          <li>Strong learner engagement</li>
+                        </ul>
+                      </div>
+                      <div class="column">
+                        <p class="has-text-weight-bold">Content Generation</p>
+                        <ul>
+                          <li>High relevance to goals</li>
+                          <li>Effective personalization</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Human Study Tab -->
+              <div id="human-study" class="tab-pane">
+                <div class="box">
+                  <img src="static/images/questionnaire-results.png" alt="End-to-end Questionnaire Results" class="mb-4"/>
+                  <div class="content">
+                    <h5 class="title is-5">User Study Insights:</h5>
+                    <div class="columns">
+                      <div class="column">
+                        <p class="has-text-weight-bold">Learning Experience</p>
+                        <ul>
+                          <li>Clear learning guidance</li>
+                          <li>Improved goal achievement</li>
+                        </ul>
+                      </div>
+                      <div class="column">
+                        <p class="has-text-weight-bold">System Design</p>
+                        <ul>
+                          <li>Intuitive interface</li>
+                          <li>High user satisfaction</li>
+                        </ul>
+                      </div>
+                      <div class="column">
+                        <p class="has-text-weight-bold">Professional Impact</p>
+                        <ul>
+                          <li>Enhanced skill acquisition</li>
+                          <li>Efficient goal completion</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
 
-    <!-- Paper poster -->
-    <!-- <section class="hero is-small is-light">
+  <!-- Video presentation -->
+  <section class="hero is-small is-light" id="demo">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">Demo Video Presentation</h2>
+        </div>
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <div class="publication-video">
+              <iframe src="https://www.youtube.com/embed/vTdtGZop-Zc" frameborder="0"
+                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Paper poster -->
+  <!-- <section class="hero is-small is-light">
     <div class="hero-body">
       <div class="container">
         <h2 class="title">Poster</h2>
@@ -427,39 +765,39 @@
   </section> -->
 
 
-    <!-- BibTex citation -->
+  <!-- BibTex citation -->
 
-    <section class="section" id="BibTeX">
-      <div class="container is-max-desktop content">
-        <h2 class="title">BibTeX</h2>
-        <pre><code>@inproceedings{www2025genmentor,
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@inproceedings{www2025genmentor,
   title={LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System},
   author={Tianfu Wang, Yi Zhan, Jianxun Lian, Zhengyu Hu, Nicholas Jing Yuan, Qi Zhang, Xing Xie, Hui Xiong},
   booktitle={ACM Web Conference},
   year={2025}
 }</code></pre>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="columns is-centered">
-          <div class="column is-8">
-            <div class="content">
-              <p>
-                This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-                  target="_blank">Academic
-                  Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io"
-                  target="_blank">Nerfies</a> project page.
-                <br> <br> This website is licensed under a <a rel="license"
-                  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
-                  Commons Attribution-ShareAlike 4.0 International License</a>.
-              </p>
-            </div>
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+                target="_blank">Academic
+                Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io"
+                target="_blank">Nerfies</a> project page.
+              <br> <br> This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
           </div>
         </div>
       </div>
-    </footer>
+    </div>
+  </footer>
 
 </body>
 
