@@ -1,11 +1,21 @@
-# GenMentor: LLM-powered & Goal-oriented Tutor
-
 <div align="center">
-  <a href="https://www.tianfuwang.tech/gen-mentor">🏠 Homepage</a> &nbsp&nbsp|&nbsp&nbsp
-  <a href="https://arxiv.org/pdf/2501.15749">📄 Paper</a> &nbsp&nbsp|&nbsp&nbsp
-  <a href="https://gen-mentor.streamlit.app/">🌐 Web Demo</a> &nbsp&nbsp|&nbsp&nbsp
-  <a href="https://youtu.be/vTdtGZop-Zc">🎥 Video Preview</a>
+  <p align="center">
+    <img src="resources/logo.png" alt="GenMentor Logo" width="200"/>
+  </p>
+  <p><em>LLM-powered & Goal-oriented Tutoring System</em></p>
+
+  <p>
+    <a href="https://www.tianfuwang.tech/gen-mentor">Website</a> &nbsp;·&nbsp;
+    <a href="https://arxiv.org/pdf/2501.15749">Paper</a> &nbsp;·&nbsp;
+    <a href="https://gen-mentor.streamlit.app/">Demo</a> &nbsp;·&nbsp;
+    <a href="https://youtu.be/vTdtGZop-Zc">Video</a>
+  </p>
 </div>
+
+---
+
+> [!IMPORTANT]  
+> :sparkles: Welcome to access the [GenMentor website](https://www.tianfuwang.tech/gen-mentor) to learn more about our work!
 
 These are the supplementary resources of our paper "LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System", accepted by WWW 2025 (Industry Track) as an Oral Presentation.
 
@@ -20,7 +30,7 @@ Welcome to explore the demo version of the GenMentor web application:
 
 [GenMentor Web App](https://gen-mentor.streamlit.app/)
 
-This interactive demo showcases GenMentor’s core functionalities, including:
+This interactive demo showcases GenMentor's core functionalities, including:
 
 - Skill Gap Identification: Precisely map learner goals to required skills.
 - Adaptive Learner Modeling: Capture learner progress and preferences.
