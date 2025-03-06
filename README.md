@@ -1,8 +1,8 @@
 <div align="center">
   <p align="center">
-    <img src="resources/logo.png" alt="GenMentor Logo" width="200"/>
+    <img src="resources/logo.png" alt="GenMentor Logo" width="300"/>
   </p>
-  <p><em>LLM-powered & Goal-oriented Tutoring System</em></p>
+  <p><b>LLM-powered & Goal-oriented Tutoring System</b></p>
 
   <p>
     <a href="https://www.tianfuwang.tech/gen-mentor">Website</a> &nbsp;·&nbsp;
