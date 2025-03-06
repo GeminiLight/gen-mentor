@@ -267,7 +267,7 @@
   <section class="hero is-small">
     <div class="hero-body">
       <div class="container">
-        <div id="results-carousel" class="carousel results-carousel">
+        <div id="results-carousel" class="carousel results-carousel" data-items="1">
           <div class="item has-text-centered">
             <img src="static/images/genmentor_demo_1.png" alt="Goal & Profile Initialization" width="80%"
               style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
@@ -633,7 +633,7 @@
 
 
   <!-- Experiments Results -->
-  <section class="hero is-small is-gary" id="results">
+  <section class="hero is-small is-light" id="results">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-centered has-text-centered">
@@ -798,6 +798,18 @@
       </div>
     </div>
   </footer>
+
+  <!-- Add carousel initialization script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      bulmaCarousel.attach('#results-carousel', {
+        slidesToScroll: 1,
+        slidesToShow: 1,
+        centered: true,
+        loop: true
+      });
+    });
+  </script>
 
 </body>
 
