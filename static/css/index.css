@@ -4,6 +4,21 @@ body {
 }
 
 
+.gradient-text {
+  background: linear-gradient(90deg, #9333ea, #3b82f6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Ensure gradient text works in different browsers */
+@supports not (background-clip: text) {
+  .gradient-text {
+    color: #3b82f6;
+  }
+}
+
 .footer .icon-link {
     font-size: 25px;
     color: #000;
@@ -30,6 +45,32 @@ body {
 
 
 .publication-title {
+  font-family: 'Google Sans', sans-serif;
+  text-align: center;
+}
+
+.title-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.title-logo {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.title-main span {
+  font-weight: 700;
+  font-size: 4.5rem !important;
+  line-height: 1;
+}
+
+.title-subtitle {
+  font-weight: 500;
+  color: #4a4a4a;
+  margin-top: 1rem;
 }
 
 .publication-banner {
@@ -46,10 +87,6 @@ body {
 }
 
 .publication-header .hero-body {
-}
-
-.publication-title {
-    font-family: 'Google Sans', sans-serif;
 }
 
 .publication-authors {
@@ -718,6 +755,23 @@ section {
   
   #framework .tabs.is-boxed li a {
     padding: 0.5rem 1rem;
+  }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .title-logo {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .title-main span {
+    font-size: 3rem !important;
+  }
+  
+  .title-subtitle {
+    font-size: 1.5rem !important;
+    margin-top: 0.75rem;
   }
 }
 
