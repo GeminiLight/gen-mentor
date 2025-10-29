@@ -1,4 +1,4 @@
-# GenMentor
+# Backend of GenMentor
 
 GenMentor is an AI-powered personalized learning platform that creates adaptive learning experiences tailored to individual learners' needs, skill gaps, and goals. The system combines advanced AI technologies including Large Language Models, Retrieval-Augmented Generation (RAG), and intelligent tutoring systems to deliver comprehensive educational content.
 
@@ -43,12 +43,9 @@ The system is built with a modular architecture consisting of:
 ### Installation
 
 ```bash
-# Create and activate virtual environment
-conda create -n gen-mentor python=3.12
-conda activate gen-mentor
-
-# Install dependencies
-pip install -r requirements.txt
+uv venv
+source .venv/bin/activate  # on Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
 ```
 
 ### Running the Application
@@ -294,20 +291,6 @@ Run with specific config:
 ```bash
 python main.py --config-name=prod
 ```
-
-### API Rate Limiting and Performance
-
-**For production deployments, consider:**
-- Setting up API key rotation for multiple providers
-- Implementing request queuing for high-traffic scenarios
-- Using caching for frequently accessed content
-- Monitoring API usage and costs per provider
-
-**Performance Tips:**
-- Use `temperature: 0` for consistent educational content
-- Enable `allow_parallel: true` for faster content generation
-- Adjust `max_workers` based on your hardware capabilities
-- Use local models (Ollama) for development to reduce API costs
 
 ### RAG and Search Configuration
 

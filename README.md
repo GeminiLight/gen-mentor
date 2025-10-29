@@ -13,6 +13,8 @@
 
 </div>
 
+---
+
 > [!IMPORTANT]  
 > :sparkles: Welcome to visit the [GenMentor website](https://www.tianfuwang.tech/gen-mentor) to learn more about our work!
 
@@ -38,7 +40,7 @@ Here, we briefly describe how to set up and run the GenMentor system locally. Pl
 
 ```bash
 cd backend
-python -m venv .venv
+uv venv
 source .venv/bin/activate  # on Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
 ```
@@ -47,7 +49,7 @@ uv pip install -r requirements.txt
 
 ```bash
 cd frontend
-python -m venv .venv
+uv venv
 source .venv/bin/activate  # on Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
 ```
@@ -88,7 +90,7 @@ backend_endpoint = "http://127.0.0.1:5000/"
 ### ▶️ Running Locally
 
 > [!NOTE]
->  The default ports are 5000 for backend, 8501 for frontend by default
+> The default ports are 5000 for backend, 8501 for frontend by default
 
 *Option A*: Manual (preferred when using separate venvs)
 

@@ -1,23 +1,22 @@
-# GenMentor Frontend (Streamlit)
+# Frontend of GenMentor
 
 A Streamlit-based UI for GenMentor that guides learners through onboarding, goal refinement, skill-gaps analysis, learning-path scheduling, and in-session knowledge documents with quizzes. It talks to the Python backend over simple HTTP endpoints and can also run in a mock/offline mode using sample JSONs.
 
 ## Quick start
 
-Requirements:
-
-- Python 3.9+ (tested with 3.10/3.11)
-- pip
-
-Install and run:
+Installation
 
 ```bash
 # from repository root or this folder
 cd frontend
-python -m venv .venv
+uv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
+```
 
+Then launch the app:
+
+```bash
 # Option A: run against a live backend (default)
 #   Make sure the backend server is up (see ../backend)
 streamlit run main.py
