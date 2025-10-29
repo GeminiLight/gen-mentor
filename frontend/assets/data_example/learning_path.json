@@ -1,0 +1,46 @@
+{
+    "learning_path": [
+        {
+            "id": "Session 1",
+            "title": "Introduction to HRIS Management",
+            "abstract": "This session introduces the basics of HRIS systems, focusing on their role in HR management.",
+            "if_learned": false,
+            "associated_skills": ["HRIS Management"],
+            "knowledge_points": [
+                {
+                    "name": "Understanding HRIS Systems",
+                    "complexity_level": "beginner"
+                },
+                {
+                    "name": "Components of HRIS",
+                    "complexity_level": "beginner"
+                },
+                {
+                    "name": "Benefits of HRIS",
+                    "complexity_level": "beginner"
+                }
+            ]
+        },
+        {
+            "id": "Session 2",
+            "title": "Advanced Employee Relations",
+            "abstract": "Explore advanced strategies for managing employee relations effectively.",
+            "if_learned": false,
+            "associated_skills": ["Employee Relations"],
+            "knowledge_points": [
+                {
+                    "name": "Conflict Resolution Techniques",
+                    "complexity_level": "intermediate"
+                },
+                {
+                    "name": "Building Employee Trust",
+                    "complexity_level": "intermediate"
+                },
+                {
+                    "name": "Effective Communication in Employee Relations",
+                    "complexity_level": "intermediate"
+                }
+            ]
+        }
+    ]
+}

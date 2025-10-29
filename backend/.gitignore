@@ -1,0 +1,8 @@
+# ignore all caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+data/

@@ -1,0 +1,12 @@
+# Hydra entrypoint config that composes the default application settings
+defaults:
+  - default
+  - _self_
+
+debug: true
+log_level: DEBUG
+
+# Optionally, override server settings here
+server:
+  host: 127.0.0.1
+  port: 5000

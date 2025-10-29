@@ -1,0 +1,34 @@
+# Global application configuration (OmegaConf)
+# Default values only; no environment interpolation or API keys included.
+
+environment: dev
+debug: true
+log_level: INFO
+
+llm:
+  provider: deepseek
+  model_name: deepseek-chat
+  base_url: null
+
+embedding:
+  provider: huggingface
+  model_name: sentence-transformers/all-mpnet-base-v2
+
+search:
+  provider: duckduckgo
+  max_results: 5
+  loader_type: web
+
+vectorstore:
+  persist_directory: data/vectorstore
+  collection_name: genmentor
+
+rag:
+  chunk_size: 1000
+  num_retrieval_results: 5
+  allow_parallel: true
+  max_workers: 3
+
+server:
+  host: 127.0.0.1
+  port: 5000

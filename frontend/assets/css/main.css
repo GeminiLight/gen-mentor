@@ -1,0 +1,106 @@
+:root {
+    --primary: #007bff;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --white: #fff;
+    --black: #000;
+    --gray: #22222200;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    color: #007bff !important;
+}
+
+section[data-testid='stSidebar'] {
+    background-color: var(--light);
+}
+
+a[data-testid="stSidebarNavLink"] {
+    font-size: 18px; 
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    list-style-type: none;
+    margin-bottom: 10px;
+    padding-left: 30px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    color: #343a40;
+}
+
+a[data-testid="stSidebarNavLink"] span:nth-of-type(2) {
+    font-size: 18px;
+    margin-left: 10px;
+    /* font-weight: normal; */
+}
+
+[data-testid="stSidebarNav"] [data-testid="stIconMaterial"] {
+    font-size: 20px !important;
+    font-weight: normal;
+}
+
+[data-testid="stSidebar"] header {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary);
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    /* border: 2px solid #e74c3c; */
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* stMainBlockContainer */
+div[data-testid="stMainBlockContainer"] {
+    padding-top: 10px !important;
+    padding-bottom: 50px !important;
+    /* background-color: var(--light); */
+    /* border-radius: 8px; */
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+}
+
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdown"] a {
+    text-decoration: none; 
+    color: #1a73e8;  
+    transition: color 0.3s ease, box-shadow 0.3s ease;;  
+}
+
+/* [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdown"] a:hover {
+    color: #d32f2f;
+} */
+
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdown"] a:focus,
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdown"] a:active {
+    /* color: black;  */
+    outline: none;  
+}
+
+
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdown"] p {
+    border-radius: 8px;
+    font-weight: normal;
+    color: #333333;
+    margin: -20px 0px 1rem;
+    padding: 8px 16px;
+}
+
+[data-testid="stSidebarUserContent"] [data-testid="stMarkdown"] p:hover {
+    background-color: #f0f2f5;
+}
+
+[data-testid="stSidebarUserContent"] [data-testid="stMarkdown"] p:focus,
+[data-testid="stSidebarUserContent"] [data-testid="stMarkdown"] p:active {
+    background-color: #e9edf5;
+}

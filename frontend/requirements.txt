@@ -1,0 +1,15 @@
+streamlit==1.40.0
+streamlit-card
+streamlit-chat
+streamlit-extras
+streamlit-tags
+st-pages==0.4.5
+streamlit-float==0.3.5
+streamlit-option-menu
+streamlit-on-Hover-tabs
+markdown
+unidecode
+extra-streamlit-components==0.1.60
+deprecation==2.1.0
+pdfplumber
+httpx

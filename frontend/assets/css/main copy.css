@@ -1,0 +1,117 @@
+:root {
+    --primary: #007bff;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --white: #fff;
+    --black: #000;
+    --gray: #22222200;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    color: #007bff !important;
+}
+
+
+
+/* section[data-testid='stSidebar'] {
+    background-color: var(--light);
+} */
+
+/* a[data-testid="stSidebarNavLink"] {
+    font-size: 18px; 
+    font-family: Avenir, Helvetica, Arial, sans-serif; 
+    list-style-type: none;
+    margin-bottom: 10px;
+    padding-left: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #343a40;
+} */
+
+/* a[data-testid="stSidebarNavLink"]:hover,
+a[data-testid="stSidebarNavLink"]:focus, 
+a[data-testid="stSidebarNavLink"]:visited  {
+    background-color: var(--primary);
+    color: #ffffff  !important;
+    font-weight: bold
+} */
+
+/* a[data-testid="stSidebarNavLink"] span {
+    color: #343a40 !important;
+    font-weight: normal;
+} */
+
+/* a[data-testid="stSidebarNavLink"]:hover span,
+a[data-testid="stSidebarNavLink"]:visited span,
+a[data-testid="stSidebarNavLink"]:focus span {
+    background-color: var(--primary);
+    color: #ffffff !important;
+    font-weight: bold
+} */
+
+/* 
+[data-testid="stSidebarNav"] [data-testid="stIconMaterial"] {
+    font-size: 18px !important;
+    margin-right: 50x !important;
+} */
+
+/* Style the sidebar background */
+section[data-testid='stSidebar'] {
+    background-color: var(--light);
+    /* flex-shrink: unset !important; */
+}
+
+/* Style sidebar navigation links */
+a[data-testid="stSidebarNavLink"] {
+    font-size: 18px; 
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    list-style-type: none;
+    margin-bottom: 10px;
+    padding-left: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #343a40; /* Default text color */
+    text-decoration: none; /* Removes underline from links */
+}
+
+/* Hover, focus, and visited states for navigation links */
+a[data-testid="stSidebarNavLink"]:hover,
+a[data-testid="stSidebarNavLink"]:focus,
+a[data-testid="stSidebarNavLink"]:active
+/* a[data-testid="stSidebarNavLink"]:visited  */
+{
+    background-color: var(--primary);
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+/* Icon styling within the sidebar navigation */
+[data-testid="stSidebarNav"] [data-testid="stIconMaterial"] {
+    color: #343a40 !important;
+    font-size: 18px !important; /* Consistent icon size */
+    margin-right: 10px !important; /* Proper spacing between icon and text */
+    /* Removed unnecessary or conflicting styles */
+}
+
+/* Optional: Reset link styling for span elements (if you need individual span control) */
+a[data-testid="stSidebarNavLink"] span {
+    color: #343a40 !important;
+    font-weight: normal;
+}
+
+/* Optional: Hover styling for span elements within links */
+a[data-testid="stSidebarNavLink"]:hover span,
+a[data-testid="stSidebarNavLink"]:focus span,
+a[data-testid="stSidebarNavLink"]:active span
+/* a[data-testid="stSidebarNavLink"]:visited span  */
+{
+    background-color: var(--primary);
+    color: #ffffff !important;
+    font-weight: bold;
+}

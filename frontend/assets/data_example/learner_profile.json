@@ -1,0 +1,63 @@
+{
+    "learner_profile": {
+        "learner_information": "The learner has an MBA from Bharathiar University and a BE from PA College of Engineering and Technology. They have experience in administration and client service in the garment industry, with skills in Microsoft Dynamics AX and MS Office.",
+        "learning_goal": "To become a Human Resources Manager at Albert Hotel, focusing on HRIS management, employee relations, recruitment, training, compliance, and payroll processing.",
+        "cognitive_status": {
+            "overall_progress": 20,
+            "mastered_skills": [
+                {
+                    "name": "Communication Skills",
+                    "proficiency_level": "advanced"
+                },
+                {
+                    "name": "Organizational Skills",
+                    "proficiency_level": "intermediate"
+                }
+            ],
+            "in_progress_skills": [
+                {
+                    "name": "HRIS Management",
+                    "required_proficiency_level": "intermediate",
+                    "current_proficiency_level": "unlearned"
+                },
+                {
+                    "name": "Employee Relations",
+                    "required_proficiency_level": "advanced",
+                    "current_proficiency_level": "beginner"
+                },
+                {
+                    "name": "Recruitment and Hiring",
+                    "required_proficiency_level": "advanced",
+                    "current_proficiency_level": "beginner"
+                },
+                {
+                    "name": "Training and Development",
+                    "required_proficiency_level": "intermediate",
+                    "current_proficiency_level": "unlearned"
+                },
+                {
+                    "name": "Compliance Management",
+                    "required_proficiency_level": "advanced",
+                    "current_proficiency_level": "unlearned"
+                },
+                {
+                    "name": "Payroll Processing",
+                    "required_proficiency_level": "intermediate",
+                    "current_proficiency_level": "unlearned"
+                }
+            ],
+            "additional_notes": "The learner has a strong foundation in communication and organizational skills."
+        },
+        "learning_preferences": {
+            "content_style": "Detailed explanations",
+            "activity_type": "Reading-based learning",
+            "additional_notes": "The learner has a strong foundation in communication and organizational skills."
+        },
+        "behavioral_patterns": {
+            "system_usage_frequency": "Average of 2 logins per week",
+            "session_duration_engagement": "Sessions average 20 minutes; moderate engagement in reading tasks",
+            "motivational_triggers": "Triggered motivational message due to low engagement in interactive tasks",
+            "additional_notes": "Prefers to learn at their own pace"
+        }
+    }
+}
