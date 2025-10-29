@@ -10,28 +10,136 @@
     <a href="https://gen-mentor.streamlit.app/">Demo</a> &nbsp;·&nbsp;
     <a href="https://youtu.be/vTdtGZop-Zc">Video</a>
   </p>
-</div>
 
----
+</div>
 
 > [!IMPORTANT]  
 > :sparkles: Welcome to visit the [GenMentor website](https://www.tianfuwang.tech/gen-mentor) to learn more about our work!
 
-These are the supplementary resources of our paper "LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System", accepted by WWW 2025 (Industry Track) as an Oral Presentation.
+This is official code of our paper "*LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System*", accepted by **WWW 2025 (Industry Track) as an Oral Presentation**.
 
 In this paper, we propose GenMentor, a large language model (LLM)-powered multi-agent framework designed for goal-oriented learning in Intelligent Tutoring Systems (ITS). This framework emphasizes personalization, adaptive learning, and goal-aligned content delivery, making it a robust solution for professional and lifelong learning scenarios.
 
-> [!NOTE]  
-> We will release more available resources (code and data) in future updates, which are still under the internal review process of Microsoft. Stay tuned!
+**🤖 Key Agent Modules**
+
+- 🧭 `Skill Gap Identifier`: Analyzes learner's current knowledge to identify gaps.
+- 👤 `Adaptive Learner Modeler`: Builds and updates learner profiles based on interactions.
+- 🗓️ `Learning Path Scheduler`: Creates personalized learning paths and schedules.
+- 📝 `Tailored Content Generator`: Produces customized learning materials and assessments.
+- 🧑‍🏫 `AI Chatbot Tutor`: Engages learners in dialogue, answering questions and providing support.
+
+## 🚀 Quick start
+
+Here, we briefly describe how to set up and run the GenMentor system locally. Please see more details in the respective `backend/` and `frontend/` directories.
+
+### 🛠️ Installation
+
+1. Backend environment setup
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # on Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
+```
+
+2. Frontend environment setup
+
+```bash
+cd frontend
+python -m venv .venv
+source .venv/bin/activate  # on Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
+```
+
+### ⚙️ Configuration
+
+1. Configure LLM secrets (at least one) for backend
+
+*Option A*: update a `.env` file in `backend/`
+
+```plaintext
+# Example for OpenAI:
+OPENAI_API_KEY="your-openai-api-key"
+
+# Example for DeepSeek:
+DEEPSEEK_API_KEY="your-deepseek-api-key"
+```
+
+*Option B*: export environment variables in your shell
+
+```bash
+# Example for OpenAI:
+export OPENAI_API_KEY="your-openai-api-key"
+
+# Example for DeepSeek:
+export DEEPSEEK_API_KEY="your-deepseek-api-key"
+DEEPSEEK_API_KEY="your-deepseek-api-key"
+```
+
+2. Configure api endpoint for frontend
+
+If you would like to run the backend on a different host/port, please update the API URL in `frontend/config.py`:
+
+```python
+backend_endpoint = "http://127.0.0.1:5000/"
+```
+
+### ▶️ Running Locally
+
+> [!NOTE]
+>  The default ports are 5000 for backend, 8501 for frontend by default
+
+*Option A*: Manual (preferred when using separate venvs)
+
+```bash
+# start backend
+cd backend
+source .venv/bin/activate  # on Windows: .venv\Scripts\activate
+uvicorn main:app --reload --port 5000
+```
+
+```bash
+# start frontend
+cd frontend
+source .venv/bin/activate  # on Windows: .venv\Scripts\activate
+streamlit run main.py --server.port 8501
+```
+
+*Option B*: Helper scripts (single shell; assumes uvicorn/streamlit on PATH)
+
+```bash
+# start backend
+bash ./scripts/start_backend.sh [PORT]
+
+# start frontend
+bash ./scripts/start_frontend.sh [PORT]
+
+# stop all
+bash ./scripts/stop_all.sh
+```
+
+### 🌐 Accessing the App
+
+Finally, you can access:
+
+- Backend API: http://127.0.0.1:5000/
+- Frontend UI: http://127.0.0.1:8501/
+
+## 🗂️ Repository layout
+
+```plain
+backend/     # FastAPI service, Hydra config, LangChain/RAG
+frontend/    # Streamlit app (multi-page UI)
+scripts/     # Start/stop helpers for local dev
+resources/   # Assets and misc resources
+```
 
 ## 🚀 Demo Version of Web Application
 
 Welcome to explore the demo version of the GenMentor web application:
 
 [GenMentor Web App](https://gen-mentor.streamlit.app/)
-
-> [!Note]
-> Due to Microsoft's policy, please click [here](mailto:tianfuwang.cs@gmail.com) to send an email to join the whitelist of the GenMentor demo.
 
 This interactive demo showcases GenMentor's core functionalities, including:
 
@@ -43,16 +151,9 @@ You could also watch the demo video for a quick overview (click the image below)
 
 [![Video Preview](https://img.youtube.com/vi/vTdtGZop-Zc/0.jpg)](https://youtu.be/vTdtGZop-Zc)
 
-## 🤖 Agent Prompts
+## 📚 Citation
 
-- Skill Gap Identifier (`prompts/skill_gap_identification`)
-- Adaptive Learner Modeler (`prompts/adaptive_learner_modeling`)
-- Learning Path Scheduler (`prompts/learning_path_scheduling`)
-- Tailored Content Generator (`prompts/tailored_content_creation`)
-
-## Citation
-
-```
+```bibtex
 @inproceedings{wang2025llm,
   title={LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System},
   author={Wang, Tianfu and Zhan, Yi and Lian, Jianxun and Hu, Zhengyu and Yuan, Nicholas Jing and Zhang, Qi and Xie, Xing and Xiong, Hui},
