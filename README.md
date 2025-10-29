@@ -128,15 +128,6 @@ Finally, you can access:
 - Backend API: http://127.0.0.1:5000/
 - Frontend UI: http://127.0.0.1:8501/
 
-## 🗂️ Repository layout
-
-```plain
-backend/     # FastAPI service, Hydra config, LangChain/RAG
-frontend/    # Streamlit app (multi-page UI)
-scripts/     # Start/stop helpers for local dev
-resources/   # Assets and misc resources
-```
-
 ## 🚀 Demo Version of Web Application
 
 Welcome to explore the demo version of the GenMentor web application:
