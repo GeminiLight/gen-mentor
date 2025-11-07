@@ -49,10 +49,10 @@ def get_available_models(backend_endpoint):
         if response.status_code == 200:
             return response.json().get("models", [])
         else:
-            st.write("Failed to fetch available models. Status code:", response.status_code)
+            # st.write("Failed to fetch available models. Status code:", response.status_code)
             return []
     except Exception as e:
-        st.write("Failed to fetch available models. Error:", e)
+        # st.write("Failed to fetch available models. Error:", e)
         return []
 
 def chat_with_tutor(chat_messages, learner_profile, llm_type="gpt4o", method_name="genmentor"):

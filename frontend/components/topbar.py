@@ -42,6 +42,8 @@ def render_topbar():
             model_id_list = [f"{m['model_provider']}/{m['model_name']}" for m in models]
             st.session_state["available_models"] = model_id_list
             backend_ok = True
+            if len(model_id_list) == 0:
+                backend_ok = False
         except Exception:
             backend_ok = False
         if not backend_ok:
@@ -114,6 +116,8 @@ def settings():
             model_id_list = [f"{m['model_provider']}/{m['model_name']}" for m in models]
             if len(model_id_list) > 0:
                 is_valid_backend = True
+            else:
+                is_valid_backend = False
         except Exception as e:
             is_valid_backend = False
         if_check_api = False
@@ -129,5 +133,6 @@ def settings():
             st.error(f"Failed to save settings: {e}")
 
     if not is_valid_backend:
-        st.info("Please enter a valid backend endpoint...")
-
+        st.warning("Backend endpoint not reachable or invalid.")
+        st.info("Ensure the GenMentor backend API is running and the endpoint is correct, including protocol and port (e.g., http://127.0.0.1:5000/).")
+        st.info("Please refer to the [GenMentor Backend Setup Instructions](https://github.com/GeminiLight/gen-mentor/blob/main/backend/README.md) for more details on how to set up and run the backend service.")
