@@ -15,4 +15,4 @@ backend/.env
 backend/data/
 
 pids/
-logs/
+.DS_Store
