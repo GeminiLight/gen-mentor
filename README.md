@@ -22,7 +22,31 @@ This is official code of our paper "*LLM-powered Multi-agent Framework for Goal-
 
 In this paper, we propose GenMentor, a large language model (LLM)-powered multi-agent framework designed for goal-oriented learning in Intelligent Tutoring Systems (ITS). This framework emphasizes personalization, adaptive learning, and goal-aligned content delivery, making it a robust solution for professional and lifelong learning scenarios.
 
+
+## 🏫 ITS Paradigm Comparison
+
+<div align="center">
+  <p align="center">
+    <img src="resources/its-paradigms.png" alt="GenMentor Overview" width="500" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px;"/>
+  </p>
+</div>
+
+| Paradigm | Typical characteristics | Primary focus |
+|---|---|---|
+| 🏫 Traditional MOOC | Static syllabus; pre-recorded lectures; fragmented learning | Broad access, low personalization |
+| 🤖 Chatbot ITS | Reactive Q&A; rule/LLM-driven; session-based help | Instant support, limited long-term adaptation |
+| 🎯 Goal-oriented ITS | Proactive planning; personalized paths; goal-aligned assessments | Targeted skill acquisition, continual adaptation |
+
+
+
+
 **🤖 Key Agent Modules**
+
+<div align="center">
+  <p align="center">
+    <img src="resources/genmentor-framework.png" alt="GenMentor Overview" width="700" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px;"/>
+  </p>
+</div>
 
 - 🧭 `Skill Gap Identifier`: Analyzes learner's current knowledge to identify gaps.
 - 👤 `Adaptive Learner Modeler`: Builds and updates learner profiles based on interactions.
