@@ -32,7 +32,7 @@ def render_learning_path():
     """, unsafe_allow_html=True)
     if not goal["learning_path"]:
         with st.spinner('Scheduling Learning Path ...'):
-            goal["learning_path"] = schedule_learning_path(goal["learner_profile"], session_count=8)
+            goal["learning_path"] = schedule_learning_path(goal["learner_profile"], session_count=8, llm_type=st.session_state["llm_type"])
             save_persistent_state()
             st.toast("🎉 Successfully schedule learning path!")
             st.rerun()
@@ -73,25 +73,16 @@ def render_learning_sessions(goal):
         st.info("Customize your learning path by re-scheduling sessions or marking them as complete.")
         expected_session_count = st.number_input("Expected Sessions", min_value=0, max_value=10, value=total_sessions)
         st.session_state["expected_session_count"] = expected_session_count
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
         if st.button("Re-schedule Learning Path", type="primary"):
             st.session_state["if_rescheduling_learning_path"] = True
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.rerun()
         if st.session_state.get("if_rescheduling_learning_path"):
             with st.spinner('Re-scheduling Learning Path ...'):
-                goal["learning_path"] = reschedule_learning_path(goal["learning_path"], goal["learner_profile"], expected_session_count)
+                goal["learning_path"] = reschedule_learning_path(goal["learning_path"], goal["learner_profile"], expected_session_count, llm_type=st.session_state["llm_type"])
                 st.session_state["if_rescheduling_learning_path"] = False
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 st.toast("🎉 Successfully re-schedule learning path!")
                 st.rerun()
     save_persistent_state()

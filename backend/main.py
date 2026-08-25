@@ -1,27 +1,45 @@
-import ast
-import json
-import time
+"""HTTP API for the GenMentor tutoring system.
+
+Every endpoint is a thin adapter: resolve the LLM for the request, hand the
+already-parsed payload to the corresponding agent module, return its result.
+Payload deserialisation lives in :mod:`api_schemas` (see ``JsonLike``), so no
+endpoint parses strings itself.
+"""
+
+from __future__ import annotations
+
+import logging
+import os
+import threading
+from pathlib import Path
+from typing import Any, Optional
+
 import uvicorn
-import hydra
-from omegaconf import DictConfig, OmegaConf
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, HTTPException, File, UploadFile, Form
+
+from api_schemas import *  # noqa: F403  (request models)
 from base.llm_factory import LLMFactory
-from base.searcher_factory import SearchRunner
 from base.search_rag import SearchRagManager
-from utils.preprocess import extract_text_from_pdf
-from fastapi.responses import JSONResponse
-from modules.skill_gap_identification import *
-from modules.adaptive_learner_modeling import *
-from modules.personalized_resource_delivery import *
-from modules.ai_chatbot_tutor import chat_with_tutor_with_llm
-from api_schemas import *
 from config import load_config
+from modules.adaptive_learner_modeling import *  # noqa: F403
+from modules.ai_chatbot_tutor import chat_with_tutor_with_llm
+from modules.personalized_resource_delivery import *  # noqa: F403
+from modules.skill_gap_identification import *  # noqa: F403
+from utils.preprocess import extract_text_from_pdf
 
 app_config = load_config(config_name="main")
-search_rag_manager = SearchRagManager.from_config(app_config)
 
-app = FastAPI()
+logging.basicConfig(level=str(app_config.get("log_level", "INFO")).upper())
+logger = logging.getLogger(__name__)
+
+# Directory for uploaded CVs. Overridable so a deployment can point it at a
+# volume; defaults to a repo-relative path so the app runs on a fresh checkout.
+UPLOAD_LOCATION = Path(
+    os.getenv("GENMENTOR_UPLOAD_DIR", Path(__file__).resolve().parent / "data" / "uploads")
+).resolve()
+
+app = FastAPI(title="GenMentor API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,310 +48,340 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_llm(model_provider: str | None = None, model_name: str | None = None, **kwargs):
-    model_provider = model_provider or "deepseek"
-    model_name = model_name or "deepseek-chat"
-    return LLMFactory.create(model=model_name, model_provider=model_provider, **kwargs)
+_search_rag_manager: Optional[SearchRagManager] = None
+_search_rag_lock = threading.Lock()
+_search_rag_failed = False
 
-UPLOAD_LOCATION = "/mnt/datadrive/tfwang/code/llm-mentor/data/cv/"
+
+def get_search_rag_manager() -> Optional[SearchRagManager]:
+    """Return the process-wide RAG manager, building it on first use.
+
+    Constructing it downloads/loads a sentence-transformer model and opens the
+    Chroma store, so it is built once and shared -- passing it into the agents
+    is what keeps them from rebuilding one per request. If construction fails
+    (no network on first run, missing model cache) the API stays up and the
+    agents fall back to answering without retrieved context.
+    """
+    global _search_rag_manager, _search_rag_failed
+    if _search_rag_manager is not None or _search_rag_failed:
+        return _search_rag_manager
+    with _search_rag_lock:
+        if _search_rag_manager is None and not _search_rag_failed:
+            try:
+                _search_rag_manager = SearchRagManager.from_config(app_config)
+            except Exception:
+                _search_rag_failed = True
+                logger.exception("Search/RAG unavailable; continuing without retrieval.")
+    return _search_rag_manager
+
+
+def get_llm(request: Optional[BaseRequest] = None, **kwargs: Any):  # noqa: F405
+    """Build the chat model for a request, falling back to the configured default."""
+    llm_config = app_config.get("llm", {})
+    provider = getattr(request, "model_provider", None) or llm_config.get("provider", "deepseek")
+    model_name = getattr(request, "model_name", None) or llm_config.get("model_name", "deepseek-chat")
+    base_url = llm_config.get("base_url")
+    return LLMFactory.create(
+        model=model_name, model_provider=provider, base_url=base_url, **kwargs
+    )
+
+
+def _fail(exc: Exception, what: str) -> HTTPException:
+    """Log the traceback server-side and return a 500 carrying the reason."""
+    logger.exception("%s failed", what)
+    return HTTPException(status_code=500, detail=f"{what} failed: {exc}")
+
+
+def _store_upload(upload: UploadFile, content: bytes) -> Path:
+    """Persist an upload under UPLOAD_LOCATION, rejecting path traversal."""
+    filename = Path(upload.filename or "").name
+    if not filename:
+        raise HTTPException(status_code=400, detail="Uploaded file must have a filename.")
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF uploads are supported.")
+    UPLOAD_LOCATION.mkdir(parents=True, exist_ok=True)
+    destination = (UPLOAD_LOCATION / filename).resolve()
+    if UPLOAD_LOCATION not in destination.parents:
+        raise HTTPException(status_code=400, detail="Invalid filename.")
+    destination.write_bytes(content)
+    return destination
+
+
+def _extract_cv_text(path: Path) -> str:
+    """Extract text from a stored CV, reporting an unreadable file as a 400."""
+    try:
+        return extract_text_from_pdf(str(path))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Could not read PDF {path.name}: {exc}")
+
+
+@app.get("/")
+async def root():
+    return {"service": "GenMentor", "status": "ok"}
+
 
 @app.get("/list-llm-models")
 async def list_llm_models():
-    try:
-        return {"models": [
+    llm_config = app_config.get("llm", {})
+    return {
+        "models": [
             {
-                "model_name": app_config.llm.model_name, 
-                "model_provider": app_config.llm.provider
+                "model_name": llm_config.get("model_name", "deepseek-chat"),
+                "model_provider": llm_config.get("provider", "deepseek"),
             }
-        ]}
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+        ]
+    }
+
 
 @app.post("/chat-with-tutor")
-async def chat_with_autor(request: ChatWithAutorRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    learner_profile = request.learner_profile
+async def chat_with_tutor(request: ChatWithTutorRequest):  # noqa: F405
     try:
-        if isinstance(request.messages, str) and request.messages.strip().startswith("["):
-            converted_messages = ast.literal_eval(request.messages)
-        else:
-            return JSONResponse(status_code=400, content={"detail": "messages must be a JSON array string"})
+        messages = request.message_list
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    try:
         response = chat_with_tutor_with_llm(
-            llm,
-            converted_messages,
-            learner_profile,
-            search_rag_manager=search_rag_manager,
+            get_llm(request),
+            messages,
+            request.learner_profile,
+            search_rag_manager=get_search_rag_manager(),
             use_search=True,
         )
         return {"response": response}
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+    except Exception as exc:
+        raise _fail(exc, "chat-with-tutor")
+
 
 @app.post("/refine-learning-goal")
-async def refine_learning_goal(request: LearningGoalRefinementRequest):
-    llm = get_llm(request.model_provider, request.model_name)
+async def refine_learning_goal(request: LearningGoalRefinementRequest):  # noqa: F405
     try:
-        refined_learning_goal = refine_learning_goal_with_llm(llm, request.learning_goal, request.learner_information)
-        return refined_learning_goal
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+        return refine_learning_goal_with_llm(  # noqa: F405
+            get_llm(request), request.learning_goal, request.learner_information
+        )
+    except Exception as exc:
+        raise _fail(exc, "refine-learning-goal")
+
 
 @app.post("/identify-skill-gap-with-info")
-async def identify_skill_gap_with_info(request: SkillGapIdentificationRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    learning_goal = request.learning_goal
-    learner_information = request.learner_information
+async def identify_skill_gap_with_info(request: SkillGapIdentificationRequest):  # noqa: F405
     skill_requirements = request.skill_requirements
+    if not isinstance(skill_requirements, (dict, list)):
+        skill_requirements = None
     try:
-        if isinstance(skill_requirements, str) and skill_requirements.strip():
-            skill_requirements = ast.literal_eval(skill_requirements)
-        if not isinstance(skill_requirements, dict):
-            skill_requirements = None
-        skill_gaps, skill_requirements = identify_skill_gap_with_llm(
-            llm, learning_goal, learner_information, skill_requirements
+        skill_gaps, skill_requirements = identify_skill_gap_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learning_goal,
+            request.learner_information,
+            skill_requirements,
         )
-        results = {**skill_gaps, **skill_requirements}
-        return results
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+        return {**skill_gaps, **skill_requirements}
+    except Exception as exc:
+        raise _fail(exc, "identify-skill-gap-with-info")
 
 
 @app.post("/identify-skill-gap")
-async def identify_skill_gap(goal: str = Form(...), cv: UploadFile = File(...), model_provider: str = Form("deepseek"), model_name: str = Form("deepseek-chat")):
-    llm = get_llm(model_provider, model_name)
-    mapper = SkillRequirementMapper(llm)
-    skill_gap_identifier = SkillGapIdentifier(llm)
+async def identify_skill_gap(
+    goal: str = Form(...),
+    cv: UploadFile = File(...),
+    model_provider: Optional[str] = Form(None),
+    model_name: Optional[str] = Form(None),
+):
+    """Identify skill gaps from an uploaded CV rather than a pasted profile."""
+    content = await cv.read()
+    file_location = _store_upload(cv, content)
+    cv_text = _extract_cv_text(file_location)
     try:
-        file_location = f"{UPLOAD_LOCATION}{cv.filename}"
-#         with open(file_location, "wb") as file_object:
-#             file_object.write(await cv.read())
-        with open(file_location, "wb") as file_object:
-            file_object.write(await cv.read())
-        # print(file_location)
-        cv_text = extract_text_from_pdf(file_location)  
-        skill_requirements = mapper.map_goal_to_skill({
-            "learning_goal": goal
-        })
-        skill_gaps = skill_gap_identifier.identify_skill_gap({
-            "learning_goal": goal,
-            "skill_requirements": skill_requirements,
-            "learner_information": cv_text
-        })
-        results = {**skill_gaps, **skill_requirements}
-        return results
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+        skill_gaps, skill_requirements = identify_skill_gap_with_llm(  # noqa: F405
+            get_llm(BaseRequest(model_provider=model_provider, model_name=model_name)),  # noqa: F405
+            goal,
+            cv_text,
+        )
+        return {**skill_gaps, **skill_requirements}
+    except Exception as exc:
+        raise _fail(exc, "identify-skill-gap")
+
 
 @app.post("/create-learner-profile-with-info")
-async def create_learner_profile_with_info(request: LearnerProfileInitializationWithInfoRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    learner_information = request.learner_information
-    learning_goal = request.learning_goal
-    skill_gaps = request.skill_gaps
+async def create_learner_profile_with_info(
+    request: LearnerProfileInitializationWithInfoRequest,  # noqa: F405
+):
     try:
-        if isinstance(learner_information, str):
-            try:
-                learner_information = ast.literal_eval(learner_information)
-            except Exception:
-                learner_information = {"raw": learner_information}
-        if isinstance(skill_gaps, str):
-            try:
-                skill_gaps = ast.literal_eval(skill_gaps)
-            except Exception:
-                skill_gaps = {"raw": skill_gaps}
-        learner_profile = initialize_learner_profile_with_llm(
-            llm, learning_goal, learner_information, skill_gaps
+        learner_profile = initialize_learner_profile_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learning_goal,
+            request.learner_information,
+            request.skill_gaps,
         )
         return {"learner_profile": learner_profile}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "create-learner-profile-with-info")
+
 
 @app.post("/create-learner-profile")
-async def create_learner_profile(request: LearnerProfileInitializationRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    file_location = f"{UPLOAD_LOCATION}{request.cv_path}"
-    learner_information = extract_text_from_pdf(file_location)
-    learning_goal = request.learning_goal
-    skill_gaps = request.skill_gaps
+async def create_learner_profile(request: LearnerProfileInitializationRequest):  # noqa: F405
+    """Build a learner profile from a CV previously uploaded to UPLOAD_LOCATION."""
+    cv_name = Path(request.cv_path).name
+    file_location = (UPLOAD_LOCATION / cv_name).resolve()
+    if UPLOAD_LOCATION not in file_location.parents or not file_location.is_file():
+        raise HTTPException(status_code=404, detail=f"CV not found: {cv_name}")
     try:
-        if isinstance(skill_gaps, str):
-            try:
-                skill_gaps = ast.literal_eval(skill_gaps)
-            except Exception:
-                skill_gaps = {"raw": skill_gaps}
-        learner_profile = initialize_learner_profile_with_llm(
-            llm, learning_goal, {"raw": learner_information}, skill_gaps
+        learner_information = _extract_cv_text(file_location)
+        learner_profile = initialize_learner_profile_with_llm(  # noqa: F405
+            get_llm(request), request.learning_goal, learner_information, request.skill_gaps
         )
         return {"learner_profile": learner_profile}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "create-learner-profile")
+
 
 @app.post("/update-learner-profile")
-async def update_learner_profile(request: LearnerProfileUpdateRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    learner_profile = request.learner_profile
-    learner_interactions = request.learner_interactions
-    learner_information = request.learner_information
-    session_information = request.session_information
+async def update_learner_profile(request: LearnerProfileUpdateRequest):  # noqa: F405
     try:
-        for name in ("learner_profile", "learner_interactions", "learner_information", "session_information"):
-            val = locals()[name]
-            if isinstance(val, str) and val.strip():
-                try:
-                    locals()[name] = ast.literal_eval(val)
-                except Exception:
-                    if name != "session_information":
-                        locals()[name] = {"raw": val}
-        learner_profile = update_learner_profile_with_llm(
-            llm,
-            locals()["learner_profile"],
-            locals()["learner_interactions"],
-            locals()["learner_information"],
-            locals()["session_information"],
+        learner_profile = update_learner_profile_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learner_interactions,
+            request.learner_information,
+            request.session_information,
         )
         return {"learner_profile": learner_profile}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "update-learner-profile")
+
 
 @app.post("/schedule-learning-path")
-async def schedule_learning_path(request: LearningPathSchedulingRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    learner_profile = request.learner_profile
-    session_count = request.session_count
+async def schedule_learning_path(request: LearningPathSchedulingRequest):  # noqa: F405
     try:
-        if isinstance(learner_profile, str) and learner_profile.strip():
-            learner_profile = ast.literal_eval(learner_profile)
-        if not isinstance(learner_profile, dict):
-            learner_profile = {}
-        learning_path = schedule_learning_path_with_llm(llm, learner_profile, session_count)
-        return learning_path
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return schedule_learning_path_with_llm(  # noqa: F405
+            get_llm(request), request.learner_profile, request.session_count
+        )
+    except Exception as exc:
+        raise _fail(exc, "schedule-learning-path")
+
 
 @app.post("/reschedule-learning-path")
-async def reschedule_learning_path(request: LearningPathReschedulingRequest):
-    llm = get_llm(request.model_provider, request.model_name)
-    learner_profile = request.learner_profile
-    learning_path = request.learning_path
-    session_count = request.session_count
-    other_feedback = request.other_feedback
+async def reschedule_learning_path(request: LearningPathReschedulingRequest):  # noqa: F405
     try:
-        if isinstance(learner_profile, str) and learner_profile.strip():
-            learner_profile = ast.literal_eval(learner_profile)
-        if not isinstance(learner_profile, dict):
-            learner_profile = {}
-        if isinstance(learning_path, str) and learning_path.strip():
-            learning_path = ast.literal_eval(learning_path)
-        if isinstance(other_feedback, str) and other_feedback.strip():
-            try:
-                other_feedback = ast.literal_eval(other_feedback)
-            except Exception:
-                pass
-        learning_path = reschedule_learning_path_with_llm(
-            llm, learning_path, learner_profile, session_count, other_feedback
+        return reschedule_learning_path_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learning_path,
+            request.learner_profile,
+            request.session_count,
+            request.other_feedback,
         )
-        return learning_path
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "reschedule-learning-path")
+
 
 @app.post("/explore-knowledge-points")
-async def explore_knowledge_points(request: KnowledgePointExplorationRequest):
-    llm = get_llm()
-    learner_profile = request.learner_profile
-    learning_path = request.learning_path
-    learning_session = request.learning_session
-    if isinstance(learner_profile, str) and learner_profile.strip():
-        learner_profile = ast.literal_eval(learner_profile)
-    if isinstance(learning_path, str) and learning_path.strip():
-        learning_path = ast.literal_eval(learning_path)
-    if isinstance(learning_session, str) and learning_session.strip():
-        learning_session = ast.literal_eval(learning_session)
+async def explore_knowledge_points(request: KnowledgePointExplorationRequest):  # noqa: F405
     try:
-        knowledge_points = explore_knowledge_points_with_llm(llm, learner_profile, learning_path, learning_session)
-        return knowledge_points
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return explore_knowledge_points_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learning_path,
+            request.learning_session,
+        )
+    except Exception as exc:
+        raise _fail(exc, "explore-knowledge-points")
+
 
 @app.post("/draft-knowledge-point")
-async def draft_knowledge_point(request: KnowledgePointDraftingRequest):
-    llm = get_llm()
-    learner_profile = request.learner_profile
-    learning_path = request.learning_path
-    learning_session = request.learning_session
-    knowledge_points = request.knowledge_points
-    knowledge_point = request.knowledge_point
-    use_search = request.use_search
+async def draft_knowledge_point(request: KnowledgePointDraftingRequest):  # noqa: F405
     try:
-        knowledge_draft = draft_knowledge_point_with_llm(llm, learner_profile, learning_path, learning_session, knowledge_points, knowledge_point, use_search)
+        knowledge_draft = draft_knowledge_point_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learning_path,
+            request.learning_session,
+            request.knowledge_points,
+            request.knowledge_point,
+            request.use_search,
+            search_rag_manager=get_search_rag_manager(),
+        )
         return {"knowledge_draft": knowledge_draft}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "draft-knowledge-point")
+
 
 @app.post("/draft-knowledge-points")
-async def draft_knowledge_points(request: KnowledgePointsDraftingRequest):
-    llm = get_llm()
-    learner_profile = request.learner_profile
-    learning_path = request.learning_path
-    learning_session = request.learning_session
-    knowledge_points = request.knowledge_points
-    use_search = request.use_search
-    allow_parallel = request.allow_parallel
+async def draft_knowledge_points(request: KnowledgePointsDraftingRequest):  # noqa: F405
     try:
-        knowledge_drafts = draft_knowledge_points_with_llm(llm, learner_profile, learning_path, learning_session, knowledge_points, allow_parallel, use_search)
+        knowledge_drafts = draft_knowledge_points_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learning_path,
+            request.learning_session,
+            request.knowledge_points,
+            allow_parallel=request.allow_parallel,
+            use_search=request.use_search,
+            max_workers=int(app_config.get("rag", {}).get("max_workers", 3)),
+            search_rag_manager=get_search_rag_manager(),
+        )
         return {"knowledge_drafts": knowledge_drafts}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "draft-knowledge-points")
+
 
 @app.post("/integrate-learning-document")
-async def integrate_learning_document(request: LearningDocumentIntegrationRequest):
-    llm = get_llm()
-    learner_profile = request.learner_profile
-    learning_path = request.learning_path
-    learning_session = request.learning_session
-    knowledge_points = request.knowledge_points
-    knowledge_drafts = request.knowledge_drafts
-    output_markdown = request.output_markdown
+async def integrate_learning_document(request: LearningDocumentIntegrationRequest):  # noqa: F405
     try:
-        learning_document = integrate_learning_document_with_llm(llm, learner_profile, learning_path, learning_session, knowledge_points, knowledge_drafts, output_markdown)
+        learning_document = integrate_learning_document_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learning_path,
+            request.learning_session,
+            request.knowledge_points,
+            request.knowledge_drafts,
+            request.output_markdown,
+        )
         return {"learning_document": learning_document}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "integrate-learning-document")
+
 
 @app.post("/generate-document-quizzes")
-async def generate_document_quizzes(request: KnowledgeQuizGenerationRequest):
-    llm = get_llm()
-    learner_profile = request.learner_profile
-    learning_document = request.learning_document
-    single_choice_count = request.single_choice_count
-    multiple_choice_count = request.multiple_choice_count
-    true_false_count = request.true_false_count
-    short_answer_count = request.short_answer_count
+async def generate_document_quizzes(request: KnowledgeQuizGenerationRequest):  # noqa: F405
     try:
-        document_quiz = generate_document_quizzes_with_llm(llm, learner_profile, learning_document, single_choice_count, multiple_choice_count, true_false_count, short_answer_count)
+        document_quiz = generate_document_quizzes_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learning_document,
+            request.single_choice_count,
+            request.multiple_choice_count,
+            request.true_false_count,
+            request.short_answer_count,
+        )
         return {"document_quiz": document_quiz}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise _fail(exc, "generate-document-quizzes")
+
 
 @app.post("/tailor-knowledge-content")
-async def tailor_knowledge_content(request: TailoredContentGenerationRequest):
-    llm = get_llm()
-    learning_path = request.learning_path
-    learner_profile = request.learner_profile
-    learning_session = request.learning_session
-    use_search = request.use_search
-    allow_parallel = request.allow_parallel
-    with_quiz = request.with_quiz
+async def tailor_knowledge_content(request: TailoredContentGenerationRequest):  # noqa: F405
+    """Run the whole content pipeline (explore -> draft -> integrate -> quiz)."""
     try:
-        tailored_content = create_learning_content_with_llm(
-            llm, learner_profile, learning_path, learning_session, allow_parallel=allow_parallel, with_quiz=with_quiz, use_search=use_search
+        tailored_content = create_learning_content_with_llm(  # noqa: F405
+            get_llm(request),
+            request.learner_profile,
+            request.learning_path,
+            request.learning_session,
+            allow_parallel=request.allow_parallel,
+            with_quiz=request.with_quiz,
+            use_search=request.use_search,
+            max_workers=int(app_config.get("rag", {}).get("max_workers", 3)),
+            search_rag_manager=get_search_rag_manager(),
         )
         return {"tailored_content": tailored_content}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
+    except Exception as exc:
+        raise _fail(exc, "tailor-knowledge-content")
+
+
 if __name__ == "__main__":
-    server_cfg = app_config.get("server", {})
-    host = app_config.get("server", {}).get("host", "127.0.0.1")
-    port = int(app_config.get("server", {}).get("port", 5000))
-    log_level = str(app_config.get("log_level", "debug")).lower()
-    uvicorn.run(app, host=host, port=port, log_level=log_level)
+    server_config = app_config.get("server", {})
+    uvicorn.run(
+        app,
+        host=server_config.get("host", "127.0.0.1"),
+        port=int(server_config.get("port", 5000)),
+        log_level=str(app_config.get("log_level", "info")).lower(),
+    )

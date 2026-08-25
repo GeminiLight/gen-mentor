@@ -1,19 +1,17 @@
 import re
 import os
 import json
-import PyPDF2
 import pdfplumber
-import re
 from pypinyin import lazy_pinyin
 import hashlib
 
 def extract_text_from_pdf(file_path):
     assert file_path.endswith('.pdf'), "Invalid file format. Please provide a PDF file."
     with pdfplumber.open(file_path) as pdf:
-        text = ""
-        for page in pdf.pages:
-            text += page.extract_text()
-        return text
+        # extract_text() returns None for pages with no text layer (e.g. scans),
+        # so skip those rather than concatenating None.
+        pages = (page.extract_text() for page in pdf.pages)
+        return "".join(text for text in pages if text)
 
 def save_json(file_path, data):
     base_dir = os.path.dirname(os.path.abspath(__file__))

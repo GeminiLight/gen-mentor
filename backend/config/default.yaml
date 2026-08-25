@@ -1,14 +1,18 @@
 # Global application configuration (OmegaConf)
 # Default values only; no environment interpolation or API keys included.
+#
+# NOTE: every key below must have a matching field in config/schemas.py:AppConfig.
+# load_config() merges this file into the structured schema, so unknown keys and
+# wrong types fail loudly instead of being silently ignored.
 
 environment: dev
 debug: true
 log_level: INFO
 
 llm:
-  provider: deepseek
-  model_name: deepseek-chat
-  base_url: null
+  provider: openai
+  model_name: deepseek-v4-flash
+  base_url: null  # URL comes from OPENAI_BASE_URL in .env (read natively by ChatOpenAI)
 
 embedding:
   provider: huggingface
@@ -20,11 +24,14 @@ search:
   loader_type: web
 
 vectorstore:
+  type: chroma
   persist_directory: data/vectorstore
   collection_name: genmentor
 
 rag:
+  text_splitter_type: recursive_character
   chunk_size: 1000
+  chunk_overlap: 0
   num_retrieval_results: 5
   allow_parallel: true
   max_workers: 3

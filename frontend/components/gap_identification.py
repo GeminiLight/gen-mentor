@@ -106,9 +106,6 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
                 goal["skill_gaps"][skill_id]["is_gap"] = gap_status
                 if not goal["skill_gaps"][skill_id]["is_gap"]:
                     goal["skill_gaps"][skill_id]["current_level"] = goal["skill_gaps"][skill_id].get("required_level", goal["skill_gaps"][skill_id].get("current_level"))
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 st.rerun()
 

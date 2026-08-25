@@ -13,7 +13,7 @@ from modules.personalized_resource_delivery.prompts.search_enhanced_knowledge_dr
     search_enhanced_knowledge_drafter_task_prompt,
 )
 from modules.personalized_resource_delivery.schemas import KnowledgeDraft
-from config.loader import default_config
+from config.loader import get_default_config
 
 
 class KnowledgeDraftPayload(BaseModel):
@@ -42,7 +42,12 @@ class SearchEnhancedKnowledgeDrafter(BaseAgent):
 
     def __init__(self, model: Any, *, search_rag_manager: Optional[SearchRagManager] = None, use_search: bool = True):
         super().__init__(model=model, system_prompt=search_enhanced_knowledge_drafter_system_prompt, jsonalize_output=True)
-        self.search_rag_manager = search_rag_manager or SearchRagManager.from_config(default_config)
+        # Only build a manager when search is actually wanted -- constructing one
+        # loads the embedding model and opens the vector store. Callers serving
+        # HTTP requests should pass a shared instance instead.
+        if search_rag_manager is None and use_search:
+            search_rag_manager = SearchRagManager.from_config(get_default_config())
+        self.search_rag_manager = search_rag_manager
         self.use_search = use_search
 
     def draft(self, payload: KnowledgeDraftPayload | Mapping[str, Any] | str):
@@ -96,7 +101,7 @@ def draft_knowledge_points_with_llm(
     knowledge_points,
     allow_parallel: bool = True,
     use_search: bool = True,
-    max_workers: int = 8,
+    max_workers: Optional[int] = None,
     *,
     search_rag_manager: Optional[SearchRagManager] = None,
 ):
@@ -105,8 +110,15 @@ def draft_knowledge_points_with_llm(
         learning_session = ast.literal_eval(learning_session)
     if isinstance(knowledge_points, str):
         knowledge_points = ast.literal_eval(knowledge_points)
+    if isinstance(knowledge_points, Mapping):
+        # `explore_knowledge_points` returns {"knowledge_points": [...]}; accept
+        # either that envelope or the bare list.
+        knowledge_points = knowledge_points.get("knowledge_points", [])
     if search_rag_manager is None and use_search:
-        search_rag_manager = SearchRagManager.from_config(default_config)
+        search_rag_manager = SearchRagManager.from_config(get_default_config())
+    if max_workers is None:
+        max_workers = getattr(search_rag_manager, "max_workers", None) or 3
+
     def draft_one(kp):
         return draft_knowledge_point_with_llm(
             llm,
@@ -130,13 +142,13 @@ def draft_knowledge_points_with_llm(
 
 
 if __name__ == "__main__":
-    from config.loader import default_config
     from base.llm_factory import LLMFactory
     import logging
 
-    llm = LLMFactory.from_config(default_config.llm)
-    search_rag_manager = SearchRagManager.from_config(default_config)
-    logging.basicConfig(level=default_config.log_level)
+    app_config = get_default_config()
+    llm = LLMFactory.from_config(app_config.llm)
+    search_rag_manager = SearchRagManager.from_config(app_config)
+    logging.basicConfig(level=app_config.log_level)
     logger = logging.getLogger(__name__)
 
     learner_profile = {"name": "Alice", "level": "intermediate"}
