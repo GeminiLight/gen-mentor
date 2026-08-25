@@ -2,7 +2,10 @@ import streamlit as st
 from collections import defaultdict
 import config
 import json
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 PERSIST_KEYS = [
     "backend_endpoint",
@@ -40,14 +43,20 @@ def _get_data_store_path():
 def load_persistent_state():
     """Load persisted keys from a local JSON file into st.session_state.
 
-    Only keys listed in PERSIST_KEYS will be restored.
+    Only keys listed in PERSIST_KEYS will be restored. Returns False if there is
+    nothing to restore or the store could not be read; a store that exists but is
+    unreadable or corrupt is logged rather than ignored.
     """
     path = _get_data_store_path()
     if not path.exists():
         return False
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except (OSError, ValueError) as exc:
+        logger.error("Could not read persisted state from %s: %s", path, exc, exc_info=True)
+        return False
+    if not isinstance(data, dict):
+        logger.error("Persisted state at %s is not a JSON object (got %s)", path, type(data).__name__)
         return False
     for k, v in data.items():
         if k in PERSIST_KEYS:
@@ -56,20 +65,19 @@ def load_persistent_state():
 
 
 def save_persistent_state():
-    """Save whitelisted st.session_state keys to a local JSON file."""
+    """Save whitelisted st.session_state keys to a local JSON file.
+
+    Returns True on success. Failures are logged and reported as False; callers
+    that can show UI (see `_autosave` in main.py) surface them to the user.
+    """
     path = _get_data_store_path()
-    data = {}
-    for k in PERSIST_KEYS:
-        if k in st.session_state:
-            try:
-                data[k] = st.session_state[k]
-            except Exception:
-                pass
+    data = {k: st.session_state[k] for k in PERSIST_KEYS if k in st.session_state}
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
         return True
-    except Exception:
+    except (OSError, TypeError, ValueError) as exc:
+        logger.error("Could not persist state to %s: %s", path, exc, exc_info=True)
         return False
 
 
@@ -145,8 +153,10 @@ def initialize_session_state():
 
     try:
         load_persistent_state()
-    except Exception:
-        pass
+    except Exception as exc:
+        # Never block start-up on a bad data store; load_persistent_state already
+        # logs the expected read/parse failures, so this only catches surprises.
+        logger.error("Unexpected error restoring persisted state: %s", exc, exc_info=True)
 
 def get_new_goal_uid():
     return max(goal["id"] for goal in st.session_state.goals) + 1 if st.session_state.goals else 0
@@ -188,10 +198,7 @@ def change_selected_goal_id(new_goal_id):
     st.session_state["is_learning_path_ready"] = True if st.session_state["learning_path"] else False
     st.session_state["is_skill_gap_ready"] = True if st.session_state["skill_gaps"] else False
     # persist change
-    try:
-        save_persistent_state()
-    except Exception:
-        pass
+    save_persistent_state()
 
 def get_existing_goal_id_list():
     return [goal["id"] for goal in st.session_state["goals"]]
@@ -211,10 +218,7 @@ def add_new_goal(learning_goal="", skill_gaps=[], learner_profile={}, learning_p
     goal_idx = index_goal_by_id(goal_uid)
     reset_to_add_goal()
     # persist after adding a goal
-    try:
-        save_persistent_state()
-    except Exception:
-        pass
+    save_persistent_state()
     return goal_idx
 
 def get_current_knowledge_point_uid():

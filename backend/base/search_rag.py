@@ -26,33 +26,45 @@ class SearchRagManager:
         vectorstore: Optional[VectorStore] = None,
         search_runner: Optional[SearchRunner] = None,
         max_retrieval_results: int = 5,
+        allow_parallel: bool = True,
+        max_workers: int = 3,
     ):
         self.embedder = embedder
         self.text_splitter = text_splitter
         self.vectorstore = vectorstore
         self.search_runner = search_runner
         self.max_retrieval_results = max_retrieval_results
+        # Surfaced from `rag.allow_parallel` / `rag.max_workers` so callers that fan
+        # out over knowledge points can honour the configured concurrency.
+        self.allow_parallel = allow_parallel
+        self.max_workers = max_workers
 
     @staticmethod
     def from_config(
         config: Union[DictConfig, Dict[str, Any]],
     ) -> "SearchRagManager":
         config = ensure_config_dict(config)
+        # `embedding` is the canonical key (see config/default.yaml); `embedder` is
+        # accepted for backward compatibility with older configs.
+        embedding_config = config.get("embedding") or config.get("embedder") or {}
+        rag_config = config.get("rag") or {}
+        vectorstore_config = config.get("vectorstore") or {}
+
         embedder = EmbedderFactory.create(
-            model=config.get("embedder", {}).get("model_name", "sentence-transformers/all-mpnet-base-v2"),
-            model_provider=config.get("embedder", {}).get("provider", "huggingface"),
+            model=embedding_config.get("model_name", "sentence-transformers/all-mpnet-base-v2"),
+            model_provider=embedding_config.get("provider", "huggingface"),
         )
 
         text_splitter = TextSplitterFactory.create(
-            splitter_type=config.get("rag", {}).get("text_splitter_type", "recursive_character"),
-            chunk_size=config.get("rag", {}).get("chunk_size", 1000),
-            chunk_overlap=config.get("rag", {}).get("chunk_overlap", 0),
+            splitter_type=rag_config.get("text_splitter_type", "recursive_character"),
+            chunk_size=rag_config.get("chunk_size", 1000),
+            chunk_overlap=rag_config.get("chunk_overlap", 0),
         )
 
         vectorstore = VectorStoreFactory.create(
-            vectorstore_type=config.get("vectorstore", {}).get("type", "chroma"),
-            collection_name=config.get("vectorstore", {}).get("collection_name", "default_collection"),
-            persist_directory=config.get("vectorstore", {}).get("persist_directory", "./data/vectorstore"),
+            vectorstore_type=vectorstore_config.get("type", "chroma"),
+            collection_name=vectorstore_config.get("collection_name", "default_collection"),
+            persist_directory=vectorstore_config.get("persist_directory", "./data/vectorstore"),
             embedder=embedder,
         )
 
@@ -65,7 +77,9 @@ class SearchRagManager:
             text_splitter=text_splitter,
             vectorstore=vectorstore,
             search_runner=search_runner,
-            max_retrieval_results=config.get("rag", {}).get("num_retrieval_results", 5),
+            max_retrieval_results=rag_config.get("num_retrieval_results", 5),
+            allow_parallel=rag_config.get("allow_parallel", True),
+            max_workers=rag_config.get("max_workers", 3),
         )
 
 

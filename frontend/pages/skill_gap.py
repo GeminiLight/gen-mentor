@@ -35,7 +35,7 @@ def render_skill_gap():
                 if st.button("Schedule Learning Path", type="primary", disabled=not if_schedule_learning_path_ready):
                     if goal["skill_gaps"] and not goal["learner_profile"]:
                         with st.spinner('Creating your profile ...'):
-                            learner_profile = create_learner_profile(goal["learning_goal"], st.session_state["learner_information"], goal["skill_gaps"])
+                            learner_profile = create_learner_profile(goal["learning_goal"], st.session_state["learner_information"], goal["skill_gaps"], st.session_state["llm_type"])
                             if learner_profile is None:
                                 st.rerun()
                             goal["learner_profile"] = learner_profile

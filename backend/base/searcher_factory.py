@@ -59,6 +59,8 @@ class WebDocumentLoader:
             # loader = WebBaseLoader(urls, bs_kwargs={"parse_only": bs4_strainer},)
             # 'verify':False, 
             loader = WebBaseLoader(urls, requests_kwargs={'timeout':10})
+        else:
+            raise ValueError(f"Unsupported loader type: {loader_type}. Choose from {{'web', 'docling'}}.")
         try:
             documents = loader.load()
         except Exception as e:
@@ -85,16 +87,26 @@ class SearchRunner:
     def from_config(
             config: Union[DictConfig, Dict[str, Any]],
         ) -> "SearchRunner":
-  
+        """Build a runner from the `search` block of an application config."""
+
         config_dict = ensure_config_dict(config)
+        search_config: Dict[str, Any] = config_dict.get("search") or {}
+        # Everything except the keys consumed below is forwarded to the provider
+        # wrapper (e.g. `search.bing_subscription_key`), which is where such
+        # provider-specific settings live -- not at the top level of the config.
+        provider_kwargs = {
+            key: value
+            for key, value in search_config.items()
+            if key not in {"provider", "max_results", "loader_type"} and value is not None
+        }
         searcher = SearcherFactory.create(
-            provider=config_dict.get("search", {}).get("provider", "duckduckgo"),
-            **config_dict,
+            provider=search_config.get("provider", "duckduckgo"),
+            **provider_kwargs,
         )
         return SearchRunner(
             searcher=searcher,
-            loader_type=config_dict.get("search", {}).get("loader_type", "web"),
-            max_search_results=config_dict.get("search", {}).get("max_results", 5),
+            loader_type=search_config.get("loader_type", "web"),
+            max_search_results=search_config.get("max_results", 5),
         )
 
     def invoke(self, query: str) -> List[SearchResult]:

@@ -10,10 +10,7 @@ from components.topbar import render_topbar
 
 def on_refine_click():
     st.session_state["if_refining_learning_goal"] = True
-    try:
-        save_persistent_state()
-    except Exception:
-        pass
+    save_persistent_state()
 
 
 def _init_onboarding_state():
@@ -24,10 +21,7 @@ def _init_onboarding_state():
     st.session_state.setdefault("learner_information_text", "")
     st.session_state.setdefault("learner_information", "")
     st.session_state.setdefault("to_add_goal", {"learning_goal": ""})
-    try:
-        save_persistent_state()
-    except Exception:
-        pass
+    save_persistent_state()
 
 
 def _inject_card_css():
@@ -64,10 +58,7 @@ def render_onboard():
     goal = st.session_state["to_add_goal"]
     if "refined_learning_goal" not in st.session_state:
         st.session_state["refined_learning_goal"] = goal["learning_goal"]
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
     with center:
         render_topbar()
         st.title("Onboarding GenMentor")
@@ -91,10 +82,7 @@ def render_goal(goal):
         with next_col:
             if st.button("Next", key="gm_nav_next", use_container_width=True, disabled=(idx == 1), type="primary"):
                 st.session_state["onboarding_card_index"] = min(1, idx + 1)
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 st.rerun()
         
 
@@ -119,22 +107,13 @@ def render_information(goal):
                 other_occupation = st.text_input("Please specify your occupation")
             if other_occupation:
                 st.session_state["learner_occupation"] = other_occupation
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
         if selected_occupation is None:
             st.session_state["learner_occupation"] = ""
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
         else:
             st.session_state["learner_occupation"] = selected_occupation
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
         upload_col, information_col = st.columns([1, 1])
         with upload_col:
             uploaded_file = st.file_uploader("[Optional] Upload a PDF with your information (e.g., resume)", type="pdf")
@@ -147,20 +126,14 @@ def render_information(goal):
         with information_col:
             learner_information_text = st.text_area("[Optional] Enter your learning perferences and style", value=st.session_state["learner_information_text"], label_visibility="visible", height=77)
             st.session_state["learner_information"] = st.session_state["learner_occupation"] + learner_information_text + learner_information_pdf
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
         # st.divider()
         arrow_left, space_col, continue_button_col = st.columns([3, 10, 3])
         save_persistent_state()
         with arrow_left:
             if st.button("Previous", key="gm_nav_prev", use_container_width=True, disabled=(idx == 0)):
                 st.session_state["onboarding_card_index"] = max(0, idx - 1)
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 st.rerun()
         with continue_button_col:
             render_continue_button(goal)
@@ -171,10 +144,7 @@ def render_continue_button(goal):
             st.warning("Please provide both a learning goal and your occupation before continuing.")
         else:
             st.session_state["selected_page"] = "Skill Gap"
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.switch_page("pages/skill_gap.py")
 
 

@@ -13,20 +13,14 @@ def login():
     password = st.text_input("Password", type="password")
     if st.button("Submit", disabled=True):
         st.session_state["logged_in"]  = True
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
         st.rerun()
     # currently not available
     st.warning("Unavailable in this demo version.")
 
 def logout():
     st.session_state["logged_in"] = False
-    try:
-        save_persistent_state()
-    except Exception:
-        pass
+    save_persistent_state()
 
 
 def render_topbar():
@@ -71,10 +65,7 @@ def render_topbar():
         )
         if len(available_models) > 0 and llm_label != st.session_state["llm_type"]:
             st.session_state["llm_type"] = llm_label
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
 
     with col4:
         if st.session_state["logged_in"]:
@@ -127,10 +118,13 @@ def settings():
         st.session_state["available_models"] = model_id_list
         try:
             save_persistent_state()
-            st.success("Settings saved. Restarting app...")
-            st.rerun()
         except Exception as e:
             st.error(f"Failed to save settings: {e}")
+        else:
+            st.success("Settings saved. Restarting app...")
+            # Outside the try: st.rerun() signals a rerun by raising, which the
+            # except clause would otherwise report as a save failure.
+            st.rerun()
 
     if not is_valid_backend:
         st.warning("Backend endpoint not reachable or invalid.")

@@ -1,17 +1,24 @@
 langchain-core==1.0.0
 langchain==1.0.0
-langchain-community==1.0.0a1
+langchain-community==0.4
 langchain-chroma==1.0.0
 langchain-huggingface==1.0.0
+langchain-deepseek
+langchain-text-splitters
 langchain-docling
+langgraph==1.0.5  # 1.0.6+ needs langchain-core>=1.1 (Reviver(allowed_objects=...)); pinned for core==1.0.0
 
 
-duckduckgo-search
+ddgs
 sentence-transformers
 
 hydra-core
+omegaconf
 beautifulsoup4
 fastapi
-pypdf
+uvicorn
+python-multipart
+pydantic
+python-dotenv
 pdfplumber
 pypinyin

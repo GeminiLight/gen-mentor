@@ -1,4 +1,5 @@
 import json
+import logging
 import math
 import time
 import copy
@@ -13,6 +14,8 @@ from utils.state import get_current_session_uid, save_persistent_state
 from config import use_mock_data, use_search
 from assets.js.doc_reading import doc_reading_auto_scroll_js
 
+logger = logging.getLogger(__name__)
+
 
 st.markdown('<style>' + open('./assets/css/main.css').read() + '</style>', unsafe_allow_html=True)
 
@@ -20,10 +23,7 @@ st.markdown('<style>' + open('./assets/css/main.css').read() + '</style>', unsaf
 def render_learning_content():
     if 'if_render_qizzes' not in st.session_state:
         st.session_state['if_render_qizzes'] = False
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
 
     goal = st.session_state["goals"][st.session_state["selected_goal_id"]]
     if not goal["learning_path"]:
@@ -59,20 +59,14 @@ def render_learning_content():
             complete_button_status = True if goal["learning_path"][st.session_state["selected_session_id"]]["if_learned"] else False
             if st.button("Regenerate", icon=":material/refresh:"):
                 st.session_state["document_caches"].pop(session_uid)
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 goal['learner_profile']['behavioral_patterns']['additional_notes'] += f"I have regenerated Session {selected_sid} content.\n"
                 st.rerun()
             if st.button("Complete Session", 
                         key="complete-session", type="primary", icon=":material/task_alt:", 
                         use_container_width=True, disabled=complete_button_status or st.session_state["if_updating_learner_profile"]):
                 st.session_state["if_updating_learner_profile"] = True
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 st.rerun()
 
             st.divider()
@@ -106,18 +100,12 @@ def render_session_details(goal):
             st.session_state["current_page"][session_uid] = 0
 
             st.switch_page("pages/learning_path.py")
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
 
     with col3:
         if st.button("Regenerate", icon=":material/refresh:", key="regenerate-content-top"):
             st.session_state["document_caches"].pop(session_uid)
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             goal['learner_profile']['behavioral_patterns']['additional_notes'] += f"I have regenerated Session {selected_sid} content.\n"
             st.session_state["current_page"][session_uid] = 0
             st.rerun()
@@ -131,19 +119,13 @@ def render_session_details(goal):
                      use_container_width=True, disabled=complete_button_status or st.session_state["if_updating_learner_profile"]):
             st.session_state["if_updating_learner_profile"] = True
             st.session_state["current_page"][session_uid] = 0
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.rerun()
 
         if st.session_state.get("if_updating_learner_profile"):
             update_result = update_learner_profile_with_feedback(goal, "", session_info)
             st.session_state["if_updating_learner_profile"] = False
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             if not update_result:
                 st.toast("Failed to update learner profile. Please try again.")
                 st.rerun()
@@ -151,10 +133,7 @@ def render_session_details(goal):
                 st.toast("🎉 Session completed successfully!")
                 goal["learning_path"][selected_sid]["if_learned"] = True
                 st.session_state["selected_page"] = "Learning Path"
-                try:
-                    save_persistent_state()
-                except Exception:
-                    pass
+                save_persistent_state()
                 if get_current_session_uid() in st.session_state["session_learning_times"]:
                     curr_time = time.time()
                     st.session_state["session_learning_times"][get_current_session_uid()]["end_time"] = curr_time
@@ -181,10 +160,7 @@ def render_content_preparation(goal):
         file_path = "./assets/data_example/knowledge_document.json"
         learning_content = load_knowledge_point_content(file_path)
         st.session_state["document_caches"][session_uid] = learning_content
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
         return learning_content
 
     with st.spinner("Stage 1/4 - Exploring knowledge Points..."):
@@ -192,7 +168,7 @@ def render_content_preparation(goal):
             goal["learner_profile"],
             goal["learning_path"],
             learning_session,
-            llm_type="gpt4o"
+            llm_type=st.session_state["llm_type"]
         )
     if knowledge_points is None:
         st.error("Failed to explore knowledge points.")
@@ -210,7 +186,7 @@ def render_content_preparation(goal):
             knowledge_points,
             use_search=use_search,
             allow_parallel=True,
-            llm_type="gpt4o"
+            llm_type=st.session_state["llm_type"]
         )
     if knowledge_drafts is None:
         st.error("Failed to draft knowledge points.")
@@ -223,7 +199,7 @@ def render_content_preparation(goal):
             learning_session,
             knowledge_points,
             knowledge_drafts,
-            llm_type="gpt4o",
+            llm_type=st.session_state["llm_type"],
             output_markdown=False
         )
         learning_document = prepare_markdown_document(document_structure, knowledge_points, knowledge_drafts)
@@ -240,15 +216,12 @@ def render_content_preparation(goal):
             multiple_choice_count=1,
             true_false_count=1,
             short_answer_count=1,
-            llm_type="gpt4o"
+            llm_type=st.session_state["llm_type"]
         )
     learning_content["quizzes"] = quizzes
     st.success("Stage 4/4 🎯 Document quizzes generated successfully.")
     st.session_state["document_caches"][session_uid] = learning_content
-    try:
-        save_persistent_state()
-    except Exception:
-        pass
+    save_persistent_state()
     st.rerun()
     return learning_content
 
@@ -276,11 +249,13 @@ def render_document_content_by_section(document):
 
     page_key = f"{selected_gid}-{session_id}"
     params = {}
+    # st.query_params is not a plain dict on every Streamlit version; probe it
+    # defensively and fall back to the experimental accessor below.
     try:
         if hasattr(st, 'query_params') and isinstance(st.query_params, dict):
             params = dict(st.query_params)
-    except Exception:
-        pass
+    except (AttributeError, TypeError) as exc:
+        logger.debug("Could not read st.query_params: %s", exc)
     if not params and hasattr(st, 'experimental_get_query_params'):
         try:
             raw = st.experimental_get_query_params()
@@ -289,16 +264,14 @@ def render_document_content_by_section(document):
             params = {}
 
     if 'gm_page' in params:
+        # A hand-edited or stale ?gm_page= value is expected; ignore it.
         try:
             p = int(params['gm_page'])
-            p = max(0, min(p, len(section_documents) - 1))
-            st.session_state['current_page'][page_key] = p
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
-        except Exception:
-            pass
+        except (TypeError, ValueError):
+            logger.debug("Ignoring non-numeric gm_page param: %r", params['gm_page'])
+        else:
+            st.session_state['current_page'][page_key] = max(0, min(p, len(section_documents) - 1))
+            save_persistent_state()
     if 'gm_anchor' in params and params['gm_anchor']:
         try:
             st.session_state[f"{page_key}__pending_anchor_text"] = urlparse.unquote(params['gm_anchor'])
@@ -317,10 +290,7 @@ def render_document_content_by_section(document):
         )
         st.session_state[prev_page_key] = current_page
         st.session_state[f"{page_key}__pending_anchor_text"] = None
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
     st.markdown(section_documents[current_page])
 
     st.sidebar.header("Document Structure")
@@ -350,19 +320,13 @@ def render_document_content_by_section(document):
         if col_prev.button("Previous Page", icon=":material/arrow_back:", use_container_width=True, key="prev-section-page"):
             new_page = current_page - 1
             st.session_state["current_page"][page_key] = new_page
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.rerun()
     if current_page < len(section_documents) - 1:
         if col_next.button("Next Page", icon=":material/arrow_forward:", use_container_width=True, key="next-section-page"):
             new_page = current_page + 1
             st.session_state["current_page"][page_key] = new_page
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.rerun()
 
     st.divider()
@@ -503,7 +467,7 @@ def update_learner_profile_with_feedback(goal, feedback_data, session_informatio
     if session_information != "":
         session_information = copy.deepcopy(session_information)
         session_information["if_learned"] = True
-    new_learner_profile = update_learner_profile(goal["learner_profile"], feedback_data, session_information=session_information)
+    new_learner_profile = update_learner_profile(goal["learner_profile"], feedback_data, session_information=session_information, llm_type=st.session_state["llm_type"])
     if new_learner_profile is None:
         st.error("Failed to update learner profile. Please try again.")
         return False

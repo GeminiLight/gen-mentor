@@ -18,16 +18,10 @@ def render_goal_management():
 def render_add_new_goal():
     if "if_refining_learning_goal" not in st.session_state:
         st.session_state["if_refining_learning_goal"] = False
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
     if "if_show_skill_gap_results_in_dialog" not in st.session_state:
         st.session_state["if_show_skill_gap_results_in_dialog"] = False
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
 
     to_add_goal = st.session_state["to_add_goal"]
     st.subheader("🎯 Add New Goal")
@@ -39,10 +33,7 @@ def render_add_new_goal():
     render_goal_refinement(to_add_goal, refine_col, hint_col)
     if clear_col.button("Clear", key="clear_goal"):
         reset_to_add_goal()
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
         st.rerun()
 
     if add_col.button("Add Goal", type="primary", icon=":material/add:", use_container_width=True):
@@ -74,15 +65,9 @@ def render_existing_goals():
             else:
                 if col_right.button("Set as Active Goal", key=f"set_{goal['id']}", help="Mark this goal as your active learning goal."):
                     st.session_state.selected_goal_id = goal["id"]
-                    try:
-                        save_persistent_state()
-                    except Exception:
-                        pass
+                    save_persistent_state()
                     change_selected_goal_id(goal["id"])
-                    try:
-                        save_persistent_state()
-                    except Exception:
-                        pass
+                    save_persistent_state()
                     st.rerun()
             
             st.info(f"{goal['learning_goal']}")
@@ -114,10 +99,7 @@ def render_existing_goals():
                 if st.button("Delete", key=f"delete_{goal['id']}", type="primary"):
                     goal_index = index_goal_by_id(goal["id"])
                     st.session_state.goals[goal_index]["is_deleted"] = True
-                    try:
-                        save_persistent_state()
-                    except Exception:
-                        pass
+                    save_persistent_state()
                     st.success("Goal deleted successfully!")
                     st.rerun()
         
@@ -137,43 +119,28 @@ def render_skill_gap_dialog():
     st.info(f"There are {num_skills} skills in total, with {num_gaps} skill gaps identified.")
     if not to_add_goal["skill_gaps"]:
         st.session_state["if_show_skill_gap_results_in_dialog"] = True
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
         render_identifying_skill_gap(to_add_goal)
     else:
         st.session_state["if_show_skill_gap_results_in_dialog"] = False
-        try:
-            save_persistent_state()
-        except Exception:
-            pass
+        save_persistent_state()
         render_identified_skill_gap(to_add_goal)
         if_schedule_learning_path_ready = to_add_goal["skill_gaps"]
         if st.button("Schedule Learning Path", type="primary", disabled=not if_schedule_learning_path_ready):
             if to_add_goal["skill_gaps"] and not to_add_goal["learner_profile"]:
                 with st.spinner('Creating your profile ...'):
-                    learner_profile = create_learner_profile(to_add_goal["learning_goal"], st.session_state["learner_information"], to_add_goal["skill_gaps"])
+                    learner_profile = create_learner_profile(to_add_goal["learning_goal"], st.session_state["learner_information"], to_add_goal["skill_gaps"], st.session_state["llm_type"])
                     if learner_profile is None:
                         st.rerun()
                     to_add_goal["learner_profile"] = learner_profile
                     st.toast("🎉 Your profile has been created!")
             new_goal_id = add_new_goal(**to_add_goal)
             st.session_state["selected_goal_id"] = new_goal_id
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.session_state["if_complete_onboarding"] = True
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.session_state["selected_page"] = "Learning Path"
-            try:
-                save_persistent_state()
-            except Exception:
-                pass
+            save_persistent_state()
             st.switch_page("pages/learning_path.py")
 
 
