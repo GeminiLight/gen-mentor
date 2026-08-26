@@ -8,6 +8,7 @@ import streamlit as st
 from streamlit.errors import StreamlitAPIException
 
 from utils.state import initialize_session_state, change_selected_goal_id, save_persistent_state, load_persistent_state, _get_data_store_path
+from config import asset_path
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +64,8 @@ st.session_state.setdefault("_autosave_enabled", True)
 from components.chatbot import render_chatbot
 
 st.set_page_config(page_title="GenMentor", page_icon="🧠", layout="wide")
-st.logo("./assets/avatar.png")
-st.markdown('<style>' + open('./assets/css/main.css').read() + '</style>', unsafe_allow_html=True)
+st.logo(asset_path("./assets/avatar.png"))
+st.markdown('<style>' + open(asset_path('./assets/css/main.css')).read() + '</style>', unsafe_allow_html=True)
 
 if st.session_state.get("if_complete_onboarding", False) and not st.session_state.get("_navigated_lp_once", False):
     st.session_state["_navigated_lp_once"] = True
