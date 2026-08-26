@@ -35,7 +35,16 @@ jobs:
 
       - name: Run backend tests
         working-directory: backend
-        run: ../.venv/bin/python -m pytest tests -q
+        # os._exit skips interpreter teardown: chromadb's Rust extension leaves
+        # a background thread that aborts the process during static
+        # destruction AFTER pytest has already reported its results (observed
+        # exit 134 with "81 passed"). Bypassing teardown keeps the real exit
+        # code; stdout/stderr are flushed first.
+        run: >
+          ../.venv/bin/python -c "import os, pytest, sys;
+          rc = pytest.main(['tests', '-q']);
+          sys.stdout.flush(); sys.stderr.flush();
+          os._exit(int(rc))"
 
   frontend:
     name: Frontend tests
