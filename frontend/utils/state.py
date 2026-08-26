@@ -184,9 +184,12 @@ def change_selected_goal_id(new_goal_id):
     if new_goal_id == st.session_state["selected_goal_id"]:
         return
     goals = st.session_state["goals"]
+    goal_id_idx = index_goal_by_id(new_goal_id)
+    if goal_id_idx is None:
+        # Unknown id (stale store): don't half-apply the switch.
+        logger.warning("change_selected_goal_id: no goal with id %r", new_goal_id)
+        return
     st.session_state["selected_goal_id"] = new_goal_id
-    goal_id_list = [goal["id"] for goal in goals]
-    goal_id_idx = goal_id_list.index(new_goal_id)
     st.session_state["learning_goal"] = goals[goal_id_idx]["learning_goal"]
     st.session_state["learner_profile"] = goals[goal_id_idx]["learner_profile"]
     st.session_state["skill_gaps"] = goals[goal_id_idx]["skill_gaps"]

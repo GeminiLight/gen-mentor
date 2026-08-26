@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import threading
 from typing import Any, Dict
 
 from omegaconf import OmegaConf, DictConfig
@@ -40,6 +41,7 @@ def load_config(
 
 
 _default_config: DictConfig | None = None
+_config_lock = threading.Lock()
 
 
 def get_default_config() -> DictConfig:
@@ -48,12 +50,16 @@ def get_default_config() -> DictConfig:
     Composing at import time would run Hydra as an import side effect, which fails
     outright when the importing process already holds Hydra's global state (e.g. a
     ``@hydra.main`` entrypoint or another ``initialize_*`` context) and pays the
-    compose cost even for callers that never read the config.
+    compose cost even for callers that never read the config. The lock keeps
+    concurrent first calls (e.g. from request threads) from tripping over
+    Hydra's global initialisation.
     """
 
     global _default_config
     if _default_config is None:
-        _default_config = load_config()
+        with _config_lock:
+            if _default_config is None:
+                _default_config = load_config()
     return _default_config
 
 

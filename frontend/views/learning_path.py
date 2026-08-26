@@ -3,7 +3,6 @@ import math
 import streamlit as st
 from components.skill_info import render_skill_info
 from utils.request_api import schedule_learning_path, reschedule_learning_path
-from components.navigation import render_navigation
 from utils.state import save_persistent_state
 
 def render_learning_path():

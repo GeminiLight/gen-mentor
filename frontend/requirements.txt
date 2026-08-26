@@ -1,18 +1,17 @@
-streamlit==1.40.0
-streamlit-card
-streamlit-chat
+# Core app framework. 1.62 tested together with pandas 3 / plotly 7 / numpy 2.5
+# (1.40 capped pandas <3, so the three move as one set).
+streamlit==1.62.0
+
+# Streamlit add-ons actually imported by the code
 streamlit-extras
-streamlit-tags
-st-pages==0.4.5
-streamlit-float==0.3.5
-streamlit-option-menu
-streamlit-on-Hover-tabs
-markdown
-unidecode
-extra-streamlit-components==0.1.60
-deprecation==2.1.0
-pdfplumber
+streamlit-float
+
+# Analytics dashboard data stack. pandas 3 note: dashboard.py only builds
+# frames from dict-of-lists constructors (no chained assignment / inplace
+# mutation), so Copy-on-Write semantics change nothing there.
+pandas==3.0.5
+plotly==7.0.0
+
+# HTTP + PDF
 httpx
-requests
-pandas
-plotly
+pdfplumber

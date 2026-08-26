@@ -58,9 +58,11 @@ learning_path_scheduler_task_prompt_session = """
 **Task A: Adaptive Path Scheduling**
 
 Create a new, structured learning path based on the learner's profile.
-The number of sessions should be within [1, 10].
+The number of sessions should be within [1, 10]; if the requested count falls
+outside that range, clamp it to the nearest bound.
 
 * **Learner Profile**: {learner_profile}
+* **Desired Session Count**: {session_count}
 """
 
 learning_path_scheduler_task_prompt_reflexion = """

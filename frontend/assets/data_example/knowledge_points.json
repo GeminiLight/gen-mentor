@@ -1,0 +1,20 @@
+{
+    "knowledge_points": [
+        {
+            "name": "NumPy Arrays",
+            "type": "foundational"
+        },
+        {
+            "name": "Pandas DataFrames",
+            "type": "foundational"
+        },
+        {
+            "name": "Data Aggregation with groupby",
+            "type": "practical"
+        },
+        {
+            "name": "Communicating Insights to Stakeholders",
+            "type": "strategic"
+        }
+    ]
+}

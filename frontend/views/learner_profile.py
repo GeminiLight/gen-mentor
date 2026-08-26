@@ -2,7 +2,6 @@ import math
 import streamlit as st
 from utils.request_api import create_learner_profile, update_learner_profile
 from components.skill_info import render_skill_info
-from components.navigation import render_navigation
 from utils.pdf import extract_text_from_pdf
 from streamlit_extras.tags import tagger_component 
 from utils.state import save_persistent_state
@@ -22,12 +21,19 @@ def render_learner_profile():
             render_learner_profile_info(goal)
         except Exception as e:
             st.error("An error occurred while rendering the learner profile.")
-            # re generate the learner profile
-            with st.spinner("Re-prepare your profile ..."):
-                learner_profile = create_learner_profile(goal["learning_goal"], st.session_state["learner_information"], goal["skill_gaps"], st.session_state["llm_type"])
-            goal["learner_profile"] = learner_profile
-            save_persistent_state()
-            st.rerun()
+            if st.session_state.get("debug", False):
+                st.exception(e)
+            # Offer a manual regeneration instead of overwriting the profile
+            # automatically: a failed create returns None (bricking main.py's
+            # cognitive_status access), and a cache hit would return the same
+            # broken profile in an endless rerun loop.
+            if st.button("Re-generate profile"):
+                with st.spinner("Re-prepare your profile ..."):
+                    learner_profile = create_learner_profile(goal["learning_goal"], st.session_state["learner_information"], goal["skill_gaps"], st.session_state["llm_type"])
+                if learner_profile is not None:
+                    goal["learner_profile"] = learner_profile
+                    save_persistent_state()
+                    st.rerun()
 
 def render_learner_profile_info(goal):
     st.markdown("""

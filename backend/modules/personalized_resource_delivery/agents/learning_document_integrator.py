@@ -107,7 +107,7 @@ def prepare_markdown_document(document_structure, knowledge_points, knowledge_dr
         for idx, kp in enumerate(knowledge_points or []):
             if not isinstance(kp, dict) or kp.get('type') != k_type:
                 continue
-            kd = (knowledge_drafts or [])[idx]
+            kd = (knowledge_drafts or [])[idx] if idx < len(knowledge_drafts or []) else None
             if isinstance(kd, dict):
                 md += f"\n\n### {kd.get('title','')}\n\n{kd.get('content','')}\n"
     md += f"\n\n## Summary\n\n{document_structure.get('summary','') if isinstance(document_structure, dict) else ''}"

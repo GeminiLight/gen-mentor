@@ -37,9 +37,12 @@ class LearningPath(BaseModel):
     @field_validator("learning_path")
     @classmethod
     def limit_sessions(cls, v: List[SessionItem]) -> List[SessionItem]:
-        if not (1 <= len(v) <= 10):
-            raise ValueError("Learning path must contain between 1 and 10 sessions.")
-        return v
+        # An over-long path is truncated to the bound (learned sessions come
+        # first by contract, so the cut falls on unlearned tail sessions).
+        # An empty path stays an error: every downstream consumer subscripts it.
+        if not v:
+            raise ValueError("Learning path must contain at least one session.")
+        return v[:10]
 
 
 class KnowledgeType(str, Enum):
@@ -64,6 +67,9 @@ class KnowledgeDraft(BaseModel):
 class DocumentStructure(BaseModel):
     title: str
     overview: str
+    # Body text the integrator prompt asks the model to produce; kept so the
+    # non-markdown response path does not silently drop it.
+    content: str = ""
     summary: str
 
 

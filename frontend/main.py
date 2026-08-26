@@ -7,7 +7,7 @@ from pathlib import Path
 import streamlit as st
 from streamlit.errors import StreamlitAPIException
 
-from utils.state import initialize_session_state, change_selected_goal_id, save_persistent_state, load_persistent_state, _get_data_store_path
+from utils.state import initialize_session_state, save_persistent_state, _get_data_store_path
 from config import asset_path
 
 logger = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ from components.chatbot import render_chatbot
 
 st.set_page_config(page_title="GenMentor", page_icon="🧠", layout="wide")
 st.logo(asset_path("./assets/avatar.png"))
-st.markdown('<style>' + open(asset_path('./assets/css/main.css')).read() + '</style>', unsafe_allow_html=True)
+st.markdown('<style>' + Path(asset_path('./assets/css/main.css')).read_text(encoding="utf-8") + '</style>', unsafe_allow_html=True)
 
 if st.session_state.get("if_complete_onboarding", False) and not st.session_state.get("_navigated_lp_once", False):
     st.session_state["_navigated_lp_once"] = True
@@ -87,6 +87,10 @@ def show_reset_dialog():
                 logger.error("Failed to reset data store at %s: %s", data_path, exc, exc_info=True)
                 st.error(f"Could not clear saved data: {exc}")
             st.session_state.clear()
+            # switch_page targets run without re-executing this script, so the
+            # defaults must be rebuilt here or every downstream key
+            # (llm_type, to_add_goal, ...) is missing on the onboarding page.
+            initialize_session_state()
             # After clearing state, navigate to onboarding page explicitly
             if not _switch_page("views/onboarding.py"):
                 st.rerun()
@@ -154,21 +158,6 @@ else:
 
         if len(history) > MASTERY_HISTORY_LENGTH:
             del history[:-MASTERY_HISTORY_LENGTH]
-    all_skill = learned_skill + unlearned_skill
-
-    if all_skill != 0:
-        mastery_rate = learned_skill / all_skill
-        if not history:
-            history.append(mastery_rate)
-        elif time.time() - goal['start_time'] > MASTERY_SNAPSHOT_INTERVAL:
-            goal['start_time'] = time.time()
-            history.append(mastery_rate)
-
-    if len(history) > MASTERY_HISTORY_LENGTH:
-        del history[:-MASTERY_HISTORY_LENGTH]
-
-if len(st.session_state["goals"]) != 0:
-    change_selected_goal_id(st.session_state["selected_goal_id"])
 
 _autosave()
 

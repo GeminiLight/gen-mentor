@@ -6,7 +6,6 @@ instead of hand-written HTTP code. It supports Bing, Tavily, and Serper.dev.
 
 from __future__ import annotations
 
-from pydoc import doc
 from typing import Any, Dict, List, Union, cast
 from langchain_core.documents import Document
 from .dataclass import SearchResult
@@ -38,7 +37,7 @@ class SearcherFactory:
             from langchain_community.utilities import BraveSearchWrapper
             wrapper = BraveSearchWrapper()
         else:
-            raise ValueError("Unsupported search provider. Choose from {'bing', 'serper', 'duckduckgo', 'brave', 'searx', 'you'}.")
+            raise ValueError("Unsupported search provider. Choose from {'duckduckgo', 'serper', 'bing', 'brave'}.")
         return wrapper
 
 
@@ -54,11 +53,10 @@ class WebDocumentLoader:
             loader = DoclingLoader(urls)
         elif loader_type == "web":
             from langchain_community.document_loaders import WebBaseLoader
-            import bs4
-            # bs4_strainer = bs4.SoupStrainer(class_=("post-title", "post-header", "post-content"))
-            # loader = WebBaseLoader(urls, bs_kwargs={"parse_only": bs4_strainer},)
-            # 'verify':False, 
-            loader = WebBaseLoader(urls, requests_kwargs={'timeout':10})
+            # continue_on_failure: search results routinely include dead links,
+            # bot-blocked pages or binary PDFs -- one bad URL must not discard
+            # the pages that did load.
+            loader = WebBaseLoader(urls, requests_kwargs={'timeout':10}, continue_on_failure=True)
         else:
             raise ValueError(f"Unsupported loader type: {loader_type}. Choose from {{'web', 'docling'}}.")
         try:
@@ -109,12 +107,40 @@ class SearchRunner:
             max_search_results=search_config.get("max_results", 5),
         )
 
+    def _raw_results(self, query: str) -> List[Dict[str, Any]]:
+        """Call the provider wrapper, normalising its result shape to a list of dicts.
+
+        The LangChain wrappers disagree: DuckDuckGo takes ``max_results`` and
+        returns a list; Bing takes ``num_results``; Serper returns a single
+        dict with an ``organic`` list; Brave exposes no ``results`` at all.
+        """
+        try:
+            results = self.searcher.results(query, max_results=self.max_search_results)
+        except TypeError:
+            results = self.searcher.results(query, num_results=self.max_search_results)
+        if isinstance(results, dict):
+            # Serper-style envelope: {"searchParameters": ..., "organic": [...]}
+            results = results.get("organic", [])
+        if not isinstance(results, list):
+            raise ValueError(
+                f"Search provider {type(self.searcher).__name__} returned an "
+                f"unsupported result shape ({type(results).__name__})."
+            )
+        return results
+
     def invoke(self, query: str) -> List[SearchResult]:
         """Perform a search and return structured results."""
-        raw_results = self.searcher.results(query, max_results=self.max_search_results)
+        raw_results = self._raw_results(query)
         urls = [item.get("link", "") for item in raw_results if item.get("link")]
-        url_contents = WebDocumentLoader.invoke(urls, loader_type=self.loader_type)
-        url_docs_dict = {url: doc for url, doc in zip(urls, url_contents)}
+        loaded_docs = WebDocumentLoader.invoke(urls, loader_type=self.loader_type)
+        # Key by the loader's own metadata source, not by position: with
+        # continue_on_failure the loader skips bad URLs, so zip(urls, docs)
+        # would misalign contents with links.
+        url_docs_dict = {}
+        for doc in loaded_docs:
+            source = (doc.metadata or {}).get("source")
+            if source:
+                url_docs_dict[source] = doc
         url_content_dict = {url: doc.page_content for url, doc in url_docs_dict.items()}
 
         structured_results: List[SearchResult] = []

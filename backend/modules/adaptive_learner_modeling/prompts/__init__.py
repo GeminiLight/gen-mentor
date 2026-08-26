@@ -75,7 +75,7 @@ Chain of Thoughts for Task B
 adaptive_learner_profiler_basic_system_prompt_requirements = """
 **Requirements**:
 - All the skills in the skill gap should be categorized as mastered or in-progress into the learner's current status.
-- `proficiency_level` should be one of: "unleared", "beginner", "intermediate", "advanced".
+- For mastered skills, `proficiency_level` must be one of: "beginner", "intermediate", "advanced" (never "unlearned"). For in-progress skills, `current_proficiency_level` may also be "unlearned".
 - Ensure that the output captures the most critical elements of the learner's current status, preferences, and challenges.
 - The profile should include any information that may impact the learner's learning experience and progress.
 """

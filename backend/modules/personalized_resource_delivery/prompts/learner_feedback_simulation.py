@@ -16,13 +16,13 @@ learner_feedback_path_output_format = """
 learner_feedback_content_output_format = """
 {{
     "feedback": {{
-        "goal_relevance": "Qualitative feedback on how well the content aligns with learner goals.",
-        "content_quality": "Qualitative feedback on the accuracy, clarity, and depth of the content.",
+        "progression": "Qualitative feedback on how well the content supports steady progression toward the learner's goals.",
+        "engagement": "Qualitative feedback on the accuracy, clarity, depth, and ability to hold the learner's attention.",
         "personalization": "Qualitative feedback on how well the content matches learner preferences."
     }},
     "suggestions": {{
-        "goal_relevance": "An actionable suggestion to improve goal relevance.",
-        "content_quality": "An actionable suggestion to improve content quality.",
+        "progression": "An actionable suggestion to improve progression and goal alignment.",
+        "engagement": "An actionable suggestion to improve engagement and content quality.",
         "personalization": "An actionable suggestion to improve personalization."
     }}
 }}

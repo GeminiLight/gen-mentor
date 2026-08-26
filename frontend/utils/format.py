@@ -17,7 +17,6 @@ def prepare_markdown_document(document_structure, knowledge_points, knowledge_dr
         knowledge_drafts = ast.literal_eval(knowledge_drafts)
     if isinstance(document_structure, str):
         document_structure = ast.literal_eval(document_structure)
-    print("!!!doucment_stru:",document_structure)
     part_titles = {
         'foundational': "## Foundational Concepts",
         'practical': "## Practical Applications",

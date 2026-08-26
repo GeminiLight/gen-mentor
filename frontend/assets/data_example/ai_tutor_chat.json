@@ -1,0 +1,3 @@
+{
+    "response": "Great question! Given your goal of moving into a data science role, focus this week on Pandas DataFrames: load a CSV with pd.read_csv, then explore it with head(), info(), and describe(). Once that feels natural, group the data with groupby to answer one real question about your dataset. Keep sessions short and code-centered — you retain more from modifying working examples than from reading long theory sections."
+}

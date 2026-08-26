@@ -3,16 +3,33 @@ import streamlit as st
 from utils.request_api import create_learner_profile, identify_skill_gap
 from utils.state import save_persistent_state
 
+# Level ranking used for gap arithmetic; unknown values rank lowest instead of
+# raising ValueError from list.index().
+LEVEL_RANK = {"unlearned": 0, "beginner": 1, "intermediate": 2, "advanced": 3}
+LEVELS = list(LEVEL_RANK)
+
+
+def _rank(level, fallback=0):
+    return LEVEL_RANK.get(str(level).strip().lower(), fallback)
+
+
 def render_identifying_skill_gap(goal):
     with st.spinner('Identifying Skill Gap ...'):
         learning_goal = goal["learning_goal"]
         learner_information = st.session_state["learner_information"]
         llm_type = st.session_state["llm_type"]
         skill_gaps = identify_skill_gap(learning_goal, learner_information, llm_type)
+    if not skill_gaps:
+        # Failure (or empty result) is cached by identify_skill_gap; assigning
+        # it and rerunning would re-enter this branch in a tight loop. Show the
+        # error and let the next user interaction retry instead.
+        st.error("Could not identify skill gaps. Please check the backend and try again.")
+        if st.button("Retry"):
+            st.cache_data.clear()
+        return None
     goal["skill_gaps"] = skill_gaps
     save_persistent_state()
     st.rerun()
-    st.toast("🎉 Successfully identify skill gaps!")
     return skill_gaps
 
 
@@ -20,7 +37,7 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
     """
     Render skill gaps in a card-style with prev/next switching.
     """
-    levels = ["unlearned", "beginner", "intermediate", "advanced"]
+    levels = LEVELS
     # Render all skill cards on a single page (no pagination)
     skill_gaps = goal.get("skill_gaps", [])
     total = len(skill_gaps)
@@ -30,8 +47,14 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
 
     for skill_id, skill_info in enumerate(skill_gaps):
         skill_name = skill_info.get("name", f"skill_{skill_id}")
-        required_level = skill_info.get("required_level", levels[0])
-        current_level = skill_info.get("current_level", levels[0])
+        # Unknown level strings (or missing values) fall back to sane defaults
+        # instead of crashing the pills widget's list.index().
+        required_level = skill_info.get("required_level") or levels[1]
+        if required_level not in LEVEL_RANK:
+            required_level = levels[1]
+        current_level = skill_info.get("current_level") or levels[0]
+        if current_level not in LEVEL_RANK:
+            current_level = levels[0]
 
         background_color = "#ffe6e6" if skill_info.get("is_gap") else "#e6ffe6"
         text_color = "#ff4d4d" if skill_info.get("is_gap") else "#33cc33"
@@ -47,6 +70,10 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
                 unsafe_allow_html=True,
             )
 
+            # Widget keys include the positional id: two skills with the same
+            # LLM-generated name would otherwise collide and crash Streamlit.
+            key_suffix = f"{skill_id}_{method_name}"
+
             # Required level selector
             new_required_level = st.pills(
                 "**Required Level**",
@@ -54,11 +81,11 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
                 selection_mode="single",
                 default=required_level,
                 disabled=False,
-                key=f"required_{skill_name}_{method_name}",
+                key=f"required_{key_suffix}",
             )
             if new_required_level != required_level:
                 goal["skill_gaps"][skill_id]["required_level"] = new_required_level
-                if levels.index(new_required_level) > levels.index(goal["skill_gaps"][skill_id].get("current_level", levels[0])):
+                if _rank(new_required_level) > _rank(goal["skill_gaps"][skill_id].get("current_level", levels[0])):
                     goal["skill_gaps"][skill_id]["is_gap"] = True
                 else:
                     goal["skill_gaps"][skill_id]["is_gap"] = False
@@ -72,11 +99,11 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
                 selection_mode="single",
                 default=current_level,
                 disabled=False,
-                key=f"current_{skill_name}__{method_name}",
+                key=f"current_{key_suffix}",
             )
             if new_current_level != current_level:
                 goal["skill_gaps"][skill_id]["current_level"] = new_current_level
-                if levels.index(new_current_level) < levels.index(goal["skill_gaps"][skill_id].get("required_level", levels[0])):
+                if _rank(new_current_level) < _rank(goal["skill_gaps"][skill_id].get("required_level", levels[1])):
                     goal["skill_gaps"][skill_id]["is_gap"] = True
                 else:
                     goal["skill_gaps"][skill_id]["is_gap"] = False
@@ -85,7 +112,7 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
 
             # Details
             with st.expander("More Analysis Details"):
-                if levels.index(goal["skill_gaps"][skill_id].get("current_level", levels[0])) < levels.index(goal["skill_gaps"][skill_id].get("required_level", levels[0])):
+                if _rank(goal["skill_gaps"][skill_id].get("current_level", levels[0])) < _rank(goal["skill_gaps"][skill_id].get("required_level", levels[1])):
                     st.warning("Current level is lower than the required level!")
                     goal["skill_gaps"][skill_id]["is_gap"] = True
                 else:
@@ -99,8 +126,7 @@ def render_identified_skill_gap(goal, method_name="genmentor"):
             gap_status = st.toggle(
                 "Mark as Gap",
                 value=skill_info.get("is_gap", False),
-                key=f"gap_{skill_name}_{method_name}",
-                disabled=not skill_info.get("is_gap", False),
+                key=f"gap_{key_suffix}",
             )
             if gap_status != old_gap_status:
                 goal["skill_gaps"][skill_id]["is_gap"] = gap_status

@@ -1,5 +1,6 @@
 import os
 import logging
+from pathlib import Path
 from typing import List, Optional
 
 from langchain_core.embeddings import Embeddings
@@ -7,6 +8,11 @@ from langchain_core.vectorstores import VectorStore
 from langchain_text_splitters.base import TextSplitter
 
 logger = logging.getLogger(__name__)
+
+# Relative persist_directory values (e.g. the "data/vectorstore" default in
+# config/default.yaml) are anchored here, so the store always lands under
+# backend/ regardless of the working directory the process was started from.
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
 
 class TextSplitterFactory:
@@ -54,10 +60,13 @@ class VectorStoreFactory:
         vectorstore_type = vectorstore_type.lower()
         if vectorstore_type in ["chroma"]:
             from langchain_chroma import Chroma
+            persist_dir = Path(persist_directory)
+            if not persist_dir.is_absolute():
+                persist_dir = _BACKEND_ROOT / persist_dir
             vectorstore = Chroma(
                 collection_name=collection_name,
                 embedding_function=embedder,
-                persist_directory=persist_directory,
+                persist_directory=str(persist_dir),
             )
             logger.info(f'There are {vectorstore._collection.count()} records in the collection')
         else:

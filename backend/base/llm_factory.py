@@ -74,7 +74,7 @@ class LLMFactory:
         config = ensure_config_dict(config)
         return init_chat_model(
             model=config.get("model_name", "deepseek-chat"),
-            model_provider=config.get("model_provider", "deepseek"),
+            model_provider=config.get("provider", config.get("model_provider", "deepseek")),
             base_url=config.get("base_url", None),
             # api_key=config.api_key,
             temperature=0,  # Always 0 for deterministic results

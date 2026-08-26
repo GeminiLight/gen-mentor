@@ -52,10 +52,9 @@ class LearnerInteractionSimulator(BaseAgent):
         Simulate learner interactions based on the ground-truth profile and session count.
 
         Args:
-            input_dict (dict): Input dictionary containing the ground-truth profile and session count.
-                - previous_ground_truth_profile (dict): The ground-truth learner profile.
-                - progressed_ground_truth_profile (dict): The progressed ground-truth learner profile.
-                - session_information (dict): Information about the current session.
+            input_dict (dict): Input dictionary containing the ground-truth profile and session number.
+                - ground_truth_profile (dict): The ground-truth learner profile.
+                - session_number (int): The 1-based index of the session to simulate.
         """
         payload = LearnerInteractionPayload(**input_dict).model_dump()
         task_prompt = learner_interaction_simulator_task_prompt

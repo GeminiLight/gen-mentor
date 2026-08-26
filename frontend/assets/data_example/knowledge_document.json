@@ -1,5 +1,67 @@
 {
-    "article_title": "Understanding HRIS Systems: A Comprehensive Guide for Aspiring HR Managers",
-    "content": "# Understanding HRIS Systems\n\nA Human Resources Information System (HRIS) is a pivotal tool in modern HR management, offering a comprehensive solution for managing and automating core HR processes. For aspiring Human Resources Managers, like yourself, mastering HRIS is essential to achieving your career goals, particularly in roles that require HRIS management, employee relations, recruitment, training, compliance, and payroll processing.\n\n## Fundamental Concepts\n\n### Definition of HRIS\n\nA Human Resources Information System (HRIS) is a software solution designed to manage and automate core HR processes within an organization. It integrates various HR functions into a single platform, allowing for efficient management of employee data, payroll processing, benefits administration, and compliance with labor laws. Implementing an HRIS can automate time tracking, payroll, and benefits management, ensuring accuracy and compliance with regulations.\n\n### History and Evolution of HRIS\n\nHRIS systems emerged in the 1980s to address the administrative burdens of HR departments. Initially focused on automating basic HR tasks, these systems have evolved significantly with advancements in technology. Modern HRIS solutions offer a wide range of functionalities, including employee self-service, real-time data analytics, and integration with other business systems.\n\n### Basic Functionalities of HRIS\n\nHRIS systems automate and manage core HR processes such as payroll, time tracking, and benefits administration. They provide a centralized platform for storing and managing employee data, enhancing data integrity and security. Modern HRIS systems also offer self-service capabilities and reporting tools that provide insights into workforce metrics.\n\n## Practical Applications\n\n### Case Study: Implementing HRIS in a Mid-Sized Company\n\nImplementing an HRIS in a mid-sized company can significantly enhance HR operations by streamlining processes and improving data management. Key steps include conducting a needs assessment, selecting a vendor, planning data migration, and providing training. Successful implementation can lead to improved efficiency and employee experience.\n\n### HRIS Role in Streamlining HR Processes\n\nHRIS systems integrate various HR functions into a single platform, reducing redundancy and minimizing errors. They support strategic decision-making by providing real-time data analytics, enabling managers to make informed decisions based on comprehensive reports on employee performance and other critical metrics.\n\n### Impact of HRIS on Employee Data Management\n\nHRIS systems centralize employee data, allowing HR managers to access and manage information efficiently. This centralization reduces redundancy and errors, enhances data security, and ensures timely and accurate payroll processing and benefits administration.\n\n## Strategic Insights\n\n### Evaluating HRIS Vendors for Strategic Alignment\n\nEvaluating HRIS vendors is crucial for aligning the system with your organization's strategic goals. Key evaluation criteria include functionality, scalability, integration capabilities, vendor reputation, and cost. Selecting the right vendor ensures that the HRIS supports both current needs and future growth.\n\n### Integrating HRIS with Business Strategy\n\nIntegrating HRIS with business strategy involves ensuring that HR processes support the overall objectives of the organization. This alignment helps in optimizing workforce management, improving decision-making, and enhancing operational efficiency.\n\n### Leveraging HRIS for Strategic Workforce Planning\n\nHRIS can significantly enhance strategic workforce planning by providing insights into workforce trends, skills gaps, and future needs. It integrates various HR functions into a cohesive system that supports strategic decision-making, ensuring the organization has the right people, with the right skills, in the right places, at the right times.\n\n**Conclusion**\n\nUnderstanding and mastering HRIS systems is crucial for aspiring Human Resources Managers. By integrating HRIS with business strategy and leveraging its functionalities for strategic workforce planning, you can enhance HR operations and align them with organizational goals. Reflect on how HRIS can improve efficiency at Albert Hotel and consider the challenges you might face during implementation. Explore additional resources to deepen your understanding and prepare for your future role.",
-    "quizzes": {"single_choice_questions": []}
+    "document": "# Working with Pandas DataFrames\n\nPandas is the foundational data manipulation library in Python, and the DataFrame is its central object. This session takes you from creating and inspecting DataFrames to grouping and summarizing a real sales dataset, closing with how to frame the findings for stakeholders.\n\n## Foundational Concepts\n\n### NumPy Arrays\n\nNumPy provides the ndarray, a fixed-type n-dimensional array that powers nearly every numeric operation in the Python data stack. Pandas is built on top of it, so understanding arrays makes DataFrame behavior — especially vectorized arithmetic and broadcasting — much easier to predict.\n\nCreate arrays with `np.array([1.5, 2.0, 2.5])` or helpers like `np.zeros` and `np.arange`. Operations apply element-wise without Python loops: `prices * 1.1` lifts every price by 10% in a single compiled pass. Aggregations such as `mean`, `sum`, and `std` return scalars, while comparisons like `prices > 100` produce the boolean masks used for filtering.\n\n### Pandas DataFrames\n\nA DataFrame is a two-dimensional, size-mutable table with labeled rows and columns, and it is the workhorse structure of the Pandas library. Each column is a Series that shares a common index, which is why selecting, filtering, and joining data feels consistent across the whole API.\n\nThe quickest way to build one from scratch is to pass a dictionary of column names to lists: `df = pd.DataFrame({\"product\": [...], \"sales\": [...]})`. More often you will load data directly with `pd.read_csv(\"sales.csv\")`, which exposes options for parsing dates, choosing an index column, and handling missing values at load time.\n\nInternalize the inspection methods early: `df.head()` previews the first rows, `df.info()` summarizes column types and non-null counts, `df.describe()` returns quick statistics for numeric columns, and `df.shape` reports the `(rows, columns)` tuple. Together they answer most questions you should ask before touching a new dataset.\n\n## Practical Applications\n\n### Data Aggregation with groupby\n\nThe split-apply-combine pattern is the heart of summarizing data. `df.groupby(\"region\")` splits rows into groups, an aggregation such as `.agg({\"sales\": \"mean\"})` computes a statistic per group, and Pandas combines the results into a new DataFrame indexed by the grouping key.\n\nChaining is idiomatic: `df.groupby(\"region\")[\"sales\"].sum().sort_values(ascending=False)` ranks regions by revenue in one readable line. Group by several columns at once by passing a list, for example `df.groupby([\"region\", \"quarter\"])`, to get a hierarchical index. The same mechanics power `pivot_table` when you want the result reshaped into a wide table for reporting.\n\n## Strategic Insights\n\n### Communicating Insights to Stakeholders\n\nAnalysis only creates value when stakeholders act on it, so plan the communication before polishing the chart. Lead with the decision the data supports, keep one message per visual, and annotate only the few data points that carry the argument instead of every value.\n\nFor executive audiences, prefer a ranked bar chart with clear units and a headline takeaway in the title — \"West region leads Q3 sales by 18%\" — over dashboards that require interpretation. Always state the time window, the filters applied, and any data-quality caveats; a single unexplained discrepancy can undo the credibility of an otherwise solid analysis.\n\n## Summary\n\nYou can now create DataFrames from dictionaries and CSV files, inspect them with head, info, describe, and shape, compute per-group statistics with groupby, and structure findings so decision-makers can act on them. The next session applies these tools to messy, real-world data cleaning.",
+    "quizzes": {
+        "single_choice_questions": [
+            {
+                "question": "Which Pandas method returns the first five rows of a DataFrame by default?",
+                "options": [
+                    "df.head()",
+                    "df.tail()",
+                    "df.first()",
+                    "df.top()"
+                ],
+                "correct_option": 0,
+                "explanation": "head(n=5) previews the top of a DataFrame; tail() returns the last rows instead."
+            },
+            {
+                "question": "What does the shape attribute of a DataFrame return?",
+                "options": [
+                    "The column labels as a list",
+                    "A tuple of (number of rows, number of columns)",
+                    "The total number of cells",
+                    "The data type of each column"
+                ],
+                "correct_option": 1,
+                "explanation": "df.shape is a (rows, columns) tuple; df.dtypes is what lists the column types."
+            },
+            {
+                "question": "Which expression computes the average of the sales column for each region?",
+                "options": [
+                    "df.groupby(\"region\")[\"sales\"].mean()",
+                    "df[\"sales\"].mean(\"region\")",
+                    "df.mean(group=\"region\")",
+                    "df.sort_values(\"sales\").mean()"
+                ],
+                "correct_option": 0,
+                "explanation": "groupby splits rows by region, the column selection picks sales, and mean() aggregates each group."
+            }
+        ],
+        "multiple_choice_questions": [
+            {
+                "question": "Which statements about df.groupby are correct? (Select all that apply)",
+                "options": [
+                    "It implements the split-apply-combine pattern",
+                    "It can group by several columns when given a list",
+                    "It requires the DataFrame to be sorted first",
+                    "Aggregations like sum() or mean() can be chained after it"
+                ],
+                "correct_options": [0, 1, 3],
+                "explanation": "Sorting is not required — grouping handles unordered rows; the other three statements describe standard groupby usage."
+            }
+        ],
+        "true_false_questions": [
+            {
+                "question": "In Pandas, a Series is a one-dimensional labeled array, while a DataFrame is two-dimensional.",
+                "correct_answer": true,
+                "explanation": "A DataFrame is a collection of Series that share one index, one Series per column."
+            }
+        ],
+        "short_answer_questions": [
+            {
+                "question": "Which DataFrame method computes count, mean, std, and quartiles for all numeric columns at once?",
+                "expected_answer": "describe",
+                "explanation": "df.describe() returns summary statistics for every numeric column by default."
+            }
+        ]
+    }
 }

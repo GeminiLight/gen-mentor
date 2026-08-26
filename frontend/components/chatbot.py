@@ -23,12 +23,19 @@ def ask_autor_chatbot():
         messages.chat_message("user").write(prompt)
         st.session_state["tutor_messages"].append({"role": "user", "content": prompt})
         response = chat_with_tutor(
-            st.session_state["tutor_messages"][-20:], 
+            st.session_state["tutor_messages"][-20:],
             learner_profile,
             st.session_state["llm_type"])
-        messages.chat_message("assistant").write(response)
-        st.session_state["tutor_messages"].append({"role": "assistant", "content": response})
-        # messages.chat_message("assistant").write(f"Echo: {prompt}")
+        if response is None:
+            # A None would be appended to tutor_messages (a persisted key) and
+            # make every future call fail validation. Drop the user turn too so
+            # the history stays well-formed.
+            st.session_state["tutor_messages"].pop()
+            messages.chat_message("assistant").write(
+                "⚠️ Sorry, the tutor is unavailable right now. Please try again later.")
+        else:
+            messages.chat_message("assistant").write(response)
+            st.session_state["tutor_messages"].append({"role": "assistant", "content": response})
 
 def click_chatbot_func():
     ask_autor_chatbot()

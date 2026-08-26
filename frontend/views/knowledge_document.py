@@ -42,8 +42,14 @@ def render_learning_content():
             return
     else:
         track_session_learning_start_time()
-        learning_content = st.session_state["document_caches"].get(session_uid, "")
-        
+        learning_content = st.session_state["document_caches"].get(session_uid)
+        if not isinstance(learning_content, dict):
+            # No cached content for this session (e.g. a stuck
+            # if_updating_learner_profile flag): fall back to generating it.
+            st.session_state["document_caches"].pop(session_uid, None)
+            render_content_preparation(goal)
+            return
+
         render_type = "by_section"
         document = learning_content["document"]
         if render_type == "by_section":
@@ -89,7 +95,10 @@ def render_motivataional_triggers():
         session_learning_times["trigger_time_list"].append(curr_time)
 
 def render_session_details(goal):
-    selected_sid = st.session_state["selected_session_id"]
+    # The path can shrink after a reschedule or goal switch while the stored
+    # cursor still points past its end; clamp instead of crashing.
+    selected_sid = max(0, min(st.session_state["selected_session_id"], len(goal["learning_path"]) - 1))
+    st.session_state["selected_session_id"] = selected_sid
     session_uid = get_current_session_uid()
     session_info = goal["learning_path"][selected_sid]
 
@@ -159,8 +168,14 @@ def render_content_preparation(goal):
         st.warning("Using mock data for knowledge document.")
         file_path = asset_path("./assets/data_example/knowledge_document.json")
         learning_content = load_knowledge_point_content(file_path)
+        if learning_content is None:
+            return None
+        # Same contract as the live pipeline below: cache, persist, rerun. The
+        # caller renders from document_caches on the next run, never from this
+        # return value, so skipping the rerun leaves the page blank.
         st.session_state["document_caches"][session_uid] = learning_content
         save_persistent_state()
+        st.rerun()
         return learning_content
 
     with st.spinner("Stage 1/4 - Exploring knowledge Points..."):
@@ -218,6 +233,9 @@ def render_content_preparation(goal):
             short_answer_count=1,
             llm_type=st.session_state["llm_type"]
         )
+    if quizzes is None:
+        st.error("Failed to generate document quizzes.")
+        return
     learning_content["quizzes"] = quizzes
     st.success("Stage 4/4 🎯 Document quizzes generated successfully.")
     st.session_state["document_caches"][session_uid] = learning_content
@@ -367,14 +385,36 @@ def render_document_content_by_document(document):
         st.markdown(f"<a name='{anchor}'></a>", unsafe_allow_html=True)
 
 
+def _resolve_correct_option(options, correct):
+    """The backend types correct_option as int | str: an index, a letter, or
+    the option text. Map whatever arrives onto the actual option string."""
+    if isinstance(correct, int) and 0 <= correct < len(options):
+        return options[correct]
+    correct_str = str(correct).strip()
+    letters = "ABCDEFGH"
+    if len(correct_str) == 1 and correct_str.upper() in letters:
+        idx = letters.index(correct_str.upper())
+        if idx < len(options):
+            return options[idx]
+    if correct_str in options:
+        return correct_str
+    # int-like string index is the last reasonable interpretation
+    try:
+        idx = int(correct_str)
+        if 0 <= idx < len(options):
+            return options[idx]
+    except ValueError:
+        pass
+    return None
+
+
 def render_questions(quiz_data):
     st.subheader("💡 Test Your Knowledge")
     for i, q in enumerate(quiz_data['single_choice_questions']):
         st.write(f"**{i+1}. {q['question']}**")
         selected_option = st.radio("Options", q['options'], key=f"single_{i}", index=None, label_visibility="hidden")
         if selected_option is not None:
-            correct_option_idx = q['correct_option']
-            correct_option = q['options'][correct_option_idx]
+            correct_option = _resolve_correct_option(q['options'], q['correct_option'])
             if selected_option == correct_option:
                 st.success("Correct!")
             else:
@@ -391,7 +431,7 @@ def render_questions(quiz_data):
                 selected_options.append(option)
 
         if st.button("Submit", key=f"multi_submit_{i}"):
-            correct_options = set(q['options'][correct_option_idx] for correct_option_idx in q['correct_options'])
+            correct_options = {c for c in (_resolve_correct_option(q['options'], idx) for idx in q['correct_options']) if c is not None}
             if set(selected_options) == set(correct_options):
                 st.success("Correct!")
             else:

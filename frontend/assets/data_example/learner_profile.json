@@ -1,63 +1,43 @@
 {
     "learner_profile": {
-        "learner_information": "The learner has an MBA from Bharathiar University and a BE from PA College of Engineering and Technology. They have experience in administration and client service in the garment industry, with skills in Microsoft Dynamics AX and MS Office.",
-        "learning_goal": "To become a Human Resources Manager at Albert Hotel, focusing on HRIS management, employee relations, recruitment, training, compliance, and payroll processing.",
+        "learner_information": "The learner is a marketing analyst with three years of experience in Excel-based reporting and Tableau dashboards, holding a BSc in Business Administration.",
+        "learning_goal": "Transition into a junior data scientist role within a year by mastering Python-based data analysis, SQL, and statistics.",
         "cognitive_status": {
-            "overall_progress": 20,
+            "overall_progress": 15,
             "mastered_skills": [
                 {
-                    "name": "Communication Skills",
-                    "proficiency_level": "advanced"
-                },
-                {
-                    "name": "Organizational Skills",
+                    "name": "Data Visualization",
                     "proficiency_level": "intermediate"
                 }
             ],
             "in_progress_skills": [
                 {
-                    "name": "HRIS Management",
+                    "name": "Python Programming",
                     "required_proficiency_level": "intermediate",
-                    "current_proficiency_level": "unlearned"
+                    "current_proficiency_level": "beginner"
                 },
                 {
-                    "name": "Employee Relations",
+                    "name": "SQL",
                     "required_proficiency_level": "advanced",
                     "current_proficiency_level": "beginner"
                 },
                 {
-                    "name": "Recruitment and Hiring",
-                    "required_proficiency_level": "advanced",
-                    "current_proficiency_level": "beginner"
-                },
-                {
-                    "name": "Training and Development",
-                    "required_proficiency_level": "intermediate",
-                    "current_proficiency_level": "unlearned"
-                },
-                {
-                    "name": "Compliance Management",
-                    "required_proficiency_level": "advanced",
-                    "current_proficiency_level": "unlearned"
-                },
-                {
-                    "name": "Payroll Processing",
+                    "name": "Statistics & Probability",
                     "required_proficiency_level": "intermediate",
                     "current_proficiency_level": "unlearned"
                 }
-            ],
-            "additional_notes": "The learner has a strong foundation in communication and organizational skills."
+            ]
         },
         "learning_preferences": {
-            "content_style": "Detailed explanations",
-            "activity_type": "Reading-based learning",
-            "additional_notes": "The learner has a strong foundation in communication and organizational skills."
+            "content_style": "Step-by-step explanations with runnable Python code examples",
+            "activity_type": "Hands-on coding exercises on realistic datasets",
+            "additional_notes": "Prefers concise summaries before each deep dive and learns best by modifying working code."
         },
         "behavioral_patterns": {
-            "system_usage_frequency": "Average of 2 logins per week",
-            "session_duration_engagement": "Sessions average 20 minutes; moderate engagement in reading tasks",
-            "motivational_triggers": "Triggered motivational message due to low engagement in interactive tasks",
-            "additional_notes": "Prefers to learn at their own pace"
+            "system_usage_frequency": "Average of 4 logins per week, mostly on weekday evenings",
+            "session_duration_engagement": "Sessions average 35 minutes with sustained engagement on coding exercises",
+            "motivational_triggers": "Responds well to progress streaks and milestone badges",
+            "additional_notes": "Tends to skim long theory sections and jump ahead to practice tasks."
         }
     }
 }

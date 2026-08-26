@@ -1,5 +1,8 @@
 import os
 import logging
+import threading
+import time
+import uuid
 from typing import List, Optional, Dict, Any, Union
 from omegaconf import DictConfig
 
@@ -16,11 +19,14 @@ from utils.config import ensure_config_dict
 
 logger = logging.getLogger(__name__)
 
+SCOPE_KEY = "gm_scope_id"
+CREATED_AT_KEY = "gm_created_at"
+
 
 class SearchRagManager:
 
     def __init__(
-        self, 
+        self,
         embedder: Embeddings,
         text_splitter: Optional[TextSplitter] = None,
         vectorstore: Optional[VectorStore] = None,
@@ -28,6 +34,7 @@ class SearchRagManager:
         max_retrieval_results: int = 5,
         allow_parallel: bool = True,
         max_workers: int = 3,
+        max_stored_chunks: int = 2000,
     ):
         self.embedder = embedder
         self.text_splitter = text_splitter
@@ -38,6 +45,13 @@ class SearchRagManager:
         # out over knowledge points can honour the configured concurrency.
         self.allow_parallel = allow_parallel
         self.max_workers = max_workers
+        # The store is a rolling cache: when the chunk count exceeds this, the
+        # oldest chunks (by gm_created_at) are deleted on the next invoke().
+        self.max_stored_chunks = max_stored_chunks
+        # Serialise add-then-retrieve across threads: the drafter fans out over
+        # knowledge points sharing this manager, and concurrent writes to the
+        # Chroma sqlite store from several threads are not safe.
+        self._invoke_lock = threading.Lock()
 
     @staticmethod
     def from_config(
@@ -80,6 +94,7 @@ class SearchRagManager:
             max_retrieval_results=rag_config.get("num_retrieval_results", 5),
             allow_parallel=rag_config.get("allow_parallel", True),
             max_workers=rag_config.get("max_workers", 3),
+            max_stored_chunks=rag_config.get("max_stored_chunks", 2000),
         )
 
 
@@ -89,7 +104,7 @@ class SearchRagManager:
         results = self.search_runner.invoke(query)
         return results
 
-    def add_documents(self, documents: List[Document]) -> None:
+    def add_documents(self, documents: List[Document], metadata: Optional[Dict[str, Any]] = None) -> None:
         if len(documents) == 0:
             logger.warning("No documents to add to the vectorstore.")
             return
@@ -100,21 +115,73 @@ class SearchRagManager:
             split_docs = self.text_splitter.split_documents(documents)
         else:
             split_docs = documents
+        if metadata:
+            # Stamp provenance (scope, creation time) on every chunk so
+            # retrieval can filter by scope and pruning can evict by age.
+            for doc in split_docs:
+                doc.metadata = {**(doc.metadata or {}), **metadata}
         self.vectorstore.add_documents(split_docs, embedding_function=self.embedder)
         logger.info(f"Added {len(split_docs)} documents to the vectorstore.")
 
-    def retrieve(self, query: str, k: Optional[int] = None) -> List[Document]:
+    def retrieve(self, query: str, k: Optional[int] = None, scope_id: Optional[str] = None) -> List[Document]:
         k = k or self.max_retrieval_results
         if not self.vectorstore:
             raise ValueError("VectorStore is not initialized.")
-        retrieval = self.vectorstore.similarity_search(query, k=k)
+        if scope_id is not None:
+            retrieval = self.vectorstore.similarity_search(query, k=k, filter={SCOPE_KEY: scope_id})
+        else:
+            retrieval = self.vectorstore.similarity_search(query, k=k)
         return retrieval
 
+    def prune(self) -> int:
+        """Delete the oldest chunks beyond max_stored_chunks; returns the number removed.
+
+        Age is the gm_created_at stamp; legacy chunks without one count as
+        oldest. Bounded stores matter because search results accumulate on
+        every invoke and were previously never evicted.
+        """
+        if not self.vectorstore:
+            raise ValueError("VectorStore is not initialized.")
+        collection = self.vectorstore._collection
+        total = collection.count()
+        if total <= self.max_stored_chunks:
+            return 0
+        fetched = collection.get(include=["metadatas"])
+        ids = fetched.get("ids") or []
+        metadatas = fetched.get("metadatas") or []
+        stamped = sorted(
+            (
+                (float((meta or {}).get(CREATED_AT_KEY, 0.0)), doc_id)
+                for doc_id, meta in zip(ids, metadatas)
+            ),
+            key=lambda pair: pair[0],
+        )
+        excess = total - self.max_stored_chunks
+        oldest_ids = [doc_id for _, doc_id in stamped[:excess]]
+        if oldest_ids:
+            collection.delete(ids=oldest_ids)
+            logger.info("Pruned %d oldest chunks from the vectorstore.", len(oldest_ids))
+        return len(oldest_ids)
+
     def invoke(self, query: str) -> List[Document]:
-        results = self.search(query)
-        documents = [res.document for res in results if res.document is not None]
-        self.add_documents(documents=documents)
-        retrieved_docs = self.retrieve(query)
+        """Search the web for `query` and retrieve only this query's fresh results.
+
+        Each call runs in its own scope: chunks are stamped with a unique
+        gm_scope_id and the retrieval filters on it, so results from concurrent
+        knowledge points or previous requests never leak into the context.
+        Callers wanting the accumulated knowledge base instead should use
+        retrieve() without a scope.
+        """
+        scope_id = uuid.uuid4().hex
+        with self._invoke_lock:
+            results = self.search(query)
+            documents = [res.document for res in results if res.document is not None]
+            self.add_documents(
+                documents,
+                metadata={SCOPE_KEY: scope_id, CREATED_AT_KEY: time.time()},
+            )
+            retrieved_docs = self.retrieve(query, scope_id=scope_id)
+            self.prune()
         return retrieved_docs
 
 
