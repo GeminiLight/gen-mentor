@@ -47,6 +47,7 @@ def render_learning_content():
             # No cached content for this session (e.g. a stuck
             # if_updating_learner_profile flag): fall back to generating it.
             st.session_state["document_caches"].pop(session_uid, None)
+            clear_quiz_results(session_uid)
             render_content_preparation(goal)
             return
 
@@ -65,6 +66,8 @@ def render_learning_content():
             complete_button_status = True if goal["learning_path"][st.session_state["selected_session_id"]]["if_learned"] else False
             if st.button("Regenerate", icon=":material/refresh:"):
                 st.session_state["document_caches"].pop(session_uid)
+                _clear_pipeline_state(session_uid)
+                clear_quiz_results(session_uid)
                 save_persistent_state()
                 goal['learner_profile']['behavioral_patterns']['additional_notes'] += f"I have regenerated Session {selected_sid} content.\n"
                 st.rerun()
@@ -114,6 +117,8 @@ def render_session_details(goal):
     with col3:
         if st.button("Regenerate", icon=":material/refresh:", key="regenerate-content-top"):
             st.session_state["document_caches"].pop(session_uid)
+            _clear_pipeline_state(session_uid)
+            clear_quiz_results(session_uid)
             save_persistent_state()
             goal['learner_profile']['behavioral_patterns']['additional_notes'] += f"I have regenerated Session {selected_sid} content.\n"
             st.session_state["current_page"][session_uid] = 0
@@ -160,6 +165,36 @@ def render_session_details(goal):
         for i, skill_name in enumerate(associated_skills):
             st.write(f"- {skill_name}")
 
+# ---------------------------------------------------------------------------
+# Stage checkpointing (refresh-safe content generation)
+# ---------------------------------------------------------------------------
+
+PIPELINE_STAGE_KEYS = ("knowledge_points", "knowledge_drafts", "document_structure")
+
+
+def next_pipeline_stage(pipeline_state):
+    """The first stage whose checkpoint is missing, or None when all are done.
+
+    A stage counts as done only when its checkpoint is present (failed stages
+    are never written), so a rerun resumes right after the last success.
+    """
+    pipeline_state = pipeline_state or {}
+    for stage_key in PIPELINE_STAGE_KEYS:
+        if pipeline_state.get(stage_key) is None:
+            return stage_key
+    return None
+
+
+def _checkpoint_pipeline_stage(session_uid, stage_key, value):
+    st.session_state["content_pipeline_state"].setdefault(session_uid, {})[stage_key] = value
+    save_persistent_state()
+
+
+def _clear_pipeline_state(session_uid):
+    st.session_state["content_pipeline_state"].pop(session_uid, None)
+    save_persistent_state()
+
+
 def render_content_preparation(goal):
     selected_sid = st.session_state["selected_session_id"]
     learning_session = goal["learning_path"][selected_sid]
@@ -174,54 +209,84 @@ def render_content_preparation(goal):
         # caller renders from document_caches on the next run, never from this
         # return value, so skipping the rerun leaves the page blank.
         st.session_state["document_caches"][session_uid] = learning_content
+        _clear_pipeline_state(session_uid)
         save_persistent_state()
         st.rerun()
         return learning_content
 
-    with st.spinner("Stage 1/4 - Exploring knowledge Points..."):
-        knowledge_points = explore_knowledge_points(
-            goal["learner_profile"],
-            goal["learning_path"],
-            learning_session,
-            llm_type=st.session_state["llm_type"]
-        )
-    if knowledge_points is None:
-        st.error("Failed to explore knowledge points.")
-        return
-    else:
+    # A page refresh mid-pipeline reruns the whole script; resume from the last
+    # checkpointed stage instead of restarting the pipeline from scratch.
+    pipeline_state = st.session_state["content_pipeline_state"].setdefault(session_uid, {})
+
+    knowledge_points = None
+    if next_pipeline_stage(pipeline_state) == "knowledge_points":
+        with st.spinner("Stage 1/4 - Exploring knowledge Points..."):
+            knowledge_points = explore_knowledge_points(
+                goal["learner_profile"],
+                goal["learning_path"],
+                learning_session,
+                llm_type=st.session_state["llm_type"]
+            )
+        if knowledge_points is None:
+            st.error("Failed to explore knowledge points.")
+            return
+        _checkpoint_pipeline_stage(session_uid, "knowledge_points", knowledge_points)
         st.success("Stage 1/4 🔍 Knowledge points explored successfully.")
-        with st.expander("View Explored Knowledge Points", expanded=False):
-            for kp in knowledge_points:
-                st.write(f"- {kp['name']} (`{kp['type']}`)")
-    with st.spinner("Stage 2/4 - Drafting knowledge points..."):
-        knowledge_drafts = draft_knowledge_points(
-            goal["learner_profile"],
-            goal["learning_path"],
-            learning_session,
-            knowledge_points,
-            use_search=use_search,
-            allow_parallel=True,
-            llm_type=st.session_state["llm_type"]
-        )
-    if knowledge_drafts is None:
-        st.error("Failed to draft knowledge points.")
-        return
-    st.success("Stage 2/4 📝 Knowledge points drafted successfully.")
-    with st.spinner("Stage 3/4 - Integrating knowledge document..."):
-        document_structure = integrate_learning_document(
-            goal["learner_profile"],
-            goal["learning_path"],
-            learning_session,
-            knowledge_points,
-            knowledge_drafts,
-            llm_type=st.session_state["llm_type"],
-            output_markdown=False
-        )
+    else:
+        knowledge_points = pipeline_state["knowledge_points"]
+        st.info("Stage 1/4 🔍 Knowledge points restored from your previous run.")
+    with st.expander("View Explored Knowledge Points", expanded=False):
+        for kp in knowledge_points:
+            st.write(f"- {kp['name']} (`{kp['type']}`)")
+    knowledge_drafts = None
+    if next_pipeline_stage(pipeline_state) == "knowledge_drafts":
+        with st.spinner("Stage 2/4 - Drafting knowledge points..."):
+            knowledge_drafts = draft_knowledge_points(
+                goal["learner_profile"],
+                goal["learning_path"],
+                learning_session,
+                knowledge_points,
+                use_search=use_search,
+                allow_parallel=True,
+                llm_type=st.session_state["llm_type"],
+                goal_id=goal.get("id")
+            )
+        if knowledge_drafts is None:
+            st.error("Failed to draft knowledge points.")
+            return
+        _checkpoint_pipeline_stage(session_uid, "knowledge_drafts", knowledge_drafts)
+        st.success("Stage 2/4 📝 Knowledge points drafted successfully.")
+    else:
+        knowledge_drafts = pipeline_state["knowledge_drafts"]
+        st.info("Stage 2/4 📝 Knowledge point drafts restored from your previous run.")
+    document_structure = None
+    if next_pipeline_stage(pipeline_state) == "document_structure":
+        with st.spinner("Stage 3/4 - Integrating knowledge document..."):
+            document_structure = integrate_learning_document(
+                goal["learner_profile"],
+                goal["learning_path"],
+                learning_session,
+                knowledge_points,
+                knowledge_drafts,
+                llm_type=st.session_state["llm_type"],
+                output_markdown=False
+            )
+        if document_structure is None:
+            st.error("Failed to integrate knowledge document.")
+            return
         learning_document = prepare_markdown_document(document_structure, knowledge_points, knowledge_drafts)
-    if learning_document is None:
-        st.error("Failed to integrate knowledge document.")
-        return
-    st.success("Stage 3/4 📚 Knowledge document integrated successfully.")
+        if learning_document is None:
+            st.error("Failed to integrate knowledge document.")
+            return
+        _checkpoint_pipeline_stage(session_uid, "document_structure", document_structure)
+        st.success("Stage 3/4 📚 Knowledge document integrated successfully.")
+    else:
+        document_structure = pipeline_state["document_structure"]
+        learning_document = prepare_markdown_document(document_structure, knowledge_points, knowledge_drafts)
+        if learning_document is None:
+            st.error("Failed to integrate knowledge document.")
+            return
+        st.info("Stage 3/4 📚 Knowledge document restored from your previous run.")
     learning_content = {"document": learning_document}
     with st.spinner("Stage 4/4 - Generating document quizzes..."):
         quizzes = generate_document_quizzes(
@@ -239,6 +304,9 @@ def render_content_preparation(goal):
     learning_content["quizzes"] = quizzes
     st.success("Stage 4/4 🎯 Document quizzes generated successfully.")
     st.session_state["document_caches"][session_uid] = learning_content
+    # The full document is cached: drop the partial state so a later
+    # Regenerate starts a fresh pipeline.
+    _clear_pipeline_state(session_uid)
     save_persistent_state()
     st.rerun()
     return learning_content
@@ -408,46 +476,158 @@ def _resolve_correct_option(options, correct):
     return None
 
 
+# ---------------------------------------------------------------------------
+# Quiz result accumulation (feeds the learner profile on session completion)
+# ---------------------------------------------------------------------------
+
+QUIZ_RESULT_TYPES = ("single_choice", "multiple_choice", "true_false", "short_answer")
+QUIZ_RESULTS_KEY_PREFIX = "quiz_results_"
+# Multiple-choice correctness is only known at Submit time, and a bare button
+# click does not survive reruns, so submitted results are latched by question
+# index inside the stored results dict (private key, never sent as-is).
+SUBMITTED_MULTIPLE_CHOICE_KEY = "_submitted_multiple_choice"
+
+
+def quiz_results_state_key(session_uid):
+    return f"{QUIZ_RESULTS_KEY_PREFIX}{session_uid}"
+
+
+def new_quiz_results():
+    results = {q_type: {"answered": 0, "correct": 0} for q_type in QUIZ_RESULT_TYPES}
+    results["wrong_questions"] = []
+    return results
+
+
+def record_quiz_answer(results, question_type, is_correct=None, question=None, expected_answer=None):
+    """Record one answered question into ``results`` in place.
+
+    ``is_correct=None`` means the question has no reliable auto-scoring (short
+    answers): it counts as answered only. ``is_correct=False`` also appends the
+    question to ``wrong_questions`` for the profiler.
+    """
+    entry = results.setdefault(question_type, {"answered": 0, "correct": 0})
+    entry["answered"] += 1
+    if is_correct:
+        entry["correct"] += 1
+    elif is_correct is False:
+        results.setdefault("wrong_questions", []).append({
+            "question": question or "",
+            "expected_answer": expected_answer,
+        })
+    return results
+
+
+def summarize_quiz_results(results):
+    """Flatten a stored quiz results dict into the aggregate payload fields."""
+    results = results or {}
+    total_answered = sum(int(results.get(q_type, {}).get("answered", 0)) for q_type in QUIZ_RESULT_TYPES)
+    total_correct = sum(int(results.get(q_type, {}).get("correct", 0)) for q_type in QUIZ_RESULT_TYPES)
+    accuracy = round(total_correct / total_answered, 2) if total_answered else 0.0
+    return {
+        "total_answered": total_answered,
+        "total_correct": total_correct,
+        "accuracy": accuracy,
+        "wrong_questions": list(results.get("wrong_questions", [])),
+    }
+
+
+def build_quiz_performance(results, session_title=""):
+    """The ``quiz_performance`` object merged into learner_interactions."""
+    return {"session_title": session_title or "", **summarize_quiz_results(results)}
+
+
+def merge_quiz_performance(feedback_data, quiz_performance):
+    """Combine feedback form data and quiz performance into learner_interactions.
+
+    ``feedback_data`` is "" in the Complete Session flow and a dict when the
+    feedback form was submitted; existing content is always preserved.
+    """
+    payload = dict(feedback_data) if isinstance(feedback_data, dict) else {}
+    if quiz_performance and quiz_performance.get("total_answered"):
+        payload["quiz_performance"] = quiz_performance
+    return payload
+
+
+def resolve_session_title(session_information, learning_path, selected_session_id=0):
+    if isinstance(session_information, dict) and session_information.get("title"):
+        return session_information["title"]
+    path = learning_path or []
+    if isinstance(selected_session_id, int) and 0 <= selected_session_id < len(path):
+        session = path[selected_session_id]
+        if isinstance(session, dict):
+            return session.get("title") or ""
+    return ""
+
+
+def get_stored_quiz_results():
+    return st.session_state.get(quiz_results_state_key(get_current_session_uid()))
+
+
+def clear_quiz_results(session_uid):
+    st.session_state.pop(quiz_results_state_key(session_uid), None)
+
+
 def render_questions(quiz_data):
     st.subheader("💡 Test Your Knowledge")
+    session_uid = get_current_session_uid()
+    # Results are rebuilt from the widget values on every rerun so changing an
+    # answer keeps the summary in sync; only multiple-choice Submit results
+    # are latched (a bare button click does not survive reruns).
+    previous_results = st.session_state.get(quiz_results_state_key(session_uid)) or {}
+    submitted_multiple_choice = dict(previous_results.get(SUBMITTED_MULTIPLE_CHOICE_KEY, {}))
+    results = new_quiz_results()
+
     for i, q in enumerate(quiz_data['single_choice_questions']):
         st.write(f"**{i+1}. {q['question']}**")
         selected_option = st.radio("Options", q['options'], key=f"single_{i}", index=None, label_visibility="hidden")
         if selected_option is not None:
             correct_option = _resolve_correct_option(q['options'], q['correct_option'])
-            if selected_option == correct_option:
+            is_correct = selected_option == correct_option
+            if is_correct:
                 st.success("Correct!")
             else:
                 st.error("Incorrect.")
+            record_quiz_answer(results, "single_choice", is_correct,
+                               question=q['question'],
+                               expected_answer=correct_option if correct_option is not None else q['correct_option'])
             with st.expander("Explanation", expanded=True, icon=":material/info:"):
                 st.write(q['explanation'])
 
     for i, q in enumerate(quiz_data['multiple_choice_questions']):
         st.write(f"**{len(quiz_data['single_choice_questions']) + i + 1}. {q['question']}**")
-        
+
         selected_options = []
         for j, option in enumerate(q['options']):
             if st.checkbox(option, key=f"multi_{i}_option_{j}"):
                 selected_options.append(option)
 
+        correct_options = [c for c in (_resolve_correct_option(q['options'], idx) for idx in q['correct_options']) if c is not None]
+
         if st.button("Submit", key=f"multi_submit_{i}"):
-            correct_options = {c for c in (_resolve_correct_option(q['options'], idx) for idx in q['correct_options']) if c is not None}
-            if set(selected_options) == set(correct_options):
+            submitted_multiple_choice[i] = set(selected_options) == set(correct_options)
+            if submitted_multiple_choice[i]:
                 st.success("Correct!")
             else:
                 st.error("Some options are incorrect.")
             with st.expander("Explanation", expanded=False):
                 st.write(q['explanation'])
 
+        if i in submitted_multiple_choice:
+            record_quiz_answer(results, "multiple_choice", submitted_multiple_choice[i],
+                               question=q['question'], expected_answer=correct_options)
+
     for i, q in enumerate(quiz_data['true_false_questions']):
         st.write(f"**{len(quiz_data['single_choice_questions']) + len(quiz_data['multiple_choice_questions']) + i + 1}. {q['question']}**")
         selected_answer = st.radio("True or False?", ["True", "False"], key=f"tf_{i}", label_visibility="hidden", index=None)
         correct_answer = "True" if q['correct_answer'] else "False"
         if selected_answer:
-            if selected_answer == correct_answer:
+            is_correct = selected_answer == correct_answer
+            if is_correct:
                 st.success("Correct!")
             else:
                 st.error("Incorrect.")
+            record_quiz_answer(results, "true_false", is_correct,
+                               question=q['question'], expected_answer=correct_answer)
             with st.expander("Explanation", expanded=False):
                 st.write(q['explanation'])
 
@@ -459,8 +639,22 @@ def render_questions(quiz_data):
                 st.success("Correct!")
             else:
                 st.error("Incorrect.")
+            # No reliable auto-scoring for short answers: count as answered only.
+            record_quiz_answer(results, "short_answer", None)
             with st.expander("Explanation", expanded=False):
                 st.write(q['explanation'])
+
+    results[SUBMITTED_MULTIPLE_CHOICE_KEY] = submitted_multiple_choice
+    st.session_state[quiz_results_state_key(session_uid)] = results
+
+    summary = summarize_quiz_results(results)
+    if summary["total_answered"] > 0:
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Answered", summary["total_answered"])
+        col2.metric("Correct", summary["total_correct"])
+        col3.metric("Accuracy", f"{summary['accuracy']:.0%}")
+
+    return results
 
 def render_content_feedback_form(goal):
     st.header("🌟 Value Your Feedback!") 
@@ -500,7 +694,16 @@ def update_learner_profile_with_feedback(goal, feedback_data, session_informatio
     if session_information != "":
         session_information = copy.deepcopy(session_information)
         session_information["if_learned"] = True
-    new_learner_profile = update_learner_profile(goal["learner_profile"], feedback_data, session_information=session_information, llm_type=st.session_state["llm_type"])
+    # Quiz results accumulated by render_questions ride along as
+    # quiz_performance so the profiler sees measured evidence, not just
+    # self-reported feedback.
+    session_title = resolve_session_title(
+        session_information,
+        goal.get("learning_path"),
+        st.session_state.get("selected_session_id", 0),
+    )
+    learner_interactions = merge_quiz_performance(feedback_data, build_quiz_performance(get_stored_quiz_results(), session_title))
+    new_learner_profile = update_learner_profile(goal["learner_profile"], learner_interactions, session_information=session_information, llm_type=st.session_state["llm_type"])
     if new_learner_profile is None:
         st.error("Failed to update learner profile. Please try again.")
         return False
