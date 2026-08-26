@@ -3,6 +3,19 @@
 
 <head>
   <meta charset="utf-8">
+  <script>
+    // Apply the color theme before first paint to avoid a flash: an explicit
+    // choice from localStorage wins, otherwise follow the system preference.
+    (function () {
+      try {
+        var theme = localStorage.getItem('gm-theme');
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* private mode etc. — stay light */ }
+    })();
+  </script>
   <!-- Meta tags for social media banners -->
   <meta name="description"
     content="GenMentor: A goal-oriented tutoring system leveraging large language models (LLMs) for personalized learning experiences in educational contexts.">
@@ -121,6 +134,13 @@
                   <i class="fab fa-github"></i>
                 </span>
                 <span>GitHub</span>
+              </a>
+              <a class="button is-dark theme-toggle" id="theme-toggle" role="button" tabindex="0"
+                aria-label="Toggle dark mode" title="Toggle light/dark theme">
+                <!-- Both icons are rendered; CSS shows the one for the OTHER
+                     theme (moon in light mode, sun in dark mode). -->
+                <span class="icon theme-icon theme-icon-moon"><i class="fas fa-moon"></i></span>
+                <span class="icon theme-icon theme-icon-sun"><i class="fas fa-sun"></i></span>
               </a>
             </div>
           </div>

@@ -99,3 +99,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// Light/dark theme toggle. The initial theme is applied pre-paint by the
+// inline script in <head> (localStorage choice, else system preference).
+// Clicking the button stores an explicit choice; while the user has not
+// chosen, live system theme changes are followed.
+(function () {
+  var attach = function () {
+  var root = document.documentElement;
+  var toggle = document.getElementById('theme-toggle');
+  var media = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function stored() {
+    try {
+      var value = localStorage.getItem('gm-theme');
+      return value === 'light' || value === 'dark' ? value : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('gm-theme', next); } catch (e) { /* ignore */ }
+    });
+  }
+
+  var onSystemChange = function (event) {
+    if (stored()) { return; }
+    root.setAttribute('data-theme', event.matches ? 'dark' : 'light');
+  };
+  if (media.addEventListener) {
+    media.addEventListener('change', onSystemChange);
+  } else if (media.addListener) {
+    media.addListener(onSystemChange);
+  }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach);
+  } else {
+    attach();
+  }
+})();

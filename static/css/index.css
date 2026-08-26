@@ -786,3 +786,166 @@ section {
 
 
 
+
+/* ---------- Theme toggle button ---------- */
+
+.theme-toggle .icon {
+  margin-right: 0 !important;
+}
+
+.theme-toggle .theme-icon-sun {
+  display: none;
+}
+
+html[data-theme='dark'] .theme-toggle .theme-icon-sun {
+  display: inline-flex;
+}
+
+html[data-theme='dark'] .theme-toggle .theme-icon-moon {
+  display: none;
+}
+
+/* ---------- Dark theme ---------- */
+
+html[data-theme='dark'] body {
+  background-color: #17181c;
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] .navbar,
+html[data-theme='dark'] .navbar-menu,
+html[data-theme='dark'] .hero,
+html[data-theme='dark'] .section {
+  background-color: #17181c;
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] .navbar-item,
+html[data-theme='dark'] .navbar-link {
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] a.navbar-item:hover,
+html[data-theme='dark'] .navbar-link:hover {
+  background-color: #24262c;
+  color: #ffffff;
+}
+
+html[data-theme='dark'] .navbar-item:hover .icon {
+  color: hsl(204, 86%, 63%);
+}
+
+html[data-theme='dark'] .hero.is-light,
+html[data-theme='dark'] .hero-body.is-light {
+  background-color: #1f2127;
+}
+
+html[data-theme='dark'] .title,
+html[data-theme='dark'] .content h1,
+html[data-theme='dark'] .content h2,
+html[data-theme='dark'] .content h3,
+html[data-theme='dark'] .content h4,
+html[data-theme='dark'] .content h5,
+html[data-theme='dark'] .content h6,
+html[data-theme='dark'] strong {
+  color: #e8e9ea;
+}
+
+html[data-theme='dark'] .subtitle {
+  color: #b5b7bd;
+}
+
+html[data-theme='dark'] .content {
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] .box {
+  background-color: #1f2127;
+  color: #dbdbdb;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .tabs a {
+  color: #b5b7bd;
+}
+
+html[data-theme='dark'] pre {
+  background-color: #101116;
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] pre code {
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] hr {
+  background-color: #2b2d34;
+}
+
+html[data-theme='dark'] .footer {
+  background-color: #101116;
+  color: #b5b7bd;
+}
+
+html[data-theme='dark'] .footer strong,
+html[data-theme='dark'] .footer .title {
+  color: #e8e9ea;
+}
+
+/* Dark-theme fixes for rules above that hardcode white surfaces or use
+   !important (navbar glass effect, results boxes/tabs, tables, footer). */
+
+html[data-theme='dark'] .navbar {
+  background-color: rgba(23, 24, 28, 0.95) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@media screen and (max-width: 1023px) {
+  html[data-theme='dark'] .navbar-menu {
+    background-color: rgba(23, 24, 28, 0.95) !important;
+  }
+}
+
+html[data-theme='dark'] #results .box {
+  background-color: #1f2127;
+}
+
+html[data-theme='dark'] #results .tabs.is-boxed li a {
+  background-color: #17181c;
+  border-color: #2b2d34;
+}
+
+html[data-theme='dark'] .table {
+  background: #1f2127;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .table th {
+  background: #24262c;
+}
+
+html[data-theme='dark'] .table tr:hover {
+  background-color: #24262c;
+}
+
+html[data-theme='dark'] .title-subtitle,
+html[data-theme='dark'] .publication-venue {
+  color: #b5b7bd;
+}
+
+html[data-theme='dark'] .footer .icon-link {
+  color: #b5b7bd;
+}
+
+html[data-theme='dark'] .tag i.fas {
+  color: #dbdbdb;
+}
+
+/* Bulma's .hero.is-light .title/.subtitle (0,3,0) outrank the generic dark
+   title rule above — override them explicitly. */
+html[data-theme='dark'] .hero.is-light .title,
+html[data-theme='dark'] .hero.is-light .subtitle,
+html[data-theme='dark'] .hero-body.is-light .title,
+html[data-theme='dark'] .hero-body.is-light .subtitle {
+  color: #e8e9ea;
+}
