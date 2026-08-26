@@ -1,9 +1,9 @@
 import streamlit as st
-from collections import defaultdict
 import config
-import json
 import logging
 from pathlib import Path
+
+from utils import data_store
 
 logger = logging.getLogger(__name__)
 
@@ -38,48 +38,49 @@ PERSIST_KEYS = [
 
 
 def _get_data_store_path():
-    return Path(__file__).resolve().parents[1] / "user_data" / "data_store.json"
+    """SQLite store (WAL). The pre-SQLite JSON store auto-migrates on first load."""
+    return Path(__file__).resolve().parents[1] / "user_data" / "data_store.db"
+
+
+def _persistable_keys():
+    """PERSIST_KEYS plus any quiz_results_* keys currently in session state.
+
+    Quiz results live under dynamic per-session keys, so they are picked up by
+    prefix instead of a static list — completing a session after an app restart
+    must still carry the quiz data into the profile update.
+    """
+    return list(PERSIST_KEYS) + [
+        k for k in st.session_state if k.startswith("quiz_results_")
+    ]
 
 
 def load_persistent_state():
-    """Load persisted keys from a local JSON file into st.session_state.
+    """Restore persisted keys from the SQLite store into st.session_state.
 
-    Only keys listed in PERSIST_KEYS will be restored. Returns False if there is
-    nothing to restore or the store could not be read; a store that exists but is
-    unreadable or corrupt is logged rather than ignored.
+    Only keys listed in PERSIST_KEYS (plus quiz_results_*) are restored.
+    Returns False if there is nothing to restore or the store could not be
+    read; a store that exists but is unreadable is logged rather than ignored.
     """
-    path = _get_data_store_path()
-    if not path.exists():
+    snapshot = data_store.load_snapshot(_get_data_store_path())
+    if not snapshot:
         return False
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        logger.error("Could not read persisted state from %s: %s", path, exc, exc_info=True)
-        return False
-    if not isinstance(data, dict):
-        logger.error("Persisted state at %s is not a JSON object (got %s)", path, type(data).__name__)
-        return False
-    for k, v in data.items():
-        if k in PERSIST_KEYS:
+    restored = False
+    for k, v in snapshot.items():
+        if k in PERSIST_KEYS or k.startswith("quiz_results_"):
             st.session_state[k] = v
-    return True
+            restored = True
+    return restored
 
 
 def save_persistent_state():
-    """Save whitelisted st.session_state keys to a local JSON file.
+    """Persist whitelisted st.session_state keys to the SQLite store.
 
     Returns True on success. Failures are logged and reported as False; callers
     that can show UI (see `_autosave` in main.py) surface them to the user.
     """
-    path = _get_data_store_path()
-    data = {k: st.session_state[k] for k in PERSIST_KEYS if k in st.session_state}
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-        return True
-    except (OSError, TypeError, ValueError) as exc:
-        logger.error("Could not persist state to %s: %s", path, exc, exc_info=True)
-        return False
+    keys = _persistable_keys()
+    snapshot = {k: st.session_state[k] for k in keys if k in st.session_state}
+    return data_store.save_snapshot(_get_data_store_path(), snapshot)
 
 
 def initialize_session_state():
@@ -155,6 +156,8 @@ def initialize_session_state():
     if "to_add_goal" not in st.session_state:
         reset_to_add_goal()
 
+    # {goal_id: [{"ts": epoch, "rate": 0..1}, ...]} — real timestamps, kept
+    # in the mastery_history table; legacy plain-rate lists auto-migrate.
     if 'learned_skills_history' not in st.session_state:
         st.session_state['learned_skills_history'] = {}
 

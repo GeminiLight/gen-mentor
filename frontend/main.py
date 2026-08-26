@@ -8,6 +8,7 @@ import streamlit as st
 from streamlit.errors import StreamlitAPIException
 
 from utils.state import initialize_session_state, save_persistent_state, _get_data_store_path
+from utils import data_store
 from config import asset_path
 
 logger = logging.getLogger(__name__)
@@ -45,17 +46,19 @@ def _switch_page(page: str) -> bool:
 
 
 def _reset_data_store(path: Path) -> None:
-    """Archive the data store under a timestamped name, then delete it.
+    """Archive the SQLite data store under a timestamped name, then delete it.
 
     The archive is written first on purpose: if it cannot be created the store is
-    left in place rather than destroyed without a backup.
+    left in place rather than destroyed without a backup. WAL/SHM siblings are
+    removed alongside the db file.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
         return
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-    shutil.copy2(str(path), str(path.parent / f"data_storage-{ts}.json"))
-    path.unlink()
+    shutil.copy2(str(path), str(path.parent / f"data_storage-{ts}.db"))
+    for sibling in data_store.db_files(path):
+        sibling.unlink(missing_ok=True)
 
 
 initialize_session_state()
@@ -113,6 +116,7 @@ knowledge_document = st.Page("views/knowledge_document.py", title="Resume Learni
 learner_profile = st.Page("views/learner_profile.py", title="My Profile", icon=":material/person:", default=False, url_path="learner_profile")
 goal_management = st.Page("views/goal_management.py", title="Goal Management", icon=":material/flag:", default=False, url_path="goal_management")
 dashboard = st.Page("views/dashboard.py", title="Analytics Dashboard", icon=":material/browse:", default=False, url_path="dashboard")
+sources = st.Page("views/sources.py", title="Knowledge Sources", icon=":material/source:", default=False, url_path="sources")
 
 # Learning Analytics Dashboard
 if not st.session_state["if_complete_onboarding"]:
@@ -150,11 +154,13 @@ else:
 
         if all_skill != 0:
             mastery_rate = learned_skill / all_skill
+            # Entries are {"ts", "rate"} — real timestamps persisted in the
+            # mastery_history table (the dashboard plots against them).
             if not history:
-                history.append(mastery_rate)
+                history.append({"ts": time.time(), "rate": mastery_rate})
             elif time.time() - goal['start_time'] > MASTERY_SNAPSHOT_INTERVAL:
                 goal['start_time'] = time.time()
-                history.append(mastery_rate)
+                history.append({"ts": time.time(), "rate": mastery_rate})
 
         if len(history) > MASTERY_HISTORY_LENGTH:
             del history[:-MASTERY_HISTORY_LENGTH]

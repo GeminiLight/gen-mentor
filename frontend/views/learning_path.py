@@ -30,8 +30,18 @@ def render_learning_path():
         </style>
     """, unsafe_allow_html=True)
     if not goal["learning_path"]:
+        st.info("Pick how many sessions this goal should be split into. Scheduling starts right away; if it fails, adjust the number and it retries.")
+        session_count = st.number_input(
+            "Number of sessions",
+            min_value=3,
+            max_value=10,
+            value=8,
+            step=1,
+            help="Total learning sessions for the first schedule of this goal (3-10).",
+            key="initial_session_count",
+        )
         with st.spinner('Scheduling Learning Path ...'):
-            scheduled = schedule_learning_path(goal["learner_profile"], session_count=8, llm_type=st.session_state["llm_type"])
+            scheduled = schedule_learning_path(goal["learner_profile"], session_count=int(session_count), llm_type=st.session_state["llm_type"])
         if scheduled is None:
             # Backend failed (message already shown by the client); keep the
             # empty path so the next render retries instead of treating the
