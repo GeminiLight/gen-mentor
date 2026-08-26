@@ -1,0 +1,6 @@
+{
+    "knowledge_draft": {
+        "title": "Pandas DataFrames",
+        "content": "A DataFrame is a two-dimensional, size-mutable table with labeled rows and columns, and it is the workhorse structure of the Pandas library. Each column is a Series that shares a common index, which is why selecting, filtering, and joining data feels consistent across the whole API.\n\nThe quickest way to build one from scratch is to pass a dictionary of column names to lists: `df = pd.DataFrame({\"product\": [...], \"sales\": [...]})`. More often you will load data directly with `pd.read_csv(\"sales.csv\")`, which exposes options for parsing dates, choosing an index column, and handling missing values at load time.\n\nInternalize the inspection methods early: `df.head()` previews the first rows, `df.info()` summarizes column types and non-null counts, `df.describe()` returns quick statistics for numeric columns, and `df.shape` reports the `(rows, columns)` tuple. Together they answer most questions you should ask before touching a new dataset."
+    }
+}

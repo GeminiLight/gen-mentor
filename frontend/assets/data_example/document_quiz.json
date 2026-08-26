@@ -1,0 +1,66 @@
+{
+    "document_quiz": {
+        "single_choice_questions": [
+            {
+                "question": "Which Pandas method returns the first five rows of a DataFrame by default?",
+                "options": [
+                    "df.head()",
+                    "df.tail()",
+                    "df.first()",
+                    "df.top()"
+                ],
+                "correct_option": 0,
+                "explanation": "head(n=5) previews the top of a DataFrame; tail() returns the last rows instead."
+            },
+            {
+                "question": "What does the shape attribute of a DataFrame return?",
+                "options": [
+                    "The column labels as a list",
+                    "A tuple of (number of rows, number of columns)",
+                    "The total number of cells",
+                    "The data type of each column"
+                ],
+                "correct_option": 1,
+                "explanation": "df.shape is a (rows, columns) tuple; df.dtypes is what lists the column types."
+            },
+            {
+                "question": "Which expression computes the average of the sales column for each region?",
+                "options": [
+                    "df.groupby(\"region\")[\"sales\"].mean()",
+                    "df[\"sales\"].mean(\"region\")",
+                    "df.mean(group=\"region\")",
+                    "df.sort_values(\"sales\").mean()"
+                ],
+                "correct_option": 0,
+                "explanation": "groupby splits rows by region, the column selection picks sales, and mean() aggregates each group."
+            }
+        ],
+        "multiple_choice_questions": [
+            {
+                "question": "Which statements about df.groupby are correct? (Select all that apply)",
+                "options": [
+                    "It implements the split-apply-combine pattern",
+                    "It can group by several columns when given a list",
+                    "It requires the DataFrame to be sorted first",
+                    "Aggregations like sum() or mean() can be chained after it"
+                ],
+                "correct_options": [0, 1, 3],
+                "explanation": "Sorting is not required — grouping handles unordered rows; the other three statements describe standard groupby usage."
+            }
+        ],
+        "true_false_questions": [
+            {
+                "question": "In Pandas, a Series is a one-dimensional labeled array, while a DataFrame is two-dimensional.",
+                "correct_answer": true,
+                "explanation": "A DataFrame is a collection of Series that share one index, one Series per column."
+            }
+        ],
+        "short_answer_questions": [
+            {
+                "question": "Which DataFrame method computes count, mean, std, and quartiles for all numeric columns at once?",
+                "expected_answer": "describe",
+                "explanation": "df.describe() returns summary statistics for every numeric column by default."
+            }
+        ]
+    }
+}

@@ -2,43 +2,113 @@
     "learning_path": [
         {
             "id": "Session 1",
-            "title": "Introduction to HRIS Management",
-            "abstract": "This session introduces the basics of HRIS systems, focusing on their role in HR management.",
+            "title": "Python Fundamentals for Data Science",
+            "abstract": "Refresh core Python syntax and learn the structures that data work relies on: lists, dictionaries, functions, and comprehensions.",
             "if_learned": false,
-            "associated_skills": ["HRIS Management"],
-            "knowledge_points": [
+            "associated_skills": ["Python Programming"],
+            "desired_outcome_when_completed": [
                 {
-                    "name": "Understanding HRIS Systems",
-                    "complexity_level": "beginner"
-                },
-                {
-                    "name": "Components of HRIS",
-                    "complexity_level": "beginner"
-                },
-                {
-                    "name": "Benefits of HRIS",
-                    "complexity_level": "beginner"
+                    "name": "Python Programming",
+                    "level": "beginner"
                 }
             ]
         },
         {
             "id": "Session 2",
-            "title": "Advanced Employee Relations",
-            "abstract": "Explore advanced strategies for managing employee relations effectively.",
+            "title": "Working with Pandas DataFrames",
+            "abstract": "Load tabular data into DataFrames, inspect it with head, info, describe, and select and filter rows and columns.",
             "if_learned": false,
-            "associated_skills": ["Employee Relations"],
-            "knowledge_points": [
+            "associated_skills": ["Python Programming"],
+            "desired_outcome_when_completed": [
                 {
-                    "name": "Conflict Resolution Techniques",
-                    "complexity_level": "intermediate"
+                    "name": "Python Programming",
+                    "level": "intermediate"
+                }
+            ]
+        },
+        {
+            "id": "Session 3",
+            "title": "Data Cleaning and Preparation",
+            "abstract": "Handle missing values, duplicate rows, and type inconsistencies so a raw dataset becomes analysis-ready.",
+            "if_learned": false,
+            "associated_skills": ["Python Programming", "Statistics & Probability"],
+            "desired_outcome_when_completed": [
+                {
+                    "name": "Python Programming",
+                    "level": "intermediate"
                 },
                 {
-                    "name": "Building Employee Trust",
-                    "complexity_level": "intermediate"
+                    "name": "Statistics & Probability",
+                    "level": "beginner"
+                }
+            ]
+        },
+        {
+            "id": "Session 4",
+            "title": "Exploratory Data Analysis and Visualization",
+            "abstract": "Profile distributions and relationships numerically, then communicate them with clear Matplotlib charts.",
+            "if_learned": false,
+            "associated_skills": ["Data Visualization", "Statistics & Probability"],
+            "desired_outcome_when_completed": [
+                {
+                    "name": "Data Visualization",
+                    "level": "intermediate"
                 },
                 {
-                    "name": "Effective Communication in Employee Relations",
-                    "complexity_level": "intermediate"
+                    "name": "Statistics & Probability",
+                    "level": "beginner"
+                }
+            ]
+        },
+        {
+            "id": "Session 5",
+            "title": "Statistics and Probability for Data Science",
+            "abstract": "Build working intuition for distributions, sampling, and uncertainty using simulation before formulas.",
+            "if_learned": false,
+            "associated_skills": ["Statistics & Probability"],
+            "desired_outcome_when_completed": [
+                {
+                    "name": "Statistics & Probability",
+                    "level": "intermediate"
+                }
+            ]
+        },
+        {
+            "id": "Session 6",
+            "title": "Statistical Inference and Hypothesis Testing",
+            "abstract": "Frame questions as testable hypotheses, run t-tests and chi-square tests, and read p-values honestly.",
+            "if_learned": false,
+            "associated_skills": ["Statistics & Probability"],
+            "desired_outcome_when_completed": [
+                {
+                    "name": "Statistics & Probability",
+                    "level": "intermediate"
+                }
+            ]
+        },
+        {
+            "id": "Session 7",
+            "title": "SQL Fundamentals for Data Extraction",
+            "abstract": "Query relational databases with SELECT, WHERE, and GROUP BY, and pull results straight into a DataFrame.",
+            "if_learned": false,
+            "associated_skills": ["SQL"],
+            "desired_outcome_when_completed": [
+                {
+                    "name": "SQL",
+                    "level": "intermediate"
+                }
+            ]
+        },
+        {
+            "id": "Session 8",
+            "title": "Advanced SQL Queries and Joins",
+            "abstract": "Combine tables with inner and left joins, reshape results with CTEs, and analyze patterns with window functions.",
+            "if_learned": false,
+            "associated_skills": ["SQL"],
+            "desired_outcome_when_completed": [
+                {
+                    "name": "SQL",
+                    "level": "advanced"
                 }
             ]
         }
