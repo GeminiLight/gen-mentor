@@ -294,6 +294,15 @@ body {
   color: hsl(204, 86%, 53%);
 }
 
+/* Action buttons (Paper / GitHub): the icon must follow the button's own
+   text color, not the menu-item grey / hover-blue treatment above. These
+   overrides sit after the :hover rule so they win at equal specificity. */
+.navbar-item .button .icon,
+.navbar-item .button:hover .icon,
+.navbar-item:hover .button .icon {
+  color: inherit;
+}
+
 .navbar .button {
   transition: transform 0.2s ease;
 }
