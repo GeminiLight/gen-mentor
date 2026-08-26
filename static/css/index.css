@@ -949,3 +949,38 @@ html[data-theme='dark'] .hero-body.is-light .title,
 html[data-theme='dark'] .hero-body.is-light .subtitle {
   color: #e8e9ea;
 }
+
+/* Theme toggle: square rounded button, ghost (outlined) style so it reads
+   as a control rather than a third solid action button. */
+
+.theme-toggle {
+  width: 2.5em;
+  height: 2.5em;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid #dbdbdb;
+  color: #4a4a4a;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus {
+  background-color: transparent;
+  border-color: hsl(204, 86%, 53%);
+  color: hsl(204, 86%, 53%);
+}
+
+html[data-theme='dark'] .theme-toggle {
+  background-color: transparent;
+  border-color: #3a3d45;
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] .theme-toggle:hover,
+html[data-theme='dark'] .theme-toggle:focus {
+  background-color: transparent;
+  border-color: hsl(204, 86%, 63%);
+  color: hsl(204, 86%, 63%);
+}
