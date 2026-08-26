@@ -22,10 +22,10 @@
   <meta property="og:title" content="GenMentor: LLM-powered & Goal-oriented Tutor" />
   <meta property="og:description"
     content="GenMentor is a personalized tutoring system that leverages large language models to optimize learning paths based on individual goals and profiles." />
-  <meta property="og:url" content="https://tianfuwang.tech/genmentor" />
-  <meta property="og:image" content="https://www.tianfuwang.tech/gen-mentor/static/images/genmentor-framework.png" />
-  <meta property="og:image:width" content="2610" />
-  <meta property="og:image:height" content="1308" />
+  <meta property="og:url" content="https://www.tianfuwang.tech/gen-mentor/" />
+  <meta property="og:image" content="https://www.tianfuwang.tech/gen-mentor/static/images/og_banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
   <meta name="twitter:title" content="GenMentor: LLM-powered & Goal-oriented Tutor">
   <meta name="twitter:description"
@@ -45,6 +45,9 @@
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
@@ -63,6 +66,12 @@
         <a class="navbar-item" href="#">
           <img src="static/images/favicon.png" alt="GenMentor Logo" class="mr-2">
           <span class="has-text-weight-bold is-size-4 gradient-text">GenMentor</span>
+        </a>
+
+        <a class="button theme-toggle is-hidden-desktop navbar-theme-toggle" role="button" tabindex="0"
+          aria-label="Toggle dark mode" title="Toggle light/dark theme">
+          <span class="icon theme-icon theme-icon-moon"><i class="fas fa-moon"></i></span>
+          <span class="icon theme-icon theme-icon-sun"><i class="fas fa-sun"></i></span>
         </a>
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
@@ -200,7 +209,12 @@
                 <span class="author-block"><sup>3</sup>Microsoft Research Asia</span>
                 <span class="eql-cntrb"><br><sup>†</sup>Indicates Corresponding Authors<br></span>
               </small>
-              <span class="author-block"><b>WWW 2025 (Industry Track) Oral</b></span>
+              <span class="author-block venue-line">
+                <span class="venue-badge">
+                  <span class="icon"><i class="fas fa-trophy"></i></span>
+                  <span>WWW 2025 (Industry Track) &middot; <b>Oral Presentation</b></span>
+                </span>
+              </span>
             </div>
 
             <div class="column has-text-centered">
@@ -268,51 +282,34 @@
   </section>
 
 
-  <!-- Added privacy demo notification -->
-  <section class="hero teaser">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered has-text-centered">
-          <div class="notification is-warning has-text-centered">
-            <span class="icon">
-              <i class="fas fa-exclamation-triangle"></i>
-            </span>
-            Due to Microsoft's privacy concerns, the demo is currently unavailable.
-            <br>
-            Please setup the demo locally by following the instructions in our `README.md` on GitHub.
-          </div>
-        </div>
-    </div>
-  </section>
-
-
   <!-- Image carousel -->
   <section class="hero is-small">
     <div class="hero-body">
       <div class="container">
         <div id="results-carousel" class="carousel results-carousel" data-items="1">
           <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_1.png" alt="Goal & Profile Initialization" width="80%"
+            <img src="static/images/genmentor_demo_1.png" alt="Goal & Profile Initialization" width="80%" loading="lazy"
               style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
             <!-- </div> -->
             <h2 class="subtitle has-text-centered">Goal & Profile Initialization</h2>
           </div>
           <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_2.png" alt="Skill Gap Identification" width="80%"
+            <img src="static/images/genmentor_demo_2.png" alt="Skill Gap Identification" width="80%" loading="lazy"
               style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
             <h2 class="subtitle has-text-centered">Skill Gap Identification</h2>
           </div>
           <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_3.png" alt="Learning Path Scheduling" width="80%"
+            <img src="static/images/genmentor_demo_3.png" alt="Learning Path Scheduling" width="80%" loading="lazy"
               style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
             <h2 class="subtitle has-text-centered">Learning Path Scheduling</h2>
           </div>
           <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_4.png" alt="Learning Content Creation" width="80%"
+            <img src="static/images/genmentor_demo_4.png" alt="Learning Content Creation" width="80%" loading="lazy"
               style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
             <h2 class="subtitle has-text-centered">Learning Content Creation</h2>
           </div>
           <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_5.png" alt="Dynamic Learner Profile" width="80%"
+            <img src="static/images/genmentor_demo_5.png" alt="Dynamic Learner Profile" width="80%" loading="lazy"
               style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
             <h2 class="subtitle has-text-centered">Dynamic Learner Profile</h2>
           </div>
@@ -369,7 +366,7 @@
               <div class="column is-4">
                 <div class="box has-background-white">
                   <h4 class="title is-6 mb-4">
-                    <span class="icon has-text-warning">
+                    <span class="feature-icon-chip chip-warning">
                       <i class="fas fa-exclamation-triangle"></i>
                     </span>
                     Limitations of Traditional ITS
@@ -384,7 +381,7 @@
               <div class="column is-4">
                 <div class="box has-background-white">
                   <h4 class="title is-6 mb-4">
-                    <span class="icon has-text-info">
+                    <span class="feature-icon-chip chip-info">
                       <i class="fas fa-briefcase"></i>
                     </span>
                     Professional Learning Needs
@@ -400,7 +397,7 @@
               <div class="column is-4">
                 <div class="box has-background-white">
                   <h4 class="title is-6 mb-4">
-                    <span class="icon has-text-success">
+                    <span class="feature-icon-chip chip-success">
                       <i class="fas fa-bullseye"></i>
                     </span>
                     Goal-oriented Learning
@@ -419,7 +416,7 @@
           <div class="column is-three-fifths">
             <div class="box">
               <h4 class="title is-4 has-text-centered mb-4">Evolution of ITS Paradigms</h4>
-              <img src="static/images/its-paradigms.png" alt="ITS for Goal-oriented Learning" />
+              <img src="static/images/its-paradigms.png" alt="ITS for Goal-oriented Learning" loading="lazy" />
               <div class="content mt-4">
                 <div class="tags are-medium is-centered">
                   <span class="tag is-light">Traditional ITS</span>
@@ -448,7 +445,7 @@
         <div class="column is-10">
           <div class="box framework-overview">
             <figure class="image">
-              <img src="static/images/genmentor-framework.png" alt="GenMentor Framework Overview" class="framework-image">
+              <img src="static/images/genmentor-framework.png" alt="GenMentor Framework Overview" class="framework-image" loading="lazy">
             </figure>
           </div>
         </div>
@@ -686,7 +683,7 @@
               <!-- Automated Results Tab -->
               <div id="automated-results" class="tab-pane is-active">
                 <div class="box">
-                  <img src="static/images/automated-results.png" alt="LLM-based Automated Evaluation" class="mb-4"/>
+                  <img src="static/images/automated-results.png" alt="LLM-based Automated Evaluation" class="mb-4" loading="lazy"/>
                   <div class="content">
                     <h5 class="title is-5">Key Performance Highlights:</h5>
                     <div class="columns">
@@ -719,7 +716,7 @@
               <!-- Human Study Tab -->
               <div id="human-study" class="tab-pane">
                 <div class="box">
-                  <img src="static/images/questionnaire-results.png" alt="End-to-end Questionnaire Results" class="mb-4"/>
+                  <img src="static/images/questionnaire-results.png" alt="End-to-end Questionnaire Results" class="mb-4" loading="lazy"/>
                   <div class="content">
                     <h5 class="title is-5">User Study Insights:</h5>
                     <div class="columns">
@@ -763,10 +760,19 @@
         <div class="columns is-centered has-text-centered">
           <h2 class="title is-3">Demo Video Presentation</h2>
         </div>
+        <div class="columns is-centered has-text-centered mb-5">
+          <div class="column is-three-fifths">
+            <div class="demo-note">
+              <span class="icon"><i class="fas fa-circle-info"></i></span>
+              <span>For privacy reasons the hosted demo is limited; the full system can be run locally via the
+                <a href="https://github.com/GeminiLight/gen-mentor#quick-start" target="_blank">README quick-start</a>.</span>
+            </div>
+          </div>
+        </div>
         <div class="columns is-centered has-text-centered">
           <div class="column is-four-fifths">
             <div class="publication-video">
-              <iframe src="https://www.youtube.com/embed/vTdtGZop-Zc" frameborder="0"
+              <iframe src="https://www.youtube.com/embed/vTdtGZop-Zc" frameborder="0" loading="lazy"
                 allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
           </div>
@@ -779,34 +785,46 @@
   <!-- BibTex citation -->
 
   <section class="section" id="BibTeX">
-    <div class="container is-max-desktop content">
+    <div class="container is-max-desktop content has-text-centered">
       <h2 class="title">BibTeX</h2>
-      <pre><code>@inproceedings{www-2025-genmentor,
+      <div class="bibtex-box">
+        <button class="button is-small bibtex-copy" id="bibtex-copy" type="button" aria-label="Copy BibTeX entry">
+          <span class="icon"><i class="fas fa-copy"></i></span>
+          <span class="bibtex-copy-label">Copy</span>
+        </button>
+        <pre class="has-text-left"><code id="bibtex-code">@inproceedings{www-2025-genmentor,
   title={LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System},
   author={Wang, Tianfu and Zhan, Yi and Lian, Jianxun and Hu, Zhengyu and Yuan, Nicholas Jing and Zhang, Qi and Xie, Xing and Xiong, Hui},
   booktitle={ACM Web Conference},
   year={2025}
 }</code></pre>
+      </div>
     </div>
   </section>
 
   <footer class="footer">
-    <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-8">
-          <div class="content">
-            <p>
-              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-                target="_blank">Academic
-                Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io"
-                target="_blank">Nerfies</a> project page.
-              <br> <br> This website is licensed under a <a rel="license"
-                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
-                Commons Attribution-ShareAlike 4.0 International License</a>.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div class="container is-max-desktop has-text-centered">
+      <img src="static/images/favicon.png" alt="GenMentor Logo" class="footer-logo" loading="lazy">
+      <p class="footer-tagline"><span class="gradient-text has-text-weight-bold">GenMentor</span> — LLM-powered &amp;
+        Goal-oriented Tutoring System</p>
+      <p class="footer-nav">
+        <a href="#abstract">Abstract</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="#framework">Framework</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="#results">Results</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="https://github.com/GeminiLight/gen-mentor" target="_blank">GitHub</a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="#" id="back-to-top">Back to top &uarr;</a>
+      </p>
+      <p class="footer-attribution is-size-7">
+        This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+          target="_blank">Academic Project Page Template</a> (adopted from the <a href="https://nerfies.github.io"
+          target="_blank">Nerfies</a> project page) and is licensed under a
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0
+          License</a>.
+      </p>
     </div>
   </footer>
 

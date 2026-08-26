@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 (function () {
   var attach = function () {
   var root = document.documentElement;
-  var toggle = document.getElementById('theme-toggle');
+  var toggles = document.querySelectorAll('.theme-toggle');
   var media = window.matchMedia('(prefers-color-scheme: dark)');
 
   function stored() {
@@ -119,11 +119,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (toggle) {
-    toggle.addEventListener('click', function () {
+  toggles.forEach(function (toggle) {
+    toggle.addEventListener('click', function (event) {
+      event.preventDefault();
       var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       root.setAttribute('data-theme', next);
       try { localStorage.setItem('gm-theme', next); } catch (e) { /* ignore */ }
+    });
+  });
+
+  var copyBtn = document.getElementById('bibtex-copy');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function () {
+      var code = document.getElementById('bibtex-code');
+      var label = copyBtn.querySelector('.bibtex-copy-label');
+      var done = function () {
+        if (!label) return;
+        label.textContent = 'Copied!';
+        setTimeout(function () { label.textContent = 'Copy'; }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code.textContent.trim()).then(done);
+      } else {
+        var area = document.createElement('textarea');
+        area.value = code.textContent.trim();
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        document.body.removeChild(area);
+        done();
+      }
     });
   }
 

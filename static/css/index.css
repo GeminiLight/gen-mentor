@@ -1047,10 +1047,11 @@ html[data-theme='dark'] #framework {
    are white-background PNGs; they cannot be re-colored, so present them
    as deliberate white plates with rounded corners. The transparent
    title logo is excluded. */
-html[data-theme='dark'] section img:not(.title-logo) {
+html[data-theme="dark"] section img:not(.title-logo) {
   background-color: #ffffff;
   border-radius: 8px;
-  padding: 6px;
+  padding: 4px;
+  border: 1px solid #2b2d34;
 }
 
 /* #framework paints a light gradient via the background SHORTHAND; the
@@ -1084,4 +1085,229 @@ html[data-theme='dark'] section .title.is-5,
 html[data-theme='dark'] .box .title,
 html[data-theme='dark'] .content .title.is-5 {
   color: #e8e9ea !important;
+}
+
+/* ---------- Refinement pass: venue badge, demo note, icon chips,
+   BibTeX copy, footer, mobile figure/tabs handling ---------- */
+
+/* Venue badge under the title */
+.venue-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.1rem;
+  border: 1.5px solid hsl(204, 86%, 53%);
+  border-radius: 999px;
+  background: rgba(72, 95, 199, 0.08);
+  color: #363636;
+  font-weight: 600;
+}
+
+.venue-badge .icon {
+  color: hsl(204, 86%, 45%);
+}
+
+html[data-theme='dark'] .venue-badge {
+  background: rgba(102, 157, 246, 0.10);
+  color: #e8e9ea;
+  border-color: hsl(204, 86%, 63%);
+}
+
+html[data-theme='dark'] .venue-badge .icon {
+  color: hsl(204, 86%, 70%);
+}
+
+/* Soft info note in the Demo section (replaces the hero warning banner) */
+.demo-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.25rem;
+  border-radius: 10px;
+  background: rgba(72, 157, 246, 0.10);
+  border: 1px solid rgba(72, 157, 246, 0.25);
+  color: #485fc7;
+  text-align: left;
+}
+
+.demo-note a {
+  color: #485fc7;
+  text-decoration: underline;
+}
+
+html[data-theme='dark'] .demo-note {
+  background: rgba(102, 157, 246, 0.10);
+  border-color: rgba(102, 157, 246, 0.30);
+  color: #9fc3f8;
+}
+
+html[data-theme='dark'] .demo-note a {
+  color: #9fc3f8;
+}
+
+/* Tinted icon chips — matches the framework component-box treatment */
+.feature-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 9px;
+  margin-right: 0.6rem;
+  vertical-align: middle;
+}
+
+.chip-warning {
+  background: rgba(255, 183, 20, 0.16);
+  color: #b37700;
+}
+
+.chip-info {
+  background: rgba(62, 142, 242, 0.16);
+  color: #2960a8;
+}
+
+.chip-success {
+  background: rgba(72, 199, 142, 0.18);
+  color: #1e7d4f;
+}
+
+html[data-theme='dark'] .chip-warning {
+  color: #f5c95c;
+}
+
+html[data-theme='dark'] .chip-info {
+  color: #7fb2f8;
+}
+
+html[data-theme='dark'] .chip-success {
+  color: #6fd6a3;
+}
+
+/* BibTeX box with copy button */
+.bibtex-box {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.bibtex-copy {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  border: 1px solid #dbdbdb;
+  background: #ffffff;
+  color: #4a4a4a;
+}
+
+.bibtex-copy:hover {
+  border-color: hsl(204, 86%, 53%);
+  color: hsl(204, 86%, 45%);
+}
+
+html[data-theme='dark'] .bibtex-copy {
+  background: #24262c;
+  border-color: #3a3d45;
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] .bibtex-copy:hover {
+  border-color: hsl(204, 86%, 63%);
+  color: hsl(204, 86%, 70%);
+}
+
+/* Footer */
+.footer-logo {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.footer-tagline {
+  color: #4a4a4a;
+  margin-bottom: 0.75rem !important;
+}
+
+.footer-nav a {
+  color: hsl(204, 86%, 40%);
+  margin: 0 0.35rem;
+}
+
+.footer-nav a:hover {
+  text-decoration: underline;
+}
+
+.footer-attribution {
+  color: #7a7a7a;
+  margin-top: 0.75rem !important;
+}
+
+html[data-theme='dark'] .footer-tagline {
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] .footer-nav a {
+  color: hsl(204, 86%, 68%);
+}
+
+html[data-theme='dark'] .footer-attribution {
+  color: #8d8f96;
+}
+
+/* Theme toggle: lighter glyph so it reads as a control, not a filled block */
+.theme-toggle .icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  font-size: 1.05rem;
+}
+
+.navbar-theme-toggle {
+  margin-left: auto;
+  margin-right: 0.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* Mobile: keep wide figures readable via horizontal panning, and stop
+   the framework tabs from crushing their labels */
+@media screen and (max-width: 768px) {
+  #framework .framework-overview,
+  #motivation .column .box,
+  #results .tab-pane .box {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #framework .framework-image {
+    min-width: 680px;
+  }
+
+  #motivation .box img {
+    min-width: 560px;
+  }
+
+  #results .tab-pane .box > img {
+    min-width: 620px;
+    margin-bottom: 0 !important;
+  }
+
+  #arch-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #arch-tabs ul {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    min-width: max-content;
+  }
+
+  #arch-tabs a {
+    white-space: nowrap;
+  }
+}
+
+.bibtex-box pre {
+  overflow-x: auto;
 }
