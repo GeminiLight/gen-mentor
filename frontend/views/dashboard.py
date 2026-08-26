@@ -142,10 +142,17 @@ def render_session_learning_timeseries(goal):
 def render_mastery_skills_timeseries(goal):
     st.markdown("#### Mastery Skills Timeseries")
     st.write("View the learning progress over time.")
-    time_values = [i * 10 for i in range(len(st.session_state['learned_skills_history'][goal['id']]))]
+    # Entries are {"ts", "rate"} with real timestamps (persisted in
+    # mastery_history); the x axis is minutes since the first sample.
+    entries = [e for e in st.session_state['learned_skills_history'].get(goal['id'], [])
+               if isinstance(e, dict) and 'rate' in e]
+    if not entries:
+        st.info("No mastery history yet — it accumulates as you learn.")
+        return
+    t0 = entries[0].get("ts", 0.0) or 0.0
     char_data = pd.DataFrame({
-        'Mastery Rate': st.session_state['learned_skills_history'][goal['id']],
-        'Time': time_values,
+        'Mastery Rate': [float(e['rate']) for e in entries],
+        'Time': [round((float(e.get('ts', t0)) - t0) / 60.0, 1) for e in entries],
     })
     st.line_chart(char_data, x='Time', y='Mastery Rate')
     

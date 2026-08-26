@@ -170,6 +170,88 @@ def render_session_details(goal):
 # ---------------------------------------------------------------------------
 
 PIPELINE_STAGE_KEYS = ("knowledge_points", "knowledge_drafts", "document_structure")
+PIPELINE_TOTAL_STAGES = 4
+PIPELINE_STAGE_LABELS = {
+    "knowledge_points": "🔍 Knowledge points",
+    "knowledge_drafts": "📝 Knowledge point drafts",
+    "document_structure": "📚 Knowledge document",
+}
+PIPELINE_STAGE_RUNNING_LABELS = {
+    "knowledge_points": "🔍 Exploring knowledge points…",
+    "knowledge_drafts": "📝 Drafting knowledge points…",
+    "document_structure": "📚 Integrating knowledge document…",
+    "_quizzes": "🎯 Generating document quizzes…",
+}
+
+
+def pipeline_progress_snapshot(pipeline_state, document_cached=False):
+    """Compute the progress read-out for an in-flight content pipeline.
+
+    Pure helper (no Streamlit, no mutation of its arguments) so the fragment
+    below can re-run it every few seconds against the latest checkpoint
+    state. Returns ``None`` when there is nothing to show — no pipeline state
+    for the session, or a cached document with nothing checkpointed — which
+    makes a stale fragment fire a no-op. Otherwise::
+
+        {"completed": 0-3, "in_flight_stage": 1-4, "total": 4,
+         "restored_lines": [...], "status_line": str}
+
+    ``restored_lines`` describe the checkpointed stages ("Stage 2/4 📝
+    Knowledge point drafts ✓ restored"); ``status_line`` describes the stage
+    the main script run is currently executing.
+    """
+    if pipeline_state is None:
+        return None
+    state = pipeline_state if isinstance(pipeline_state, dict) else {}
+    restored = [
+        (stage, key)
+        for stage, key in enumerate(PIPELINE_STAGE_KEYS, start=1)
+        if state.get(key) is not None
+    ]
+    if not restored and document_cached:
+        return None
+    restored_lines = [
+        f"Stage {stage}/{PIPELINE_TOTAL_STAGES} {PIPELINE_STAGE_LABELS[key]} ✓ restored"
+        for stage, key in restored
+    ]
+    in_flight_stage = min(len(restored) + 1, PIPELINE_TOTAL_STAGES)
+    if in_flight_stage <= len(PIPELINE_STAGE_KEYS):
+        running_label = PIPELINE_STAGE_RUNNING_LABELS[PIPELINE_STAGE_KEYS[in_flight_stage - 1]]
+    else:
+        running_label = PIPELINE_STAGE_RUNNING_LABELS["_quizzes"]
+    return {
+        "completed": len(restored),
+        "in_flight_stage": in_flight_stage,
+        "total": PIPELINE_TOTAL_STAGES,
+        "restored_lines": restored_lines,
+        "status_line": f"Stage {in_flight_stage}/{PIPELINE_TOTAL_STAGES} {running_label}",
+    }
+
+
+@st.fragment(run_every="5s")
+def render_pipeline_progress(session_uid):
+    """Auto-refreshing progress area for the content preparation pipeline.
+
+    Display only: the heavy generation runs on the main script run (see
+    ``render_content_preparation``) and checkpoints into session state, which
+    this fragment re-reads every 5 seconds so an in-flight pipeline visibly
+    advances without user interaction. When the completed document cache
+    appears while the pipeline is still flagged as in flight, a full app
+    rerun swaps the page over to the document view. A fire without pipeline
+    state renders nothing.
+    """
+    document_cached = bool((st.session_state.get("document_caches") or {}).get(session_uid, False))
+    pipeline_state = (st.session_state.get("content_pipeline_state") or {}).get(session_uid)
+    snapshot = pipeline_progress_snapshot(pipeline_state, document_cached)
+    if snapshot is None:
+        return
+    if document_cached:
+        st.rerun(scope="app")
+        return
+    st.progress(snapshot["in_flight_stage"] / snapshot["total"])
+    st.write(snapshot["status_line"])
+    for line in snapshot["restored_lines"]:
+        st.caption(line)
 
 
 def next_pipeline_stage(pipeline_state):
@@ -218,6 +300,10 @@ def render_content_preparation(goal):
     # checkpointed stage instead of restarting the pipeline from scratch.
     pipeline_state = st.session_state["content_pipeline_state"].setdefault(session_uid, {})
 
+    # Progress read-out only: it refreshes itself every 5 seconds while the
+    # stages below run on this main script run and checkpoint their results.
+    render_pipeline_progress(session_uid)
+
     knowledge_points = None
     if next_pipeline_stage(pipeline_state) == "knowledge_points":
         with st.spinner("Stage 1/4 - Exploring knowledge Points..."):
@@ -233,8 +319,8 @@ def render_content_preparation(goal):
         _checkpoint_pipeline_stage(session_uid, "knowledge_points", knowledge_points)
         st.success("Stage 1/4 🔍 Knowledge points explored successfully.")
     else:
+        # Restored stages are reported by render_pipeline_progress above.
         knowledge_points = pipeline_state["knowledge_points"]
-        st.info("Stage 1/4 🔍 Knowledge points restored from your previous run.")
     with st.expander("View Explored Knowledge Points", expanded=False):
         for kp in knowledge_points:
             st.write(f"- {kp['name']} (`{kp['type']}`)")
@@ -258,7 +344,6 @@ def render_content_preparation(goal):
         st.success("Stage 2/4 📝 Knowledge points drafted successfully.")
     else:
         knowledge_drafts = pipeline_state["knowledge_drafts"]
-        st.info("Stage 2/4 📝 Knowledge point drafts restored from your previous run.")
     document_structure = None
     if next_pipeline_stage(pipeline_state) == "document_structure":
         with st.spinner("Stage 3/4 - Integrating knowledge document..."):
@@ -286,7 +371,6 @@ def render_content_preparation(goal):
         if learning_document is None:
             st.error("Failed to integrate knowledge document.")
             return
-        st.info("Stage 3/4 📚 Knowledge document restored from your previous run.")
     learning_content = {"document": learning_document}
     with st.spinner("Stage 4/4 - Generating document quizzes..."):
         quizzes = generate_document_quizzes(
@@ -482,14 +566,32 @@ def _resolve_correct_option(options, correct):
 
 QUIZ_RESULT_TYPES = ("single_choice", "multiple_choice", "true_false", "short_answer")
 QUIZ_RESULTS_KEY_PREFIX = "quiz_results_"
-# Multiple-choice correctness is only known at Submit time, and a bare button
-# click does not survive reruns, so submitted results are latched by question
-# index inside the stored results dict (private key, never sent as-is).
-SUBMITTED_MULTIPLE_CHOICE_KEY = "_submitted_multiple_choice"
+# All questions are judged together when "Submit Answers" is pressed, and a
+# bare button click does not survive reruns, so the judged per-question
+# verdicts are latched inside the stored results dict (private key, never
+# sent as-is to the profiler).
+SUBMITTED_ANSWERS_KEY = "_submitted_answers"
+# Wrong questions accumulate per goal for later review. The in-session copy
+# lives under QUIZ_REVIEW_LIST_KEY and is mirrored after every update into a
+# quiz_results_review_{goal_id} key, which the persistence layer auto-picks
+# (goal ids are normalised to strings because JSON round-trips do that to
+# int dict keys anyway).
+QUIZ_REVIEW_LIST_KEY = "quiz_review_list"
+# (kind, quiz_data list key, widget key prefix) in question render order.
+QUIZ_KIND_FIELDS = (
+    ("single_choice", "single_choice_questions", "single_"),
+    ("multiple_choice", "multiple_choice_questions", "multi_"),
+    ("true_false", "true_false_questions", "tf_"),
+    ("short_answer", "short_answer_questions", "short_"),
+)
 
 
 def quiz_results_state_key(session_uid):
     return f"{QUIZ_RESULTS_KEY_PREFIX}{session_uid}"
+
+
+def quiz_review_state_key(goal_id):
+    return f"{QUIZ_RESULTS_KEY_PREFIX}review_{goal_id}"
 
 
 def new_quiz_results():
@@ -548,6 +650,171 @@ def merge_quiz_performance(feedback_data, quiz_performance):
     return payload
 
 
+def _quiz_verdict(answered, display_correct):
+    """The per-question verdict shown after Submit ("unanswered" when skipped)."""
+    if not answered:
+        return "unanswered"
+    return "correct" if display_correct else "incorrect"
+
+
+def format_expected_answer(expected):
+    """Render an expected answer (option text, list of options, or text) inline."""
+    if expected is None:
+        return ""
+    if isinstance(expected, (list, tuple)):
+        return ", ".join(str(item) for item in expected)
+    return str(expected)
+
+
+def judge_quiz_submissions(quiz_data, selections):
+    """Judge every question against the submitted selections in one pass.
+
+    Pure helper (no Streamlit, no mutation of its arguments). ``selections``
+    holds the widget values aligned with the question lists in ``quiz_data``:
+    ``single_choice`` -> option text or None, ``multiple_choice`` -> list of
+    checked option texts, ``true_false`` -> "True"/"False"/None,
+    ``short_answer`` -> raw text.
+
+    Returns ``(results, judgments)``: ``results`` is the quiz-results dict
+    stored for the profile update (per-type counts + wrong_questions), and
+    ``judgments`` maps each question's widget key to its verdict for
+    rendering and review-list updates. Short answers have no reliable
+    auto-scoring, so they count as answered only (``is_correct=None``) and
+    never reach the review list; unanswered questions are not counted.
+    """
+    quiz_data = quiz_data or {}
+    selections = selections or {}
+    results = new_quiz_results()
+    judgments = {}
+    number = 0
+
+    def pick(kind, index):
+        values = selections.get(kind) or []
+        return values[index] if index < len(values) else None
+
+    for i, q in enumerate(quiz_data.get("single_choice_questions") or []):
+        number += 1
+        selected = pick("single_choice", i)
+        correct_option = _resolve_correct_option(q["options"], q["correct_option"])
+        expected = correct_option if correct_option is not None else q["correct_option"]
+        answered = selected is not None
+        is_correct = (selected == correct_option) if answered else None
+        if answered:
+            record_quiz_answer(results, "single_choice", is_correct,
+                               question=q["question"], expected_answer=expected)
+        judgments[f"single_{i}"] = {
+            "number": number, "kind": "single_choice", "question": q["question"],
+            "answered": answered, "is_correct": is_correct,
+            "verdict": _quiz_verdict(answered, bool(is_correct)), "expected_answer": expected,
+        }
+
+    for i, q in enumerate(quiz_data.get("multiple_choice_questions") or []):
+        number += 1
+        selected = list(pick("multiple_choice", i) or [])
+        correct_options = [c for c in (_resolve_correct_option(q["options"], idx) for idx in q["correct_options"]) if c is not None]
+        answered = len(selected) > 0
+        is_correct = (set(selected) == set(correct_options)) if answered else None
+        if answered:
+            record_quiz_answer(results, "multiple_choice", is_correct,
+                               question=q["question"], expected_answer=correct_options)
+        judgments[f"multi_{i}"] = {
+            "number": number, "kind": "multiple_choice", "question": q["question"],
+            "answered": answered, "is_correct": is_correct,
+            "verdict": _quiz_verdict(answered, bool(is_correct)), "expected_answer": correct_options,
+        }
+
+    for i, q in enumerate(quiz_data.get("true_false_questions") or []):
+        number += 1
+        selected = pick("true_false", i)
+        correct_answer = "True" if q["correct_answer"] else "False"
+        answered = selected is not None
+        is_correct = (selected == correct_answer) if answered else None
+        if answered:
+            record_quiz_answer(results, "true_false", is_correct,
+                               question=q["question"], expected_answer=correct_answer)
+        judgments[f"tf_{i}"] = {
+            "number": number, "kind": "true_false", "question": q["question"],
+            "answered": answered, "is_correct": is_correct,
+            "verdict": _quiz_verdict(answered, bool(is_correct)), "expected_answer": correct_answer,
+        }
+
+    for i, q in enumerate(quiz_data.get("short_answer_questions") or []):
+        number += 1
+        user_answer = pick("short_answer", i) or ""
+        expected = q.get("expected_answer") or ""
+        answered = bool(user_answer.strip())
+        display_correct = user_answer.strip().lower() == expected.strip().lower()
+        if answered:
+            record_quiz_answer(results, "short_answer", None)
+        judgments[f"short_{i}"] = {
+            "number": number, "kind": "short_answer", "question": q["question"],
+            "answered": answered, "is_correct": None,
+            "verdict": _quiz_verdict(answered, display_correct), "expected_answer": expected,
+        }
+
+    return results, judgments
+
+
+def update_quiz_review_list(review_list, goal_id, wrong_entries, wrong_at):
+    """Merge freshly wrong questions into the per-goal review list.
+
+    Dedupes by question text within the goal: a question missed again bumps
+    ``times_seen`` and refreshes ``wrong_at`` instead of adding a second row.
+    Mutates and returns ``review_list`` ({goal_id: [entry, ...]}).
+    """
+    entries = review_list.setdefault(str(goal_id), [])
+    by_question = {entry.get("question"): entry for entry in entries}
+    for wrong in wrong_entries:
+        question = wrong.get("question") or ""
+        existing = by_question.get(question)
+        if existing is not None:
+            existing["times_seen"] = int(existing.get("times_seen", 1)) + 1
+            existing["wrong_at"] = wrong_at
+            if wrong.get("session_title"):
+                existing["session_title"] = wrong["session_title"]
+            if wrong.get("expected_answer") is not None:
+                existing["expected_answer"] = wrong["expected_answer"]
+        else:
+            entry = {
+                "session_title": wrong.get("session_title", ""),
+                "question": question,
+                "expected_answer": wrong.get("expected_answer"),
+                "wrong_at": wrong_at,
+                "times_seen": 1,
+            }
+            entries.append(entry)
+            by_question[question] = entry
+    return review_list
+
+
+def humanize_time_ago(epoch, now=None):
+    """Humanise a unix timestamp relative to ``now`` ("3 hours ago")."""
+    try:
+        epoch = float(epoch)
+    except (TypeError, ValueError):
+        return "at an unknown time"
+    now = time.time() if now is None else float(now)
+    seconds = max(0, int(now - epoch))
+    if seconds < 10:
+        return "just now"
+    if seconds < 60:
+        return f"{seconds} seconds ago"
+    minutes = seconds // 60
+    if minutes < 60:
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    hours = seconds // 3600
+    if hours < 24:
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    days = hours // 24
+    if days < 31:
+        return f"{days} day{'s' if days != 1 else ''} ago"
+    months = days // 31
+    if months < 12:
+        return f"{months} month{'s' if months != 1 else ''} ago"
+    years = days // 365
+    return f"{years} year{'s' if years != 1 else ''} ago"
+
+
 def resolve_session_title(session_information, learning_path, selected_session_id=0):
     if isinstance(session_information, dict) and session_information.get("title"):
         return session_information["title"]
@@ -567,94 +834,136 @@ def clear_quiz_results(session_uid):
     st.session_state.pop(quiz_results_state_key(session_uid), None)
 
 
+def record_wrong_questions_for_review(goal_id, session_title, judgments):
+    """Fold one submission's wrong questions into the per-goal review list.
+
+    Also mirrors the goal's entries into a ``quiz_results_review_{goal_id}``
+    session key after every update so the persistence layer (which picks up
+    any ``quiz_results_*`` key automatically) keeps the review list across
+    app restarts.
+    """
+    wrong_entries = [
+        {"session_title": session_title, "question": judgment["question"],
+         "expected_answer": judgment.get("expected_answer")}
+        for judgment in judgments.values()
+        if judgment.get("is_correct") is False
+    ]
+    if not wrong_entries:
+        return
+    if QUIZ_REVIEW_LIST_KEY not in st.session_state:
+        st.session_state[QUIZ_REVIEW_LIST_KEY] = {}
+    review_list = update_quiz_review_list(st.session_state[QUIZ_REVIEW_LIST_KEY], goal_id, wrong_entries, wrong_at=time.time())
+    st.session_state[quiz_review_state_key(goal_id)] = list(review_list.get(str(goal_id), []))
+    save_persistent_state()
+
+
+def render_quiz_judgments(judgments, quiz_data):
+    """Per-question verdicts and explanations after Submit Answers."""
+    st.divider()
+    for _kind, list_key, key_prefix in QUIZ_KIND_FIELDS:
+        for i, q in enumerate((quiz_data or {}).get(list_key) or []):
+            judgment = judgments.get(f"{key_prefix}{i}")
+            if judgment is None:
+                continue
+            st.write(f"**{judgment['number']}. {q['question']}**")
+            if judgment.get("verdict") == "correct":
+                st.success("Correct!")
+            elif judgment.get("verdict") == "incorrect":
+                st.error("Incorrect.")
+            else:
+                st.caption("Not answered.")
+            expected = format_expected_answer(judgment.get("expected_answer"))
+            with st.expander("Explanation", expanded=judgment.get("verdict") == "incorrect", icon=":material/info:"):
+                if judgment.get("verdict") == "incorrect" and expected:
+                    st.markdown(f"**Expected answer:** {expected}")
+                st.write(q.get("explanation", ""))
+
+
+def render_quiz_review_list(goal_id):
+    """Collapsed recap of the questions this goal still owes a correct answer."""
+    entries = (st.session_state.get(QUIZ_REVIEW_LIST_KEY) or {}).get(str(goal_id))
+    if not entries:
+        # Restart-safe fallback: the mirrored quiz_results_review_* key is the
+        # copy restored by the persistence layer.
+        entries = st.session_state.get(quiz_review_state_key(goal_id)) or []
+    if not entries:
+        return
+    count = len(entries)
+    with st.expander(f"🔖 Review later — {count} question{'s' if count != 1 else ''} to revisit", expanded=False):
+        st.caption("Questions answered incorrectly for this goal, most recent first.")
+        for entry in sorted(entries, key=lambda e: e.get("wrong_at") or 0, reverse=True):
+            times_seen = int(entry.get("times_seen", 1))
+            st.markdown(f"**{entry.get('question', '')}**")
+            st.caption(
+                f"Missed {times_seen} time{'s' if times_seen != 1 else ''} · "
+                f"last seen {humanize_time_ago(entry.get('wrong_at') or 0)} · "
+                f"{entry.get('session_title') or 'earlier session'}"
+            )
+            expected = format_expected_answer(entry.get("expected_answer"))
+            if expected:
+                st.markdown(f"Expected answer: {expected}")
+
+
 def render_questions(quiz_data):
     st.subheader("💡 Test Your Knowledge")
     session_uid = get_current_session_uid()
-    # Results are rebuilt from the widget values on every rerun so changing an
-    # answer keeps the summary in sync; only multiple-choice Submit results
-    # are latched (a bare button click does not survive reruns).
-    previous_results = st.session_state.get(quiz_results_state_key(session_uid)) or {}
-    submitted_multiple_choice = dict(previous_results.get(SUBMITTED_MULTIPLE_CHOICE_KEY, {}))
-    results = new_quiz_results()
+    goal_id = st.session_state["selected_goal_id"]
+    goal = st.session_state["goals"][goal_id]
+    session_title = resolve_session_title(None, goal.get("learning_path"),
+                                          st.session_state.get("selected_session_id", 0))
+
+    # Selections are made for every question first and judged together when
+    # "Submit Answers" is pressed; nothing is scored per interaction.
+    selections = {"single_choice": [], "multiple_choice": [], "true_false": [], "short_answer": []}
+    question_counts = {list_key: len(quiz_data.get(list_key) or []) for _kind, list_key, _prefix in QUIZ_KIND_FIELDS}
 
     for i, q in enumerate(quiz_data['single_choice_questions']):
-        st.write(f"**{i+1}. {q['question']}**")
-        selected_option = st.radio("Options", q['options'], key=f"single_{i}", index=None, label_visibility="hidden")
-        if selected_option is not None:
-            correct_option = _resolve_correct_option(q['options'], q['correct_option'])
-            is_correct = selected_option == correct_option
-            if is_correct:
-                st.success("Correct!")
-            else:
-                st.error("Incorrect.")
-            record_quiz_answer(results, "single_choice", is_correct,
-                               question=q['question'],
-                               expected_answer=correct_option if correct_option is not None else q['correct_option'])
-            with st.expander("Explanation", expanded=True, icon=":material/info:"):
-                st.write(q['explanation'])
+        st.write(f"**{i + 1}. {q['question']}**")
+        selections["single_choice"].append(
+            st.radio("Options", q['options'], key=f"single_{i}", index=None, label_visibility="hidden"))
 
     for i, q in enumerate(quiz_data['multiple_choice_questions']):
-        st.write(f"**{len(quiz_data['single_choice_questions']) + i + 1}. {q['question']}**")
-
-        selected_options = []
-        for j, option in enumerate(q['options']):
-            if st.checkbox(option, key=f"multi_{i}_option_{j}"):
-                selected_options.append(option)
-
-        correct_options = [c for c in (_resolve_correct_option(q['options'], idx) for idx in q['correct_options']) if c is not None]
-
-        if st.button("Submit", key=f"multi_submit_{i}"):
-            submitted_multiple_choice[i] = set(selected_options) == set(correct_options)
-            if submitted_multiple_choice[i]:
-                st.success("Correct!")
-            else:
-                st.error("Some options are incorrect.")
-            with st.expander("Explanation", expanded=False):
-                st.write(q['explanation'])
-
-        if i in submitted_multiple_choice:
-            record_quiz_answer(results, "multiple_choice", submitted_multiple_choice[i],
-                               question=q['question'], expected_answer=correct_options)
+        st.write(f"**{question_counts['single_choice_questions'] + i + 1}. {q['question']}**")
+        selections["multiple_choice"].append([
+            option for j, option in enumerate(q['options'])
+            if st.checkbox(option, key=f"multi_{i}_option_{j}")
+        ])
 
     for i, q in enumerate(quiz_data['true_false_questions']):
-        st.write(f"**{len(quiz_data['single_choice_questions']) + len(quiz_data['multiple_choice_questions']) + i + 1}. {q['question']}**")
-        selected_answer = st.radio("True or False?", ["True", "False"], key=f"tf_{i}", label_visibility="hidden", index=None)
-        correct_answer = "True" if q['correct_answer'] else "False"
-        if selected_answer:
-            is_correct = selected_answer == correct_answer
-            if is_correct:
-                st.success("Correct!")
-            else:
-                st.error("Incorrect.")
-            record_quiz_answer(results, "true_false", is_correct,
-                               question=q['question'], expected_answer=correct_answer)
-            with st.expander("Explanation", expanded=False):
-                st.write(q['explanation'])
+        st.write(f"**{question_counts['single_choice_questions'] + question_counts['multiple_choice_questions'] + i + 1}. {q['question']}**")
+        selections["true_false"].append(
+            st.radio("True or False?", ["True", "False"], key=f"tf_{i}", label_visibility="hidden", index=None))
 
     for i, q in enumerate(quiz_data['short_answer_questions']):
-        st.write(f"**{len(quiz_data['single_choice_questions']) + len(quiz_data['multiple_choice_questions']) + len(quiz_data['true_false_questions']) + i + 1}. {q['question']}**")
-        user_answer = st.text_input("Your Answer", key=f"short_{i}", label_visibility="hidden")
-        if user_answer:
-            if user_answer.strip().lower() == q['expected_answer'].strip().lower():
-                st.success("Correct!")
-            else:
-                st.error("Incorrect.")
-            # No reliable auto-scoring for short answers: count as answered only.
-            record_quiz_answer(results, "short_answer", None)
-            with st.expander("Explanation", expanded=False):
-                st.write(q['explanation'])
+        st.write(f"**{question_counts['single_choice_questions'] + question_counts['multiple_choice_questions'] + question_counts['true_false_questions'] + i + 1}. {q['question']}**")
+        selections["short_answer"].append(
+            st.text_input("Your Answer", key=f"short_{i}", label_visibility="hidden"))
 
-    results[SUBMITTED_MULTIPLE_CHOICE_KEY] = submitted_multiple_choice
-    st.session_state[quiz_results_state_key(session_uid)] = results
+    if st.button("Submit Answers", key="submit-all-answers", type="primary",
+                 icon=":material/fact_check:", use_container_width=True):
+        # Judge everything at once and latch the outcome (a bare button click
+        # does not survive reruns) so the summary is already stored before the
+        # Complete Session profile update reads it.
+        results, judgments = judge_quiz_submissions(quiz_data, selections)
+        results[SUBMITTED_ANSWERS_KEY] = judgments
+        st.session_state[quiz_results_state_key(session_uid)] = results
+        record_wrong_questions_for_review(goal_id, session_title, judgments)
+        save_persistent_state()
 
-    summary = summarize_quiz_results(results)
-    if summary["total_answered"] > 0:
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Answered", summary["total_answered"])
-        col2.metric("Correct", summary["total_correct"])
-        col3.metric("Accuracy", f"{summary['accuracy']:.0%}")
+    stored_results = st.session_state.get(quiz_results_state_key(session_uid)) or {}
+    judgments = stored_results.get(SUBMITTED_ANSWERS_KEY) or {}
+    if judgments:
+        render_quiz_judgments(judgments, quiz_data)
+        summary = summarize_quiz_results(stored_results)
+        if summary["total_answered"] > 0:
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Answered", summary["total_answered"])
+            col2.metric("Correct", summary["total_correct"])
+            col3.metric("Accuracy", f"{summary['accuracy']:.0%}")
 
-    return results
+    render_quiz_review_list(goal_id)
+
+    return stored_results
 
 def render_content_feedback_form(goal):
     st.header("🌟 Value Your Feedback!") 
