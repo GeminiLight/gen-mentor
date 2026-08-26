@@ -248,20 +248,13 @@ def render_document_content_by_section(document):
         section_documents.append(document[start_idx:end_idx-1].strip())
 
     page_key = f"{selected_gid}-{session_id}"
-    params = {}
-    # st.query_params is not a plain dict on every Streamlit version; probe it
-    # defensively and fall back to the experimental accessor below.
+    # st.query_params is dict-like and returns plain string values on every
+    # supported Streamlit version; the deprecated experimental accessor
+    # (removed after 2024-04-11) is no longer needed as a fallback.
     try:
-        if hasattr(st, 'query_params') and isinstance(st.query_params, dict):
-            params = dict(st.query_params)
-    except (AttributeError, TypeError) as exc:
-        logger.debug("Could not read st.query_params: %s", exc)
-    if not params and hasattr(st, 'experimental_get_query_params'):
-        try:
-            raw = st.experimental_get_query_params()
-            params = {k: (v[0] if isinstance(v, list) and v else v) for k, v in raw.items()}
-        except Exception:
-            params = {}
+        params = st.query_params.to_dict()
+    except Exception:
+        params = {}
 
     if 'gm_page' in params:
         # A hand-edited or stale ?gm_page= value is expected; ignore it.
