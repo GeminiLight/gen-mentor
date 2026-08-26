@@ -14,7 +14,9 @@ def ask_autor_chatbot():
         goal = st.session_state["to_add_goal"]
     else:
         goal = st.session_state["goals"][st.session_state["selected_goal_id"]]
-    learner_profile = goal["learner_profile"]
+    # The profile only exists once "Schedule Learning Path" has run; the tutor
+    # works fine without one, so default instead of crashing the dialog.
+    learner_profile = goal.get("learner_profile", "")
 
     messages = st.container(height=300)
     if prompt := st.chat_input("Ask me anything"):
