@@ -59,6 +59,30 @@ def active_backend_endpoint() -> str:
     return endpoint.rstrip("/") + "/"
 
 
+def kb_sources(goal_id):
+    """List the pages pinned into a goal's knowledge base."""
+    url = f"{active_backend_endpoint()}knowledge-base/{goal_id}"
+    try:
+        response = httpx.get(url, timeout=30)
+    except httpx.HTTPError as exc:
+        st.error(f"Could not reach the backend at {url}: {exc}")
+        return []
+    if response.status_code != 200:
+        return []
+    return response.json().get("sources", [])
+
+
+def kb_unpin(goal_id, source):
+    """Remove a page from the goal's knowledge base; True on success."""
+    url = f"{active_backend_endpoint()}knowledge-base/{goal_id}"
+    try:
+        response = httpx.request("DELETE", url, params={"source": source}, timeout=30)
+    except httpx.HTTPError as exc:
+        st.error(f"Could not reach the backend at {url}: {exc}")
+        return False
+    return response.status_code == 200
+
+
 def make_post_request(api_name, data, mock_data_path=None, timeout=DEFAULT_TIMEOUT):
     """POST to the backend and return the decoded body, or ``None`` on failure."""
     if use_mock_data and mock_data_path:
