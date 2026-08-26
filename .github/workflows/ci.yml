@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Resolve backend dependencies (fast fail)
+        # Note: uv writes the lock atomically via a temp file next to the
+        # output path, so /dev/null is not a valid target on GitHub runners
+        # (/dev is not writable); use the runner's scratch dir instead.
+        run: uv pip compile backend/requirements.txt -o "$RUNNER_TEMP/backend-requirements.lock"
+
+      - name: Create virtual environment
+        run: |
+          uv venv .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+
+      - name: Install backend dependencies
+        run: uv pip install -r backend/requirements.txt pytest httpx
+
+      - name: Run backend tests
+        working-directory: backend
+        run: ../.venv/bin/python -m pytest tests -q
+
+  frontend:
+    name: Frontend tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Resolve frontend dependencies (drift check)
+        run: uv pip compile frontend/requirements.txt -o "$RUNNER_TEMP/frontend-requirements.lock"
+
+      - name: Create virtual environment
+        run: |
+          uv venv .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+
+      - name: Install frontend dependencies
+        run: uv pip install -r frontend/requirements.txt pytest
+
+      - name: Byte-compile all frontend sources
+        run: .venv/bin/python -m compileall frontend
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: ../.venv/bin/python -m pytest tests -q
