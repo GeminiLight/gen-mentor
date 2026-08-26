@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Sequence
+from typing import Any, Dict, List, Sequence
 
 from pydantic import BaseModel, Field, RootModel, field_validator
 
@@ -62,6 +62,11 @@ class KnowledgePoints(BaseModel):
 class KnowledgeDraft(BaseModel):
     title: str
     content: str
+    # Machine-generated provenance (NOT produced by the model): the numbered
+    # external resources this draft was grounded on, appended by the API layer
+    # so [N] markers in `content` stay verifiable.
+    sources: List[Dict[str, Any]] = Field(default_factory=list)
+    model_config = {"extra": "ignore"}
 
 
 class DocumentStructure(BaseModel):

@@ -62,6 +62,30 @@ def integrate_learning_document_with_llm(llm, learner_profile, learning_path, le
     return prepare_markdown_document(document_structure, knowledge_points, knowledge_drafts)
 
 
+def _format_sources(sources) -> str:
+    """Render a draft's provenance as a compact reference list.
+
+    `[N]` markers inside draft content refer to these entries, keeping the
+    generated document verifiable against what the search actually returned.
+    """
+    if not isinstance(sources, list) or not sources:
+        return ""
+    lines = []
+    seen = set()
+    for src in sources:
+        if not isinstance(src, dict):
+            continue
+        idx = src.get("index")
+        url = str(src.get("source") or "").strip()
+        title = str(src.get("title") or "").strip() or url
+        key = (idx, url)
+        if idx is None or key in seen or (not title and not url):
+            continue
+        seen.add(key)
+        lines.append(f"[{idx}] {title}" + (f" — {url}" if url and url != title else ""))
+    return "**Sources**\n\n" + "\n".join(lines) if lines else ""
+
+
 def prepare_markdown_document(document_structure, knowledge_points, knowledge_drafts):
     """Render a markdown learning document from the integrated structure and drafts.
 
@@ -110,5 +134,8 @@ def prepare_markdown_document(document_structure, knowledge_points, knowledge_dr
             kd = (knowledge_drafts or [])[idx] if idx < len(knowledge_drafts or []) else None
             if isinstance(kd, dict):
                 md += f"\n\n### {kd.get('title','')}\n\n{kd.get('content','')}\n"
+                refs = _format_sources(kd.get('sources'))
+                if refs:
+                    md += f"\n\n{refs}\n"
     md += f"\n\n## Summary\n\n{document_structure.get('summary','') if isinstance(document_structure, dict) else ''}"
     return md

@@ -16,6 +16,7 @@ from config import backend_endpoint, use_mock_data, use_search as default_use_se
 # must correspond to a route registered in backend/main.py.
 API_NAMES = {
     "chat_with_tutor": "chat-with-tutor",
+    "chat_with_tutor_stream": "chat-with-tutor/stream",
     "refine_goal": "refine-learning-goal",
     "identify_skill_gap": "identify-skill-gap-with-info",
     "create_profile": "create-learner-profile-with-info",
@@ -98,17 +99,46 @@ def get_available_models(backend_endpoint=None):
     return response.json().get("models", [])
 
 
-def chat_with_tutor(chat_messages, learner_profile, llm_type=None, method_name="genmentor"):
+def chat_with_tutor(chat_messages, learner_profile, llm_type=None, method_name="genmentor", goal_id=None):
     data = {
         "messages": chat_messages,
         "learner_profile": learner_profile,
         "method_name": method_name,
+        **({"goal_id": str(goal_id)} if goal_id is not None else {}),
         **model_selection(llm_type),
     }
     response = make_post_request(
         API_NAMES["chat_with_tutor"], data, "./assets/data_example/ai_tutor_chat.json"
     )
     return response.get("response") if response else None
+
+
+def chat_with_tutor_stream(chat_messages, learner_profile, llm_type=None, method_name="genmentor", goal_id=None):
+    """Stream the tutor's reply; yields text deltas as they arrive.
+
+    Returns None (after showing the error) if the stream cannot be opened, so
+    callers can fall back or bail out without a stack trace.
+    """
+    data = {
+        "messages": chat_messages,
+        "learner_profile": learner_profile,
+        "method_name": method_name,
+        **({"goal_id": str(goal_id)} if goal_id is not None else {}),
+        **model_selection(llm_type),
+    }
+    backend_url = f"{active_backend_endpoint()}{API_NAMES['chat_with_tutor_stream']}"
+    try:
+        with httpx.stream("POST", backend_url, json=data, timeout=DEFAULT_TIMEOUT) as response:
+            if response.status_code != 200:
+                response.read()
+                st.error(f"Tutor stream failed ({response.status_code}): {response.text[:300]}")
+                return None
+            for chunk in response.iter_text():
+                if chunk:
+                    yield chunk
+    except httpx.HTTPError as exc:
+        st.error(f"Could not reach the backend at {backend_url}: {exc}")
+        return None
 
 
 def refine_learning_goal(learning_goal, learner_information, llm_type=None, method_name="genmentor"):
@@ -265,6 +295,7 @@ def draft_knowledge_point(
     use_search=None,
     llm_type=None,
     method_name="genmentor",
+    goal_id=None,
 ):
     data = {
         "learner_profile": learner_profile,
@@ -274,6 +305,7 @@ def draft_knowledge_point(
         "knowledge_point": knowledge_point,
         "use_search": default_use_search if use_search is None else use_search,
         "method_name": method_name,
+        **({"goal_id": str(goal_id)} if goal_id is not None else {}),
         **model_selection(llm_type),
     }
     response = make_post_request(
@@ -291,6 +323,7 @@ def draft_knowledge_points(
     use_search=None,
     llm_type=None,
     method_name="genmentor",
+    goal_id=None,
 ):
     data = {
         "learner_profile": learner_profile,
@@ -300,6 +333,7 @@ def draft_knowledge_points(
         "allow_parallel": allow_parallel,
         "use_search": default_use_search if use_search is None else use_search,
         "method_name": method_name,
+        **({"goal_id": str(goal_id)} if goal_id is not None else {}),
         **model_selection(llm_type),
     }
     response = make_post_request(

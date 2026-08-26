@@ -32,7 +32,8 @@ PERSIST_KEYS = [
     "userId",
     "document_caches",
     "session_learning_times",
-    
+    "content_pipeline_state",
+
 ]
 
 
@@ -124,6 +125,12 @@ def initialize_session_state():
         
     if "document_caches" not in st.session_state:
         st.session_state["document_caches"] = {}
+
+    # Per-session checkpoints (knowledge_points / knowledge_drafts /
+    # document_structure) so an interrupted content pipeline can resume
+    # instead of restarting after a page refresh or app restart.
+    if "content_pipeline_state" not in st.session_state:
+        st.session_state["content_pipeline_state"] = {}
 
     if "session_learning_times" not in st.session_state:
         st.session_state["session_learning_times"] = {}

@@ -14,19 +14,32 @@ llm:
   model_name: deepseek-v4-flash
   base_url: null  # URL comes from OPENAI_BASE_URL in .env (read natively by ChatOpenAI)
 
+# Local embedding default switched to bge-small-en-v1.5: ~4x faster than the
+# previous all-mpnet-base-v2 with comparable retrieval quality. To use an
+# OpenAI-compatible embeddings API instead (when the gateway serves one), set
+# provider: openai and model_name accordingly (key/base URL come from
+# OPENAI_API_KEY / OPENAI_BASE_URL in .env).
 embedding:
   provider: huggingface
-  model_name: sentence-transformers/all-mpnet-base-v2
+  model_name: BAAI/bge-small-en-v1.5
 
+# Tavily (provider: tavily + TAVILY_API_KEY) returns page content with the
+# search itself, skipping the slow per-page crawl entirely. duckduckgo needs
+# no key but is slower and flakier.
 search:
   provider: duckduckgo
   max_results: 5
   loader_type: web
+  tavily_api_key: null      # falls back to the TAVILY_API_KEY env var
+  tavily_search_depth: basic  # basic | advanced
 
 vectorstore:
   type: chroma
   persist_directory: data/vectorstore
-  collection_name: genmentor
+  # Renamed when the default embedding model changed (vector spaces are not
+  # comparable across models); the old genmentor/genmentor_kb collections are
+  # simply abandoned on disk.
+  collection_name: genmentor_v2
 
 rag:
   text_splitter_type: recursive_character

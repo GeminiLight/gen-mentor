@@ -54,6 +54,8 @@ class BaseRequest(BaseModel):
 class ChatWithTutorRequest(BaseRequest):
     messages: JsonLike
     learner_profile: JsonLike = ""
+    # When set, retrieval also draws on this goal's pinned knowledge base.
+    goal_id: Optional[str] = None
 
     @property
     def message_list(self) -> List[dict]:
@@ -123,6 +125,7 @@ class KnowledgePointDraftingRequest(BaseRequest):
     knowledge_points: JsonLike
     knowledge_point: JsonLike
     use_search: bool = True
+    goal_id: Optional[str] = None  # pins search results into the goal's knowledge base
 
 
 class KnowledgePointsDraftingRequest(BaseRequest):
@@ -132,6 +135,7 @@ class KnowledgePointsDraftingRequest(BaseRequest):
     knowledge_points: JsonLike
     use_search: bool = True
     allow_parallel: bool = True
+    goal_id: Optional[str] = None  # pins search results into the goal's knowledge base
 
 
 class LearningDocumentIntegrationRequest(BaseRequest):
@@ -159,6 +163,7 @@ class TailoredContentGenerationRequest(BaseRequest):
     use_search: bool = True
     allow_parallel: bool = True
     with_quiz: bool = True
+    goal_id: Optional[str] = None  # pins search results into the goal's knowledge base
 
 
 __all__ = [

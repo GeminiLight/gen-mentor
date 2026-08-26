@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_float import *
-from utils.request_api import chat_with_tutor
+from utils.request_api import chat_with_tutor_stream
 from utils.state import index_goal_by_id
 
 
@@ -22,20 +22,24 @@ def ask_autor_chatbot():
     if prompt := st.chat_input("Ask me anything"):
         messages.chat_message("user").write(prompt)
         st.session_state["tutor_messages"].append({"role": "user", "content": prompt})
-        response = chat_with_tutor(
-            st.session_state["tutor_messages"][-20:],
-            learner_profile,
-            st.session_state["llm_type"])
-        if response is None:
-            # A None would be appended to tutor_messages (a persisted key) and
-            # make every future call fail validation. Drop the user turn too so
-            # the history stays well-formed.
+        # goal_id: retrieval also draws on this goal's pinned knowledge base
+        goal_id = goal.get("id") if isinstance(goal, dict) else None
+        with messages.chat_message("assistant"):
+            # The stream client renders its own error and yields nothing on
+            # failure, so an empty reply here means "show fallback".
+            stream = chat_with_tutor_stream(
+                st.session_state["tutor_messages"][-20:],
+                learner_profile,
+                st.session_state["llm_type"],
+                goal_id=goal_id,
+            )
+            reply = st.write_stream(stream)
+        if not reply:
+            # Stream failed (message already shown); drop the user turn so the
+            # persisted history stays well-formed for the next attempt.
             st.session_state["tutor_messages"].pop()
-            messages.chat_message("assistant").write(
-                "⚠️ Sorry, the tutor is unavailable right now. Please try again later.")
         else:
-            messages.chat_message("assistant").write(response)
-            st.session_state["tutor_messages"].append({"role": "assistant", "content": response})
+            st.session_state["tutor_messages"].append({"role": "assistant", "content": reply})
 
 def click_chatbot_func():
     ask_autor_chatbot()
