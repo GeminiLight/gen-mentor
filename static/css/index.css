@@ -984,3 +984,52 @@ html[data-theme='dark'] .theme-toggle:focus {
   border-color: hsl(204, 86%, 63%);
   color: hsl(204, 86%, 63%);
 }
+
+/* ---------- Dark theme, second pass ---------- */
+
+/* The navbar itself is .is-light: Bulma's .navbar.is-light .navbar-item
+   (0,3,0) outrules the generic dark item color and leaves near-black
+   text on the darkened bar. */
+html[data-theme='dark'] .navbar.is-light .navbar-item,
+html[data-theme='dark'] .navbar.is-light .navbar-link {
+  color: #dbdbdb;
+}
+
+/* Bulma background helpers carry !important, so the dark overrides need
+   it too. */
+html[data-theme='dark'] .has-background-white {
+  background-color: #1f2127 !important;
+}
+
+html[data-theme='dark'] .has-background-light {
+  background-color: #24262c !important;
+}
+
+html[data-theme='dark'] .has-background-primary-light {
+  background-color: rgba(0, 209, 178, 0.15) !important;
+}
+
+html[data-theme='dark'] .has-background-info-light {
+  background-color: rgba(50, 152, 220, 0.15) !important;
+}
+
+html[data-theme='dark'] .has-background-success-light {
+  background-color: rgba(72, 199, 142, 0.15) !important;
+}
+
+html[data-theme='dark'] .tag.is-light {
+  background-color: #2b2d34;
+  color: #dbdbdb;
+}
+
+/* .feature-card hardcodes a near-white surface. */
+html[data-theme='dark'] .feature-card {
+  background: #1f2127;
+  color: #dbdbdb;
+}
+
+/* Keep the demo-status warning readable without glaring on dark. */
+html[data-theme='dark'] .notification.is-warning {
+  background-color: #3a2f14;
+  color: #f0e6c8;
+}
