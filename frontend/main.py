@@ -69,7 +69,7 @@ st.markdown('<style>' + open(asset_path('./assets/css/main.css')).read() + '</st
 
 if st.session_state.get("if_complete_onboarding", False) and not st.session_state.get("_navigated_lp_once", False):
     st.session_state["_navigated_lp_once"] = True
-    _switch_page("pages/learning_path.py")
+    _switch_page("views/learning_path.py")
 
 @st.dialog("Confirm Reset")
 def show_reset_dialog():
@@ -88,7 +88,7 @@ def show_reset_dialog():
                 st.error(f"Could not clear saved data: {exc}")
             st.session_state.clear()
             # After clearing state, navigate to onboarding page explicitly
-            if not _switch_page("pages/onboarding.py"):
+            if not _switch_page("views/onboarding.py"):
                 st.rerun()
     with col_cancel:
         if st.button("Cancel"):
@@ -99,16 +99,16 @@ if st.session_state["show_chatbot"]:
     render_chatbot()
 
 if st.session_state["if_complete_onboarding"]:
-    onboarding = st.Page("pages/onboarding.py", title="Onboarding", icon=":material/how_to_reg:", default=False, url_path="onboarding")
-    learning_path = st.Page("pages/learning_path.py", title="Learning Path", icon=":material/route:", default=True, url_path="learning_path")
+    onboarding = st.Page("views/onboarding.py", title="Onboarding", icon=":material/how_to_reg:", default=False, url_path="onboarding")
+    learning_path = st.Page("views/learning_path.py", title="Learning Path", icon=":material/route:", default=True, url_path="learning_path")
 else:
-    onboarding = st.Page("pages/onboarding.py", title="Onboarding", icon=":material/how_to_reg:", default=True, url_path="onboarding")
-    learning_path = st.Page("pages/learning_path.py", title="Learning Path", icon=":material/route:", default=False, url_path="learning_path")
-skill_gaps = st.Page("pages/skill_gap.py", title="Skill Gap", icon=":material/insights:", default=False, url_path="skill_gap")
-knowledge_document = st.Page("pages/knowledge_document.py", title="Resume Learning", icon=":material/menu_book:", default=False, url_path="knowledge_document")
-learner_profile = st.Page("pages/learner_profile.py", title="My Profile", icon=":material/person:", default=False, url_path="learner_profile")
-goal_management = st.Page("pages/goal_management.py", title="Goal Management", icon=":material/flag:", default=False, url_path="goal_management")
-dashboard = st.Page("pages/dashboard.py", title="Analytics Dashboard", icon=":material/browse:", default=False, url_path="dashboard")
+    onboarding = st.Page("views/onboarding.py", title="Onboarding", icon=":material/how_to_reg:", default=True, url_path="onboarding")
+    learning_path = st.Page("views/learning_path.py", title="Learning Path", icon=":material/route:", default=False, url_path="learning_path")
+skill_gaps = st.Page("views/skill_gap.py", title="Skill Gap", icon=":material/insights:", default=False, url_path="skill_gap")
+knowledge_document = st.Page("views/knowledge_document.py", title="Resume Learning", icon=":material/menu_book:", default=False, url_path="knowledge_document")
+learner_profile = st.Page("views/learner_profile.py", title="My Profile", icon=":material/person:", default=False, url_path="learner_profile")
+goal_management = st.Page("views/goal_management.py", title="Goal Management", icon=":material/flag:", default=False, url_path="goal_management")
+dashboard = st.Page("views/dashboard.py", title="Analytics Dashboard", icon=":material/browse:", default=False, url_path="dashboard")
 
 # Learning Analytics Dashboard
 if not st.session_state["if_complete_onboarding"]:
@@ -122,14 +122,38 @@ else:
         with _center:
             if st.button("Reset", help="Clear local history (keeps timestamped backups)"):
                 show_reset_dialog()
-    goal = st.session_state["goals"][st.session_state["selected_goal_id"]]
-    # Seed the snapshot clock once per goal; resetting it on every render would
-    # make the interval check below unreachable.
-    goal.setdefault('start_time', time.time())
-    history = st.session_state['learned_skills_history'].setdefault(goal['id'], [])
+    # Look the goal up by its "id" field rather than list position: an older or
+    # hand-edited data store can leave selected_goal_id out of range, which a
+    # bare list index would turn into an app-wide crash.
+    goals = st.session_state["goals"]
+    goal = next((g for g in goals if g.get("id") == st.session_state["selected_goal_id"]), None)
+    if goal is None and goals:
+        goal = goals[0]
+        st.session_state["selected_goal_id"] = goal.get("id", 0)
+    if goal is not None:
+        # Seed the snapshot clock once per goal; resetting it on every render would
+        # make the interval check below unreachable.
+        goal.setdefault('start_time', time.time())
+        history = st.session_state['learned_skills_history'].setdefault(goal.get('id', 0), [])
 
-    unlearned_skill = len(goal['learner_profile']['cognitive_status']['in_progress_skills'])
-    learned_skill = len(goal['learner_profile']['cognitive_status']['mastered_skills'])
+        # A goal whose profile is still empty (e.g. created while the backend was
+        # down) has no cognitive_status yet; treat it as zero skills rather than
+        # crashing the whole app.
+        cognitive_status = (goal.get('learner_profile') or {}).get('cognitive_status') or {}
+        unlearned_skill = len(cognitive_status.get('in_progress_skills', []))
+        learned_skill = len(cognitive_status.get('mastered_skills', []))
+        all_skill = learned_skill + unlearned_skill
+
+        if all_skill != 0:
+            mastery_rate = learned_skill / all_skill
+            if not history:
+                history.append(mastery_rate)
+            elif time.time() - goal['start_time'] > MASTERY_SNAPSHOT_INTERVAL:
+                goal['start_time'] = time.time()
+                history.append(mastery_rate)
+
+        if len(history) > MASTERY_HISTORY_LENGTH:
+            del history[:-MASTERY_HISTORY_LENGTH]
     all_skill = learned_skill + unlearned_skill
 
     if all_skill != 0:

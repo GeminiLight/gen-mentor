@@ -13,7 +13,7 @@ from utils.request_api import identify_skill_gap, create_learner_profile
 def render_skill_gap():
     goal = st.session_state["to_add_goal"]
     if not goal["learning_goal"] or not st.session_state["learner_information"]:
-        st.switch_page("pages/onboarding.py")
+        st.switch_page("views/onboarding.py")
 
     left, center, right = st.columns([1, 5, 1])
     with center:
@@ -45,6 +45,6 @@ def render_skill_gap():
                     st.session_state["if_complete_onboarding"] = True
                     st.session_state["selected_page"] = "Learning Path"
                     save_persistent_state()
-                    st.switch_page("pages/learning_path.py")
+                    st.switch_page("views/learning_path.py")
 
 render_skill_gap()
