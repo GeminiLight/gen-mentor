@@ -1033,3 +1033,22 @@ html[data-theme='dark'] .notification.is-warning {
   background-color: #3a2f14;
   color: #f0e6c8;
 }
+
+/* ---------- Dark theme, third pass ---------- */
+
+/* #framework resets its own background with an ID selector
+   (background-color: initial), which outrules the generic .hero-body
+   override above. */
+html[data-theme='dark'] #framework {
+  background-color: #1f2127;
+}
+
+/* Academic figures (framework diagram, demo screenshots, result charts)
+   are white-background PNGs; they cannot be re-colored, so present them
+   as deliberate white plates with rounded corners. The transparent
+   title logo is excluded. */
+html[data-theme='dark'] section img:not(.title-logo) {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 6px;
+}
