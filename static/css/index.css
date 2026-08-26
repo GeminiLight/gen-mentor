@@ -1052,3 +1052,10 @@ html[data-theme='dark'] section img:not(.title-logo) {
   border-radius: 8px;
   padding: 6px;
 }
+
+/* #framework paints a light gradient via the background SHORTHAND; the
+   background-color override above left that image layer intact and the
+   section still rendered white. Reset it with the shorthand. */
+html[data-theme='dark'] #framework {
+  background: #1f2127;
+}
