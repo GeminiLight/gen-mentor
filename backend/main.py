@@ -198,6 +198,27 @@ def chat_with_tutor_stream(request: ChatWithTutorRequest):  # noqa: F405
     return StreamingResponse(generate(), media_type="text/plain; charset=utf-8")
 
 
+@app.get("/knowledge-base/{goal_id}")
+async def knowledge_base(goal_id: str):
+    """List the pages pinned into a goal's knowledge base (newest first)."""
+    manager = get_search_rag_manager()
+    if manager is None:
+        return {"goal_id": goal_id, "sources": []}
+    return {"goal_id": goal_id, "sources": manager.list_kb(goal_id)}
+
+
+@app.delete("/knowledge-base/{goal_id}")
+async def knowledge_base_unpin(goal_id: str, source: Optional[str] = None):
+    """Remove a page (by its url) from the goal's knowledge base."""
+    if not source:
+        raise HTTPException(status_code=400, detail="A `source` url is required to unpin.")
+    manager = get_search_rag_manager()
+    if manager is None:
+        raise HTTPException(status_code=503, detail="Knowledge base is not available.")
+    removed = manager.unpin_kb(goal_id, source=source)
+    return {"goal_id": goal_id, "removed_chunks": removed}
+
+
 @app.post("/refine-learning-goal")
 async def refine_learning_goal(request: LearningGoalRefinementRequest):  # noqa: F405
     try:

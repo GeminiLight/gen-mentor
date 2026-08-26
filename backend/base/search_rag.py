@@ -275,6 +275,49 @@ class SearchRagManager:
             return []
         return self.kb_vectorstore.similarity_search(query, k=k, filter={KB_GOAL_KEY: str(goal_id)})
 
+    def list_kb(self, goal_id: str) -> List[Dict[str, Any]]:
+        """Summarise the goal's knowledge base grouped by source page."""
+        if self.kb_vectorstore is None:
+            return []
+        fetched = self.kb_vectorstore._collection.get(
+            where={KB_GOAL_KEY: str(goal_id)}, include=["metadatas"]
+        )
+        by_source: Dict[str, Dict[str, Any]] = {}
+        for doc_id, meta in zip(fetched.get("ids") or [], fetched.get("metadatas") or []):
+            meta = meta or {}
+            url = str(meta.get("source") or "").strip()
+            if not url:
+                continue
+            entry = by_source.setdefault(url, {
+                "source": url,
+                "title": str(meta.get("title") or "") or url,
+                "pinned_at": float(meta.get(CREATED_AT_KEY, 0.0) or 0.0),
+                "chunk_ids": [],
+            })
+            entry["chunk_ids"].append(doc_id)
+            entry["pinned_at"] = max(entry["pinned_at"], float(meta.get(CREATED_AT_KEY, 0.0) or 0.0))
+        # Most recently pinned first; each entry carries its chunk ids so the
+        # UI can offer a precise unpin.
+        return sorted(by_source.values(), key=lambda e: e["pinned_at"], reverse=True)
+
+    def unpin_kb(self, goal_id: str, source: Optional[str] = None, chunk_ids: Optional[List[str]] = None) -> int:
+        """Remove pages (by source url) or specific chunks from a goal's KB."""
+        if self.kb_vectorstore is None:
+            return 0
+        collection = self.kb_vectorstore._collection
+        ids: List[str] = list(chunk_ids or [])
+        if source:
+            fetched = collection.get(
+                where={"$and": [{KB_GOAL_KEY: str(goal_id)}, {"source": str(source)}]},
+                include=[],
+            )
+            ids.extend(fetched.get("ids") or [])
+        if not ids:
+            return 0
+        collection.delete(ids=ids)
+        logger.info("Unpinned %d KB chunks for goal %s", len(ids), goal_id)
+        return len(ids)
+
     def prune_kb(self, goal_id: str) -> int:
         """Cap a goal's KB at kb_max_chunks_per_goal, evicting oldest first."""
         if self.kb_vectorstore is None:
