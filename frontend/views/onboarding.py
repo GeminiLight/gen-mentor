@@ -145,7 +145,7 @@ def render_continue_button(goal):
         else:
             st.session_state["selected_page"] = "Skill Gap"
             save_persistent_state()
-            st.switch_page("pages/skill_gap.py")
+            st.switch_page("views/skill_gap.py")
 
 
 def render_cards_with_nav(goal):

@@ -141,7 +141,7 @@ def render_skill_gap_dialog():
             save_persistent_state()
             st.session_state["selected_page"] = "Learning Path"
             save_persistent_state()
-            st.switch_page("pages/learning_path.py")
+            st.switch_page("views/learning_path.py")
 
 
 

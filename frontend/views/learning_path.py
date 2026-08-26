@@ -8,15 +8,15 @@ from utils.state import save_persistent_state
 
 def render_learning_path():
     if not st.session_state.get("if_complete_onboarding"):
-        st.switch_page("pages/onboarding.py")
+        st.switch_page("views/onboarding.py")
 
     goal = st.session_state["goals"][st.session_state["selected_goal_id"]]
     save_persistent_state()
     if not goal["learning_goal"] or not st.session_state["learner_information"]:
-        st.switch_page("pages/onboarding.py")
+        st.switch_page("views/onboarding.py")
     else:
         if not goal["skill_gaps"]:
-            st.switch_page("pages/skill_gap.py")
+            st.switch_page("views/skill_gap.py")
 
     st.title("Learning Path")
     st.write("Track your learning progress through the sessions below.")
@@ -32,11 +32,16 @@ def render_learning_path():
     """, unsafe_allow_html=True)
     if not goal["learning_path"]:
         with st.spinner('Scheduling Learning Path ...'):
-            goal["learning_path"] = schedule_learning_path(goal["learner_profile"], session_count=8, llm_type=st.session_state["llm_type"])
-            save_persistent_state()
-            st.toast("🎉 Successfully schedule learning path!")
-            st.rerun()
-        my_bar.empty()
+            scheduled = schedule_learning_path(goal["learner_profile"], session_count=8, llm_type=st.session_state["llm_type"])
+        if scheduled is None:
+            # Backend failed (message already shown by the client); keep the
+            # empty path so the next render retries instead of treating the
+            # failure as success.
+            st.stop()
+        goal["learning_path"] = scheduled
+        save_persistent_state()
+        st.toast("🎉 Successfully schedule learning path!")
+        st.rerun()
     else:
         render_overall_information(goal)
         render_learning_sessions(goal)
@@ -80,11 +85,17 @@ def render_learning_sessions(goal):
             st.rerun()
         if st.session_state.get("if_rescheduling_learning_path"):
             with st.spinner('Re-scheduling Learning Path ...'):
-                goal["learning_path"] = reschedule_learning_path(goal["learning_path"], goal["learner_profile"], expected_session_count, llm_type=st.session_state["llm_type"])
-                st.session_state["if_rescheduling_learning_path"] = False
-                save_persistent_state()
-                st.toast("🎉 Successfully re-schedule learning path!")
-                st.rerun()
+                rescheduled = reschedule_learning_path(goal["learning_path"], goal["learner_profile"], expected_session_count, llm_type=st.session_state["llm_type"])
+            st.session_state["if_rescheduling_learning_path"] = False
+            if rescheduled is None:
+                # Keep the existing path on failure — overwriting it with None
+                # would make the next render schedule a brand-new path from
+                # scratch and lose all completed-session progress.
+                st.stop()
+            goal["learning_path"] = rescheduled
+            save_persistent_state()
+            st.toast("🎉 Successfully re-schedule learning path!")
+            st.rerun()
     save_persistent_state()
     columns_spec = 2
     num_columns = math.ceil(len(goal["learning_path"]) / columns_spec)  
@@ -122,7 +133,7 @@ def render_learning_sessions(goal):
                             st.session_state["selected_point_id"] = 0
                             st.session_state["selected_page"] = "Knowledge Document"
                             save_persistent_state()
-                            st.switch_page("pages/knowledge_document.py")
+                            st.switch_page("views/knowledge_document.py")
                     else:
                         start_key = f"start_{session['id']}_{session['if_learned']}"
                         if st.button("Completed", key=start_key, use_container_width=True, type="secondary", icon=":material/done_outline:"):
@@ -130,7 +141,7 @@ def render_learning_sessions(goal):
                             st.session_state["selected_point_id"] = 0
                             st.session_state["selected_page"] = "Knowledge Document"
                             save_persistent_state()
-                            st.switch_page("pages/knowledge_document.py")
+                            st.switch_page("views/knowledge_document.py")
 
 
 render_learning_path()

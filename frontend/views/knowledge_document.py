@@ -99,7 +99,7 @@ def render_session_details(goal):
             st.session_state["selected_page"] = "Learning Path"
             st.session_state["current_page"][session_uid] = 0
 
-            st.switch_page("pages/learning_path.py")
+            st.switch_page("views/learning_path.py")
             save_persistent_state()
 
     with col3:
@@ -139,7 +139,7 @@ def render_session_details(goal):
                     st.session_state["session_learning_times"][get_current_session_uid()]["end_time"] = curr_time
                     
                 save_persistent_state()
-                st.switch_page("pages/learning_path.py")
+                st.switch_page("views/learning_path.py")
 
     st.write(f"# {session_info['id']}")
     st.write(f"# {session_info['title']}")

@@ -14,4 +14,4 @@ def render_session_completion(goal, selected_sid):
         goal["learning_path"][selected_sid]["if_learned"] = True
         st.session_state["selected_page"] = "Learning Path"
         st.session_state["session_learning_times"][get_current_session_uid()]["end_time"] = time.time()
-        st.switch_page("pages/learning_path.py")
+        st.switch_page("views/learning_path.py")
