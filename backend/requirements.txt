@@ -18,6 +18,7 @@ sentence-transformers
 hydra-core
 omegaconf
 beautifulsoup4
+httpx
 fastapi
 uvicorn
 python-multipart

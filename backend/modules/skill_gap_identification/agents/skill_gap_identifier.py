@@ -44,9 +44,13 @@ class SkillGapIdentifier(BaseAgent):
         """Identify knowledge gaps using learner information and expected skills."""
         payload_dict = SkillGapPayload(**input_dict).model_dump()
         task_prompt = skill_gap_identifier_task_prompt
-        raw_output = self.invoke(payload_dict, task_prompt=task_prompt)
-        validated = SkillGaps.model_validate(raw_output)
-        return validated.model_dump()
+        # invoke_validated: on a schema violation the model gets one corrective
+        # re-ask (with the validation error) before the request fails.
+        return self.invoke_validated(
+            payload_dict,
+            task_prompt=task_prompt,
+            validator=lambda raw: SkillGaps.model_validate(raw).model_dump(),
+        )
 
 def identify_skill_gap_with_llm(
     llm: Any,

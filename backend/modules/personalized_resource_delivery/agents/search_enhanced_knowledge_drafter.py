@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 import logging
-from typing import Any, Mapping, Optional, List
+from typing import Any, Dict, Mapping, Optional, List
 from concurrent.futures import ThreadPoolExecutor
 
 from pydantic import BaseModel, field_validator
@@ -74,10 +74,11 @@ class SearchEnhancedKnowledgeDrafter(BaseAgent):
         self.search_rag_manager = search_rag_manager
         self.use_search = use_search
 
-    def draft(self, payload: KnowledgeDraftPayload | Mapping[str, Any] | str):
+    def draft(self, payload: KnowledgeDraftPayload | Mapping[str, Any] | str, goal_id: Optional[str] = None):
         if not isinstance(payload, KnowledgeDraftPayload):
             payload = KnowledgeDraftPayload.model_validate(payload)
         data = payload.model_dump()
+        sources: List[Dict[str, Any]] = []
         # Optionally enrich external resources using the search RAG manager
         if self.use_search and self.search_rag_manager is not None:
             # Payload fields may arrive as plain strings (not containers), so
@@ -95,17 +96,30 @@ class SearchEnhancedKnowledgeDrafter(BaseAgent):
                 knowledge_point_name = knowledge_point.strip()
             query = f"{session_title} {knowledge_point_name}".strip()
             try:
-                docs = self.search_rag_manager.invoke(query)
+                # pin_goal_id: this query's pages also land in the goal's
+                # durable knowledge base for later retrieval.
+                docs = self.search_rag_manager.invoke(query, pin_goal_id=goal_id)
             except Exception:
                 logger.exception("Search/RAG enrichment failed for query %r; drafting without it.", query)
                 docs = []
             context = format_docs(docs)
+            # Capture provenance for the citation list ([N] markers in content
+            # refer to these by index).
+            for idx, doc in enumerate(docs):
+                meta = doc.metadata or {}
+                sources.append({
+                    "index": idx,
+                    "title": meta.get("title") or meta.get("source") or "",
+                    "source": meta.get("source") or "",
+                })
             if context:
                 ext = data.get("external_resources") or ""
                 data["external_resources"] = f"{ext}{context}"
         raw_output = self.invoke(data, task_prompt=search_enhanced_knowledge_drafter_task_prompt)
         validated_output = KnowledgeDraft.model_validate(raw_output)
-        return validated_output.model_dump()
+        output = validated_output.model_dump()
+        output["sources"] = sources
+        return output
 
 def draft_knowledge_point_with_llm(
     llm,
@@ -117,6 +131,7 @@ def draft_knowledge_point_with_llm(
     use_search: bool = True,
     *,
     search_rag_manager: Any = _UNSET,
+    goal_id: Optional[str] = None,
 ):
     """Draft a single knowledge point using the agent, optionally enriching with a SearchRagManager."""
     drafter = SearchEnhancedKnowledgeDrafter(llm, search_rag_manager=search_rag_manager, use_search=use_search)
@@ -127,7 +142,7 @@ def draft_knowledge_point_with_llm(
         "knowledge_points": knowledge_points,
         "knowledge_point": knowledge_point,
     }
-    return drafter.draft(payload)
+    return drafter.draft(payload, goal_id=goal_id)
 
 
 def draft_knowledge_points_with_llm(
@@ -141,6 +156,7 @@ def draft_knowledge_points_with_llm(
     max_workers: Optional[int] = None,
     *,
     search_rag_manager: Any = _UNSET,
+    goal_id: Optional[str] = None,
 ):
     """Draft multiple knowledge points in parallel or sequentially using the agent."""
     learning_session = _coerce_container(learning_session)
@@ -166,6 +182,7 @@ def draft_knowledge_points_with_llm(
             kp,
             use_search=use_search,
             search_rag_manager=search_rag_manager,
+            goal_id=goal_id,
         )
 
     if allow_parallel:

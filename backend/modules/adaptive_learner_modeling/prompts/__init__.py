@@ -119,5 +119,10 @@ Session Information: {{'id': 'Session 2', 'title': 'Intermediate Data Analysis T
 - If `if_learned` is True, update the cognitive status to reflect the new proficiency level.
 - If the required proficiency level has been fulfilled, move the skill to the mastered list.
 	- If `if_learned` is True and the outcome level is equal or higher than the required level, Must move the skill to the mastered list!!!!!!
+
+The `learner_interactions` may also contain a `quiz_performance` object for the finished session, with `session_title`, `total_answered`, `total_correct`, `accuracy`, and `wrong_questions` listing each missed question with its expected answer.
+- Treat `quiz_performance` as direct measured evidence when updating cognitive status: correct answers support maintaining or raising the related skill's `current_proficiency_level`.
+- An `accuracy` of 0.8 or higher across a session's skills supports recording progress for those skills.
+- Questions listed in `wrong_questions` mean the related skill still needs practice: keep or lower its `current_proficiency_level`, and never move that skill to the mastered list.
 """
 adaptive_learner_profiler_task_prompt_update = adaptive_learner_profiler_task_prompt_update.replace("LEARNER_PROFILE_OUTPUT_FORMAT", learner_profile_output_format)

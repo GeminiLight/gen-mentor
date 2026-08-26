@@ -16,15 +16,19 @@ class LLMConfig:
 class EmbeddingConfig:
     """Configuration for the embedding model consumed by EmbedderFactory."""
     provider: str = "huggingface"  # huggingface, openai, azure, together
-    model_name: str = "sentence-transformers/all-mpnet-base-v2"
+    model_name: str = "BAAI/bge-small-en-v1.5"
 
 
 @dataclass
 class SearchConfig:
     """Configuration for web search and for loading the pages it returns."""
-    provider: str = "duckduckgo"  # tavily, serper, bing, duckduckgo, brave, searx, you
+    provider: str = "duckduckgo"  # tavily, serper, bing, duckduckgo, brave
     max_results: int = 5
     loader_type: str = "web"  # web | docling
+    # Tavily credentials (only needed when provider is tavily); a null key
+    # falls back to the TAVILY_API_KEY environment variable.
+    tavily_api_key: Optional[str] = None
+    tavily_search_depth: str = "basic"  # basic | advanced
     # Provider-specific credentials/endpoints (only needed by some providers, e.g. bing).
     bing_subscription_key: Optional[str] = None
     bing_search_url: Optional[str] = None

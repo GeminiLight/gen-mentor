@@ -53,9 +53,13 @@ class LearningPathScheduler(BaseAgent):
         """Schedule sessions based on learner profile and desired count."""
         payload_dict = SessionSchedulePayload(**input_dict).model_dump()
         task_prompt = learning_path_scheduler_task_prompt_session
-        raw_output = self.invoke(payload_dict, task_prompt=task_prompt)
-        validated_output = LearningPath.model_validate(raw_output)
-        return validated_output.model_dump()
+        # invoke_validated: one corrective re-ask on schema violations
+        # (session count/shape drift is the common failure mode here).
+        return self.invoke_validated(
+            payload_dict,
+            task_prompt=task_prompt,
+            validator=lambda raw: LearningPath.model_validate(raw).model_dump(),
+        )
 
     def reflexion(self, input_dict: Dict[str, Any]) -> JSONDict:
         """Refine the learning path based on evaluator feedback."""

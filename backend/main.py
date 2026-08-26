@@ -16,12 +16,15 @@ from typing import Any, Optional
 
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from api_schemas import *  # noqa: F403  (request models)
 from base.llm_factory import LLMFactory
 from base.search_rag import SearchRagManager
 from config import load_config
+from modules.ai_chatbot_tutor import chat_with_tutor_stream_with_llm
+from utils.telemetry import stats_snapshot
 from modules.adaptive_learner_modeling import *  # noqa: F403
 from modules.ai_chatbot_tutor import chat_with_tutor_with_llm
 from modules.personalized_resource_delivery import *  # noqa: F403
@@ -115,6 +118,13 @@ def _extract_cv_text(path: Path) -> str:
         raise HTTPException(status_code=400, detail=f"Could not read PDF {path.name}: {exc}")
 
 
+# Warm the RAG stack (embedding model + vector stores) in the background at
+# startup: without this, the first retrieval-using request pays the whole
+# model load itself. The double-checked lock inside get_search_rag_manager
+# makes concurrent first requests safe.
+threading.Thread(target=get_search_rag_manager, name="rag-warmup", daemon=True).start()
+
+
 @app.get("/")
 async def root():
     return {"service": "GenMentor", "status": "ok"}
@@ -133,6 +143,12 @@ async def list_llm_models():
     }
 
 
+@app.get("/stats")
+async def stats():
+    """In-process telemetry: per-agent call counts, token usage, latencies."""
+    return stats_snapshot()
+
+
 @app.post("/chat-with-tutor")
 async def chat_with_tutor(request: ChatWithTutorRequest):  # noqa: F405
     try:
@@ -146,10 +162,40 @@ async def chat_with_tutor(request: ChatWithTutorRequest):  # noqa: F405
             request.learner_profile,
             search_rag_manager=get_search_rag_manager(),
             use_search=True,
+            goal_id=request.goal_id,
         )
         return {"response": response}
     except Exception as exc:
         raise _fail(exc, "chat-with-tutor")
+
+
+@app.post("/chat-with-tutor/stream")
+def chat_with_tutor_stream(request: ChatWithTutorRequest):  # noqa: F405
+    """Streaming variant of /chat-with-tutor: yields reply text as it is generated."""
+    try:
+        messages = request.message_list
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    def generate():
+        try:
+            # streaming=True makes the model emit token callbacks, which is what
+            # langgraph's "messages" stream mode forwards delta-by-delta.
+            for delta in chat_with_tutor_stream_with_llm(
+                get_llm(request, streaming=True),
+                messages,
+                request.learner_profile,
+                search_rag_manager=get_search_rag_manager(),
+                use_search=True,
+                goal_id=request.goal_id,
+            ):
+                if delta:
+                    yield delta
+        except Exception as exc:
+            logger.exception("chat-with-tutor/stream failed")
+            yield f"\n[stream error] {exc}"
+
+    return StreamingResponse(generate(), media_type="text/plain; charset=utf-8")
 
 
 @app.post("/refine-learning-goal")
@@ -298,6 +344,7 @@ async def draft_knowledge_point(request: KnowledgePointDraftingRequest):  # noqa
             request.knowledge_point,
             request.use_search,
             search_rag_manager=get_search_rag_manager(),
+            goal_id=request.goal_id,
         )
         return {"knowledge_draft": knowledge_draft}
     except Exception as exc:
@@ -320,6 +367,7 @@ async def draft_knowledge_points(request: KnowledgePointsDraftingRequest):  # no
             use_search=request.use_search,
             max_workers=int(app_config.get("rag", {}).get("max_workers", 3)),
             search_rag_manager=get_search_rag_manager(),
+            goal_id=request.goal_id,
         )
         return {"knowledge_drafts": knowledge_drafts}
     except Exception as exc:
@@ -374,6 +422,7 @@ async def tailor_knowledge_content(request: TailoredContentGenerationRequest):  
             use_search=request.use_search,
             max_workers=int(app_config.get("rag", {}).get("max_workers", 3)),
             search_rag_manager=get_search_rag_manager(),
+            goal_id=request.goal_id,
         )
         return {"tailored_content": tailored_content}
     except Exception as exc:
