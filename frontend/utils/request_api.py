@@ -10,7 +10,7 @@ import json
 import httpx
 import streamlit as st
 
-from config import backend_endpoint, use_mock_data, use_search as default_use_search
+from config import backend_endpoint, use_mock_data, use_search as default_use_search, asset_path
 
 # Endpoint paths, keyed by the client function that calls them. Every entry here
 # must correspond to a route registered in backend/main.py.
@@ -52,7 +52,9 @@ def model_selection(llm_type=None):
 def make_post_request(api_name, data, mock_data_path=None, timeout=DEFAULT_TIMEOUT):
     """POST to the backend and return the decoded body, or ``None`` on failure."""
     if use_mock_data and mock_data_path:
-        with open(mock_data_path) as handle:
+        # Resolve against the frontend root, not the process CWD, so mock
+        # fixtures load no matter where streamlit was launched from.
+        with open(asset_path(mock_data_path)) as handle:
             return json.load(handle)
 
     backend_url = f"{backend_endpoint}{api_name}"

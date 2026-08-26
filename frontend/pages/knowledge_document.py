@@ -11,13 +11,13 @@ from components.time_tracking import track_session_learning_start_time
 from utils.request_api import draft_knowledge_points, explore_knowledge_points, generate_document_quizzes, integrate_learning_document, update_learner_profile
 from utils.format import prepare_markdown_document
 from utils.state import get_current_session_uid, save_persistent_state
-from config import use_mock_data, use_search
+from config import use_mock_data, use_search, asset_path
 from assets.js.doc_reading import doc_reading_auto_scroll_js
 
 logger = logging.getLogger(__name__)
 
 
-st.markdown('<style>' + open('./assets/css/main.css').read() + '</style>', unsafe_allow_html=True)
+st.markdown('<style>' + open(asset_path('./assets/css/main.css')).read() + '</style>', unsafe_allow_html=True)
 
 
 def render_learning_content():
@@ -157,7 +157,7 @@ def render_content_preparation(goal):
     session_uid = get_current_session_uid()
     if use_mock_data:
         st.warning("Using mock data for knowledge document.")
-        file_path = "./assets/data_example/knowledge_document.json"
+        file_path = asset_path("./assets/data_example/knowledge_document.json")
         learning_content = load_knowledge_point_content(file_path)
         st.session_state["document_caches"][session_uid] = learning_content
         save_persistent_state()
