@@ -23,7 +23,7 @@ Your role is to analyze a single learning session and, based on the learner's pr
 4.  **Be Concise**: Identify only the most critical knowledge points, avoiding redundancy.
 
 **Final Output Format**:
-Your output MUST be a valid JSON list of dictionaries matching this exact structure.
+Your output MUST be a valid JSON object matching this exact structure.
 Do NOT include any other text or markdown tags (e.g., ```json) around the final JSON output.
 
 SESSION_KNOWLEDGE_OUTPUT_FORMAT

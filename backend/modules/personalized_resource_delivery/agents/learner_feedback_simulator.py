@@ -39,8 +39,7 @@ class LearnerFeedbackSimulator(BaseAgent):
     name: str = "LearnerFeedbackSimulator"
 
     def __init__(self, model):
-        super().__init__(model=model, jsonalize_output=True)
-        self.system_prompt = learner_feedback_simulator_system_prompt
+        super().__init__(model=model, system_prompt=learner_feedback_simulator_system_prompt, jsonalize_output=True)
 
     def feedback_path(self, payload: LearningPathFeedbackPayload | Mapping[str, Any] | str):
         task_prompt = learner_feedback_simulator_task_prompt_path

@@ -32,6 +32,16 @@ class InProgressSkill(BaseModel):
 
 class CognitiveStatus(BaseModel):
     overall_progress: int = Field(..., ge=0, le=100)
+
+    @field_validator("overall_progress", mode="before")
+    @classmethod
+    def clamp_progress(cls, v):
+        # Models occasionally emit 101 or -5; clamping beats failing the
+        # whole profile update.
+        try:
+            return max(0, min(100, int(v)))
+        except (TypeError, ValueError):
+            return v
     mastered_skills: List[MasteredSkill] = Field(default_factory=list)
     in_progress_skills: List[InProgressSkill] = Field(default_factory=list)
 

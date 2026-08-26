@@ -12,7 +12,9 @@ frontend/user_data/*
 frontend/assets/validation_dataset
 frontend/.env
 backend/.env
-backend/data/
+
+# Runtime data (vector store, uploads) — matches at any depth
+data/
 
 pids/
 .DS_Store

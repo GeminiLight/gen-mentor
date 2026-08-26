@@ -306,6 +306,9 @@ async def draft_knowledge_point(request: KnowledgePointDraftingRequest):  # noqa
 
 @app.post("/draft-knowledge-points")
 async def draft_knowledge_points(request: KnowledgePointsDraftingRequest):  # noqa: F405
+    # A prose string here would otherwise be iterated character by character.
+    if not isinstance(request.knowledge_points, (list, dict)):
+        raise HTTPException(status_code=400, detail="knowledge_points must be a JSON array.")
     try:
         knowledge_drafts = draft_knowledge_points_with_llm(  # noqa: F405
             get_llm(request),

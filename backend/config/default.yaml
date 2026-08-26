@@ -35,6 +35,8 @@ rag:
   num_retrieval_results: 5
   allow_parallel: true
   max_workers: 3
+  # Rolling cap for the search-result cache; oldest chunks are evicted beyond it.
+  max_stored_chunks: 2000
 
 server:
   host: 127.0.0.1

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import logging
 from typing import Any, Mapping, Optional, List
 from concurrent.futures import ThreadPoolExecutor
 
@@ -14,6 +15,25 @@ from modules.personalized_resource_delivery.prompts.search_enhanced_knowledge_dr
 )
 from modules.personalized_resource_delivery.schemas import KnowledgeDraft
 from config.loader import get_default_config
+
+logger = logging.getLogger(__name__)
+
+# Sentinel distinguishing "no manager passed" (auto-build on demand) from
+# "a manager was passed but construction failed" (search gracefully disabled).
+_UNSET = object()
+
+
+def _coerce_container(value: Any) -> Any:
+    """Parse a legacy ``str(dict)`` payload; plain prose survives untouched."""
+    if not isinstance(value, str):
+        return value
+    text = value.strip()
+    if not text or text[0] not in "[{":
+        return value
+    try:
+        return ast.literal_eval(text)
+    except (SyntaxError, ValueError, TypeError, MemoryError, RecursionError):
+        return value
 
 
 class KnowledgeDraftPayload(BaseModel):
@@ -40,13 +60,17 @@ class SearchEnhancedKnowledgeDrafter(BaseAgent):
 
     name: str = "SearchEnhancedKnowledgeDrafter"
 
-    def __init__(self, model: Any, *, search_rag_manager: Optional[SearchRagManager] = None, use_search: bool = True):
+    def __init__(self, model: Any, *, search_rag_manager: Any = _UNSET, use_search: bool = True):
         super().__init__(model=model, system_prompt=search_enhanced_knowledge_drafter_system_prompt, jsonalize_output=True)
-        # Only build a manager when search is actually wanted -- constructing one
-        # loads the embedding model and opens the vector store. Callers serving
-        # HTTP requests should pass a shared instance instead.
-        if search_rag_manager is None and use_search:
+        # Only build a manager when none was provided AND search is wanted --
+        # constructing one loads the embedding model and opens the vector store.
+        # A caller that explicitly passes None (e.g. the API layer after a
+        # construction failure) means "answer without retrieval", not "rebuild
+        # and fail the request".
+        if search_rag_manager is _UNSET and use_search:
             search_rag_manager = SearchRagManager.from_config(get_default_config())
+        elif search_rag_manager is _UNSET:
+            search_rag_manager = None
         self.search_rag_manager = search_rag_manager
         self.use_search = use_search
 
@@ -56,12 +80,25 @@ class SearchEnhancedKnowledgeDrafter(BaseAgent):
         data = payload.model_dump()
         # Optionally enrich external resources using the search RAG manager
         if self.use_search and self.search_rag_manager is not None:
-            session = data.get("learning_session") or {}
-            session_title = str(session.get("title", "")).strip() or "learning_session"
-            knowledge_point = data.get("knowledge_point") or {}
-            knowledge_point_name = str(knowledge_point.get('name', '')).strip()
+            # Payload fields may arrive as plain strings (not containers), so
+            # guard every .get() instead of assuming a Mapping.
+            session = data.get("learning_session")
+            session_title = ""
+            if isinstance(session, Mapping):
+                session_title = str(session.get("title", "")).strip()
+            session_title = session_title or (str(session).strip() if isinstance(session, str) else "") or "learning_session"
+            knowledge_point = data.get("knowledge_point")
+            knowledge_point_name = ""
+            if isinstance(knowledge_point, Mapping):
+                knowledge_point_name = str(knowledge_point.get('name', '')).strip()
+            elif isinstance(knowledge_point, str):
+                knowledge_point_name = knowledge_point.strip()
             query = f"{session_title} {knowledge_point_name}".strip()
-            docs = self.search_rag_manager.invoke(query)
+            try:
+                docs = self.search_rag_manager.invoke(query)
+            except Exception:
+                logger.exception("Search/RAG enrichment failed for query %r; drafting without it.", query)
+                docs = []
             context = format_docs(docs)
             if context:
                 ext = data.get("external_resources") or ""
@@ -79,7 +116,7 @@ def draft_knowledge_point_with_llm(
     knowledge_point,
     use_search: bool = True,
     *,
-    search_rag_manager: Optional[SearchRagManager] = None,
+    search_rag_manager: Any = _UNSET,
 ):
     """Draft a single knowledge point using the agent, optionally enriching with a SearchRagManager."""
     drafter = SearchEnhancedKnowledgeDrafter(llm, search_rag_manager=search_rag_manager, use_search=use_search)
@@ -103,19 +140,19 @@ def draft_knowledge_points_with_llm(
     use_search: bool = True,
     max_workers: Optional[int] = None,
     *,
-    search_rag_manager: Optional[SearchRagManager] = None,
+    search_rag_manager: Any = _UNSET,
 ):
     """Draft multiple knowledge points in parallel or sequentially using the agent."""
-    if isinstance(learning_session, str):
-        learning_session = ast.literal_eval(learning_session)
-    if isinstance(knowledge_points, str):
-        knowledge_points = ast.literal_eval(knowledge_points)
+    learning_session = _coerce_container(learning_session)
+    knowledge_points = _coerce_container(knowledge_points)
     if isinstance(knowledge_points, Mapping):
         # `explore_knowledge_points` returns {"knowledge_points": [...]}; accept
         # either that envelope or the bare list.
         knowledge_points = knowledge_points.get("knowledge_points", [])
-    if search_rag_manager is None and use_search:
+    if search_rag_manager is _UNSET and use_search:
         search_rag_manager = SearchRagManager.from_config(get_default_config())
+    elif search_rag_manager is _UNSET:
+        search_rag_manager = None
     if max_workers is None:
         max_workers = getattr(search_rag_manager, "max_workers", None) or 3
 

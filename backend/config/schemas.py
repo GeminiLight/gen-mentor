@@ -47,6 +47,7 @@ class RAGConfig:
     num_retrieval_results: int = 5
     allow_parallel: bool = True
     max_workers: int = 3
+    max_stored_chunks: int = 2000
 
 
 @dataclass

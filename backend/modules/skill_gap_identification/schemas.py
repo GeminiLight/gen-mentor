@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List
-from pydantic import BaseModel, Field, RootModel, field_validator
+from pydantic import BaseModel, Field, RootModel, field_validator, model_validator
 
 
 
@@ -35,15 +35,20 @@ class SkillRequirements(BaseModel):
     @field_validator("skill_requirements")
     @classmethod
     def validate_length_and_uniqueness(cls, v: List[SkillRequirement]):
-        if not (1 <= len(v) <= 10):
-            raise ValueError("Number of skill requirements must be within 1 to 10.")
+        # LLM output repair, not rejection: an over-long list is truncated and
+        # case-insensitive duplicate names keep their first occurrence. An
+        # empty list stays an error -- a goal with zero skills is degenerate.
+        if not v:
+            raise ValueError("At least one skill requirement is needed.")
+        deduped: List[SkillRequirement] = []
         seen = set()
         for item in v:
             key = item.name.strip().lower()
             if key in seen:
-                raise ValueError(f'Duplicate skill name detected: "{item.name}".')
+                continue
             seen.add(key)
-        return v
+            deduped.append(item)
+        return deduped[:10]
 
 
 class SkillGap(BaseModel):
@@ -57,26 +62,21 @@ class SkillGap(BaseModel):
     @field_validator("reason")
     @classmethod
     def limit_reason_words(cls, v: str) -> str:
-        words = v.split()
-        if len(words) > 20:
-            raise ValueError("Reason must be 20 words or fewer.")
-        return v
+        # Models regularly overshoot "max 20 words"; truncate rather than fail
+        # the whole request.
+        return " ".join(v.split()[:20])
 
-    @field_validator("is_gap")
-    @classmethod
-    def check_gap_consistency(cls, is_gap_value, info):
-        data = info.data
-        required = data.get("required_level")
-        current = data.get("current_level")
-        if required is None or current is None:
-            return is_gap_value
+    @model_validator(mode="after")
+    def check_gap_consistency(self) -> "SkillGap":
+        # Runs after ALL fields are set (a field_validator on is_gap would only
+        # see the fields declared before it). Auto-correct rather than raise:
+        # the levels are the ground truth and a wrong is_gap flag would
+        # otherwise fail the whole request.
         order = {"unlearned": 0, "beginner": 1, "intermediate": 2, "advanced": 3}
-        gap_should_be = order[current.value] < order[required.value]
-        if is_gap_value != gap_should_be:
-            raise ValueError(
-                f'is_gap inconsistency: required="{required.value}", current="{current.value}" implies is_gap={gap_should_be}.'
-            )
-        return is_gap_value
+        gap_should_be = order[self.current_level.value] < order[self.required_level.value]
+        if self.is_gap != gap_should_be:
+            self.is_gap = gap_should_be
+        return self
 
 
 class SkillGaps(BaseModel):
@@ -85,15 +85,19 @@ class SkillGaps(BaseModel):
     @field_validator("skill_gaps")
     @classmethod
     def limit_length_and_names(cls, v: List[SkillGap]):
-        if not (1 <= len(v) <= 10):
-            raise ValueError("Number of skill gaps must be within 1 to 10.")
+        # Same repair-first policy as SkillRequirements: dedup by name, cap at
+        # ten; empty stays an error (see the explorer's contract).
+        if not v:
+            raise ValueError("At least one skill gap is needed.")
+        deduped: List[SkillGap] = []
         seen = set()
         for item in v:
             key = item.name.strip().lower()
             if key in seen:
-                raise ValueError(f'Duplicate skill name detected: "{item.name}".')
+                continue
             seen.add(key)
-        return v
+            deduped.append(item)
+        return deduped[:10]
 
 
 class SkillGapsRoot(RootModel):

@@ -15,6 +15,39 @@ Generate a ground-truth learner profile based on the following learner informati
 - **Skill Requirements**: {skill_requirements}
 
 The skills in Skill Requirements should be categorized as mastered or in-progress into the learner's current status.
+
+**Output Format**:
+{{
+    "learner_profile": {{
+        "learner_information": "Summary of the learner's information",
+        "learning_goal": "The learner's stated learning goal",
+        "cognitive_status": {{
+            "overall_progress": 60,
+            "mastered_skills": [
+                {{
+                    "skill": "Skill Name",
+                    "proficiency_level": "advanced (final actual proficiency level)"
+                }}
+            ],
+            "in_progress_skills": [
+                {{
+                    "skill": "Skill Name",
+                    "proficiency_level": "advanced (expected proficiency level)",
+                    "progress_percentage": 40
+                }}
+            ]
+        }},
+        "learning_preferences": {{
+            "content_style": "[Concise summaries or Detailed explanations]",
+            "activity_type": "[Reading-based learning or Actively query or Interactive exercises]"
+        }},
+        "behavioral_patterns": {{
+            "system_usage_frequency": "Average of 3 logins per week",
+            "session_duration_engagement": "Sessions average 30 minutes; high engagement in interactive tasks",
+            "motivational_triggers": "Triggered motivational message due to decreased login frequency last week"
+        }}
+    }}
+}}
 """
 
 
@@ -27,33 +60,39 @@ You are a learner behavior simulator for an Intelligent Tutoring System designed
 3. **Learner Feedback**: Collects self-reported satisfaction, self-assessed mastery, goal alignment feedback, and perceived difficulty for each session.
 
 **Output Format**:
-{{
-    "performance_metrics": {{
-        "participation_frequency": "...",
-        "exercise_scores": "...",
-        "completion_rate": "..."
-    }},
-    "time_tracking": {{
-        "session_duration": "...",
-        "activity_participation": "...",
-        "average_task_time": "..."
-    }},
-    "learner_feedback": {{
-        "satisfaction": "...",
-        "self_assessed_mastery": "...",
-        "goal_alignment_feedback": "...",
-        "difficulty_perception": "..."
-    }}
-}}
+{
+    "session_number": 1,
+    "interactions": [
+        {
+            "category": "performance_metrics",
+            "participation_frequency": "...",
+            "exercise_scores": "...",
+            "completion_rate": "..."
+        },
+        {
+            "category": "time_tracking",
+            "session_duration": "...",
+            "activity_participation": "...",
+            "average_task_time": "..."
+        },
+        {
+            "category": "learner_feedback",
+            "satisfaction": "...",
+            "self_assessed_mastery": "...",
+            "goal_alignment_feedback": "...",
+            "difficulty_perception": "..."
+        }
+    ],
+    "notes": "Brief summary of how this session reflects the learner's profile"
+}
 """
 
 learner_interaction_simulator_task_prompt = """
 Using the provided ground-truth learner profile, simulate the learner's behavior during one session. Generate data logs that capture the learner's performance, time tracking, and feedback for this session, showing the evolution in learner behavior.
 
 Inputs:
-- **Before-Learning Ground-Truth Learner Profile**: {previous_ground_truth_profile}
-- **Expected After-Learning Ground-Truth Learner Profile**: {progressed_ground_truth_profile}
-- **Learning Session Details**: {session_information}
+- **Ground-Truth Learner Profile**: {ground_truth_profile}
+- **Session Number**: {session_number} (1-based index of the session being simulated)
 
 Please generate data logs in the following categories:
 
@@ -101,7 +140,7 @@ After each session, the profile should reflect a realistic progression that mimi
 {{
     "learner_profile": {{
         "learner_information": "Summary of the learner's information",
-        "learning_goal": "Summary of the learner's information",
+        "learning_goal": "The learner's stated learning goal",
         "cognitive_status": {{
             "overall_progress": 60,
             "mastered_skills": [
@@ -112,21 +151,21 @@ After each session, the profile should reflect a realistic progression that mimi
             ],
             "in_progress_skills": [
                 {{
-                "skill": "Skill Name",
-                "proficiency_level": "advanced (expected proficiency level)"
-                "progress_percentage": 40,
+                    "skill": "Skill Name",
+                    "proficiency_level": "advanced (expected proficiency level)",
+                    "progress_percentage": 40
                 }}
             ]
         }},
         "learning_preferences": {{
             "content_style": "[Concise summaries or Detailed explanations]",
-            "activity_type": "[Reading-based learning or Actively query or Interactive exercises]",
+            "activity_type": "[Reading-based learning or Actively query or Interactive exercises]"
         }},
         "behavioral_patterns": {{
             "system_usage_frequency": "Average of 3 logins per week",
             "session_duration_engagement": "Sessions average 30 minutes; high engagement in interactive tasks",
             "motivational_triggers": "Triggered motivational message due to decreased login frequency last week"
-        }},
+        }}
     }}
 }}
 """

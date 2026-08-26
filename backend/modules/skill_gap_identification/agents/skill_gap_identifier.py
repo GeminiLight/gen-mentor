@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Dict, Optional, Tuple, TypeAlias
-from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Optional, Tuple, TypeAlias, Union
+from pydantic import BaseModel, Field, field_validator
 from base import BaseAgent
 from ..prompts.skill_gap_identifier import skill_gap_identifier_system_prompt, skill_gap_identifier_task_prompt
 from ..schemas import SkillRequirements, SkillGaps
@@ -16,7 +16,13 @@ class SkillGapPayload(BaseModel):
 
     learning_goal: str = Field(...)
     learner_information: str = Field(...)
-    skill_requirements: Dict[str, Any] = Field(...)
+    # Accept the mapping form {"skill_requirements": [...]} and the bare list.
+    skill_requirements: Union[Dict[str, Any], List[Any]] = Field(default_factory=dict)
+
+    @field_validator("skill_requirements", mode="before")
+    @classmethod
+    def _normalize_requirements(cls, v):
+        return {"skill_requirements": v} if isinstance(v, list) else v
 
 
 class SkillGapIdentifier(BaseAgent):
