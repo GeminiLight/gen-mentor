@@ -169,3 +169,40 @@ document.addEventListener('DOMContentLoaded', () => {
     attach();
   }
 })();
+
+// Scrollspy: highlight the nav item whose section is in view, using the
+// .navbar-item.is-active styles that already exist in index.css.
+document.addEventListener('DOMContentLoaded', () => {
+  const navLinks = Array.from(document.querySelectorAll('.navbar-start a.navbar-item[href^="#"]'));
+  const linkById = {};
+  navLinks.forEach(link => { linkById[link.getAttribute('href').slice(1)] = link; });
+  const sections = Object.keys(linkById)
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+
+  // Close the mobile menu after tapping a nav item; Bulma leaves it open.
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const burger = document.querySelector('.navbar-burger');
+      const menu = document.getElementById('navbarBasic');
+      if (burger && menu && menu.classList.contains('is-active')) {
+        burger.classList.remove('is-active');
+        menu.classList.remove('is-active');
+        burger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  if (!('IntersectionObserver' in window) || !sections.length) return;
+  const setActive = (id) => {
+    navLinks.forEach(link => link.classList.remove('is-active'));
+    const link = linkById[id];
+    if (link) link.classList.add('is-active');
+  };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-25% 0px -65% 0px', threshold: 0 });
+  sections.forEach(section => observer.observe(section));
+});

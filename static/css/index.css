@@ -1311,3 +1311,31 @@ html[data-theme='dark'] .footer-attribution {
 .bibtex-box pre {
   overflow-x: auto;
 }
+
+/* ---------- Nav & control refinements ---------- */
+
+/* Unify the primary accent (navbar Paper button, primary tags) with the
+   site's blue; Bulma's default teal reads as a foreign accent next to
+   the blue hover/badge system. */
+.button.is-primary {
+  background-color: hsl(204, 86%, 47%);
+}
+
+.button.is-primary:hover,
+.button.is-primary:focus {
+  background-color: hsl(204, 86%, 41%);
+}
+
+.tag.is-primary {
+  background-color: hsl(204, 86%, 47%);
+}
+
+/* Carousel dots: black-on-dark was invisible; light grey with an
+   accent-blue active dot in dark mode. */
+html[data-theme='dark'] .slider-pagination .slider-page {
+  background-color: #6b6e78;
+}
+
+html[data-theme='dark'] .slider-pagination .slider-page.is-active {
+  background-color: hsl(204, 86%, 63%);
+}
