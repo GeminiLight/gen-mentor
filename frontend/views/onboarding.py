@@ -4,7 +4,7 @@ import time
 import asyncio
 from components.goal_refinement import render_goal_refinement
 from utils.pdf import extract_text_from_pdf
-from utils.state import save_persistent_state
+from utils.state import reset_to_add_goal, save_persistent_state
 from components.topbar import render_topbar
 
 
@@ -20,7 +20,13 @@ def _init_onboarding_state():
     st.session_state.setdefault("learner_occupation", "")
     st.session_state.setdefault("learner_information_text", "")
     st.session_state.setdefault("learner_information", "")
-    st.session_state.setdefault("to_add_goal", {"learning_goal": ""})
+    # After a Reset (session_state.clear() + switch_page), this page runs
+    # without main.py's initialize_session_state — a bare literal here would
+    # leave skill_gaps/learner_profile/learning_path missing and crash every
+    # downstream consumer. reset_to_add_goal provides the full shape.
+    if "to_add_goal" not in st.session_state or not isinstance(st.session_state.get("to_add_goal"), dict) or "skill_gaps" not in st.session_state["to_add_goal"]:
+        reset_to_add_goal()
+    st.session_state.setdefault("llm_type", "None")
     save_persistent_state()
 
 

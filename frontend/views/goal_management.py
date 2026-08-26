@@ -64,19 +64,21 @@ def render_existing_goals():
                 col_right.button("Current Active Goal", type="primary", key=f"active_{goal['id']}", use_container_width=True)
             else:
                 if col_right.button("Set as Active Goal", key=f"set_{goal['id']}", help="Mark this goal as your active learning goal."):
-                    st.session_state.selected_goal_id = goal["id"]
-                    save_persistent_state()
+                    # change_selected_goal_id sets selected_goal_id itself and
+                    # resets the per-session/point cursors; assigning the id
+                    # directly first would make it an early-return no-op.
                     change_selected_goal_id(goal["id"])
                     save_persistent_state()
                     st.rerun()
             
             st.info(f"{goal['learning_goal']}")
             st.write(f"**Overall Progress:**")
-            learner_profile = goal["learner_profile"]
-            overall_progress = learner_profile["cognitive_status"]["overall_progress"]
+            learner_profile = goal["learner_profile"] or {}
+            overall_progress = (learner_profile.get("cognitive_status") or {}).get("overall_progress", 0)
             progress = st.slider("Progress", min_value=0, max_value=100, value=overall_progress, key=f"progress_{goal['id']}", disabled=True)
-            unlearned_skill = len(goal['learner_profile']['cognitive_status']['in_progress_skills'])
-            learned_skill = len(goal['learner_profile']['cognitive_status']['mastered_skills'])
+            _cs = (learner_profile.get("cognitive_status") or {})
+            unlearned_skill = len(_cs.get('in_progress_skills', []))
+            learned_skill = len(_cs.get('mastered_skills', []))
             all_skill = learned_skill + unlearned_skill
             col1, col2, col3 = st.columns([1, 1, 1])
             with col1:
@@ -91,14 +93,20 @@ def render_existing_goals():
             col1, col2 = st.columns([7, 1])
             with col1:
                 if st.button("Edit", key=f"edit_{goal['id']}"):
-                    edited_goal = st.text_area("Edit Goal", value=goal["learning_goal"])
-                    if st.button("Save", key=f"save_{goal['id']}"):
-                        goal["learning_goal"] = edited_goal
-                        st.success("Goal updated successfully!")
+                    show_edit_goal_dialog(goal["id"])
+
             with col2:
                 if st.button("Delete", key=f"delete_{goal['id']}", type="primary"):
                     goal_index = index_goal_by_id(goal["id"])
                     st.session_state.goals[goal_index]["is_deleted"] = True
+                    # If the deleted goal was the active one, move the selection
+                    # to the next remaining goal instead of tracking a ghost.
+                    if st.session_state["selected_goal_id"] == goal["id"]:
+                        remaining = [g for g in st.session_state.goals if not g["is_deleted"]]
+                        if remaining:
+                            change_selected_goal_id(remaining[0]["id"])
+                        # else: no goals left; the app reverts to onboarding on
+                        # the next render via the empty-goals guards.
                     save_persistent_state()
                     st.success("Goal deleted successfully!")
                     st.rerun()
@@ -108,6 +116,23 @@ def render_existing_goals():
 
             
             
+
+
+@st.dialog("Edit Goal")
+def show_edit_goal_dialog(goal_id: int):
+    """Edit a goal's text inside a dialog — nested buttons on the main page can
+    never save because the outer button's state is gone on the rerun."""
+    goal_index = index_goal_by_id(goal_id)
+    if goal_index is None:
+        st.error("Goal not found.")
+        return
+    goal = st.session_state.goals[goal_index]
+    edited_goal = st.text_area("Edit Goal", value=goal["learning_goal"])
+    if st.button("Save", type="primary"):
+        goal["learning_goal"] = edited_goal
+        save_persistent_state()
+        st.success("Goal updated successfully!")
+        st.rerun()
 
 
 @st.dialog("Skill Gap", width="large")

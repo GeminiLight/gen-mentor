@@ -1,7 +1,6 @@
 import streamlit as st
 import config
 from utils.state import save_persistent_state
-import requests
 import re
 from pathlib import Path
 from utils.request_api import get_available_models
@@ -81,14 +80,15 @@ def render_topbar():
 
 @st.dialog("Settings")
 def settings():
-    """Settings dialog to edit backend endpoint and LLM API key stored in frontend/config.py
+    """Settings dialog to override the backend endpoint for this installation.
 
-    This writes updates back to the `frontend/config.py` file and triggers a rerun.
+    The override lives in st.session_state (persisted via PERSIST_KEYS) and is
+    what `utils.request_api.active_backend_endpoint()` actually calls;
+    frontend/config.py remains the fallback default.
     """
-    # current backend endpoint
     is_valid_backend = False
     if_check_api = False
-    cur_backend = getattr(config, "backend_endpoint", "http://127.0.0.1:5006/")
+    cur_backend = st.session_state.get("backend_endpoint") or getattr(config, "backend_endpoint", "http://127.0.0.1:5000/")
     new_backend = st.text_input("Backend endpoint (include protocol and port)", value=cur_backend)
 
     st.markdown("---")

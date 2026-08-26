@@ -49,6 +49,15 @@ def model_selection(llm_type=None):
     return {"model_provider": provider, "model_name": model_name}
 
 
+def active_backend_endpoint() -> str:
+    """The backend base URL to call: the settings-dialog override if set, else config.
+
+    Normalised to end with a single slash so it composes directly with route names.
+    """
+    endpoint = st.session_state.get("backend_endpoint") or backend_endpoint
+    return endpoint.rstrip("/") + "/"
+
+
 def make_post_request(api_name, data, mock_data_path=None, timeout=DEFAULT_TIMEOUT):
     """POST to the backend and return the decoded body, or ``None`` on failure."""
     if use_mock_data and mock_data_path:
@@ -57,7 +66,7 @@ def make_post_request(api_name, data, mock_data_path=None, timeout=DEFAULT_TIMEO
         with open(asset_path(mock_data_path)) as handle:
             return json.load(handle)
 
-    backend_url = f"{backend_endpoint}{api_name}"
+    backend_url = f"{active_backend_endpoint()}{api_name}"
     try:
         response = httpx.post(backend_url, json=data, timeout=timeout)
     except httpx.HTTPError as exc:
@@ -76,8 +85,10 @@ def make_post_request(api_name, data, mock_data_path=None, timeout=DEFAULT_TIMEO
     return None
 
 
-def get_available_models(backend_endpoint):
-    backend_url = f"{backend_endpoint}list-llm-models"
+def get_available_models(backend_endpoint=None):
+    """List models from the backend; an omitted endpoint falls back to the active one."""
+    base = backend_endpoint or active_backend_endpoint()
+    backend_url = f"{base.rstrip('/')}/list-llm-models"
     try:
         response = httpx.get(backend_url, timeout=30)
     except httpx.HTTPError:
@@ -94,7 +105,9 @@ def chat_with_tutor(chat_messages, learner_profile, llm_type=None, method_name="
         "method_name": method_name,
         **model_selection(llm_type),
     }
-    response = make_post_request(API_NAMES["chat_with_tutor"], data)
+    response = make_post_request(
+        API_NAMES["chat_with_tutor"], data, "./assets/data_example/ai_tutor_chat.json"
+    )
     return response.get("response") if response else None
 
 
@@ -106,7 +119,9 @@ def refine_learning_goal(learning_goal, learner_information, llm_type=None, meth
         **model_selection(llm_type),
     }
     response = make_post_request(API_NAMES["refine_goal"], data)
-    return response.get("refined_goal") if response else "Refined learning goal"
+    # None on failure so the caller can keep the user's original text instead
+    # of persisting a placeholder.
+    return response.get("refined_goal") if response else None
 
 
 @st.cache_data(show_spinner=False)
@@ -288,7 +303,7 @@ def draft_knowledge_points(
         **model_selection(llm_type),
     }
     response = make_post_request(
-        API_NAMES["draft_knowledge_points"], data, "./assets/data_example/knowledge_points.json"
+        API_NAMES["draft_knowledge_points"], data, "./assets/data_example/knowledge_drafts.json"
     )
     return response.get("knowledge_drafts") if response else None
 

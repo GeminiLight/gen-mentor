@@ -113,16 +113,18 @@ def render_session_learning_timeseries(goal):
         if if_learned:
             selected_gid = st.session_state["selected_goal_id"]
             match = re.search(r'\d+', session['id'])
+            if match is None:
+                # Session ids without digits can't be mapped to a tracking key.
+                session_data["Time"].append(0)
+                continue
             selected_sid = int(match.group(0)) -1
-            times = st.session_state["session_learning_times"][f'{selected_gid}-{selected_sid}']
-            if times["end_time"] is not None:
-                # st.markdown(times)
-                time_spent = (times["end_time"] - times["start_time"]) / 60
-                # st.markdown(time_spent)
-            else:  
+            times = st.session_state["session_learning_times"].get(f'{selected_gid}-{selected_sid}', {})
+            end_time = times.get("end_time")
+            if end_time is not None:
+                time_spent = (end_time - times.get("start_time", end_time)) / 60
+            else:
                 time_spent = 0
             session_data["Time"].append(time_spent)
-            # st.markdown(session_data)
         else:
             session_data["Time"].append(0)
     

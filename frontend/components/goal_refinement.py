@@ -17,14 +17,23 @@ def render_goal_refinement(goal, button_col=None, hint_col=None):
         if hint_col is not None:
             hint_col.write("**✨ Refining learning goal...**")
 
-        st.session_state["refined_learning_goal"] = refine_learning_goal(
+        refined = refine_learning_goal(
             goal["learning_goal"],
             st.session_state["learner_information"],
             st.session_state["llm_type"],
         )
-        goal["learning_goal"] = st.session_state["refined_learning_goal"]
-        st.toast("✅ Refined Learning goal successfully.")
         st.session_state["if_refining_learning_goal"] = False
+        if refined is None:
+            # Keep the user's original text rather than a placeholder.
+            if hint_col is not None:
+                hint_col.error("Could not refine the goal. Please try again.")
+            return
+        st.session_state["refined_learning_goal"] = refined
+        goal["learning_goal"] = refined
+        # goal_management renders its goal text_area with key "new_learning_goal";
+        # without syncing the widget state, the rerun would hand back the
+        # pre-refinement value and overwrite the refined goal.
+        st.session_state["new_learning_goal"] = refined
+        st.toast("✅ Refined Learning goal successfully.")
         save_persistent_state()
         st.rerun()
-        # return goal["refined_learning_goal"]
