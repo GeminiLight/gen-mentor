@@ -1059,3 +1059,29 @@ html[data-theme='dark'] section img:not(.title-logo) {
 html[data-theme='dark'] #framework {
   background: #1f2127;
 }
+
+/* .feature-card list/body text hardcodes greys for the light theme. */
+html[data-theme='dark'] .feature-card h4 {
+  color: #e8e9ea;
+}
+
+html[data-theme='dark'] .feature-card p,
+html[data-theme='dark'] .feature-card li {
+  color: #dbdbdb;
+}
+
+/* Terminal dark-mode text layer: a few list/heading colors are set by
+   rules nested in @media blocks that are hard to outrank selectively
+   (and some text inherits from them), so scope explicit colors to the
+   dark theme with !important as the final word. Light theme untouched. */
+html[data-theme='dark'] section li,
+html[data-theme='dark'] .box li,
+html[data-theme='dark'] .content li {
+  color: #dbdbdb !important;
+}
+
+html[data-theme='dark'] section .title.is-5,
+html[data-theme='dark'] .box .title,
+html[data-theme='dark'] .content .title.is-5 {
+  color: #e8e9ea !important;
+}
