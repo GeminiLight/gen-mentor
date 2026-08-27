@@ -91,25 +91,34 @@ if st.session_state["if_complete_onboarding"]:
 else:
     onboarding = st.Page("views/onboarding.py", title="Onboarding", icon=":material/how_to_reg:", default=True, url_path="onboarding")
     learning_path = st.Page("views/learning_path.py", title="Learning Path", icon=":material/route:", default=False, url_path="learning_path")
-skill_gaps = st.Page("views/skill_gap.py", title="Skill Gap", icon=":material/insights:", default=False, url_path="skill_gap")
-knowledge_document = st.Page("views/knowledge_document.py", title="Resume Learning", icon=":material/menu_book:", default=False, url_path="knowledge_document")
-learner_profile = st.Page("views/learner_profile.py", title="My Profile", icon=":material/person:", default=False, url_path="learner_profile")
-goal_management = st.Page("views/goal_management.py", title="Goal Management", icon=":material/flag:", default=False, url_path="goal_management")
-dashboard = st.Page("views/dashboard.py", title="Analytics Dashboard", icon=":material/browse:", default=False, url_path="dashboard")
-sources = st.Page("views/sources.py", title="Knowledge Sources", icon=":material/source:", default=False, url_path="sources")
+def _page(filename: str, title: str, icon: str) -> st.Page:
+    return st.Page(f"views/{filename}", title=title, icon=icon, default=False,
+                   url_path=filename.rsplit(".", 1)[0])
 
-# Learning Analytics Dashboard
+skill_gaps = _page("skill_gap.py", "Skill Gap", ":material/insights:")
+knowledge_document = _page("knowledge_document.py", "Lesson Viewer", ":material/menu_book:")
+learner_profile = _page("learner_profile.py", "My Profile", ":material/person:")
+goal_management = _page("goal_management.py", "Goal Management", ":material/flag:")
+dashboard = _page("dashboard.py", "Analytics Dashboard", ":material/monitoring:")
+sources = _page("sources.py", "Knowledge Sources", ":material/library_books:")
+
 if not st.session_state["if_complete_onboarding"]:
-    nav_position = "sidebar"
+    # Setup flow: the sidebar is hidden; navigation is driven by page redirects.
     pg = st.navigation({"GenMentor": [onboarding, skill_gaps, learning_path]}, position="hidden", expanded=True)
 else:
-    nav_position = "sidebar"
-    pg = st.navigation({"GenMentor": [goal_management, learning_path, knowledge_document, learner_profile, dashboard]}, position=nav_position, expanded=True)
+    # Flat list, as before: grouped sections render collapsible headers users
+    # found disjointed. sources stays in (it regressed out of this dict once).
+    pg = st.navigation(
+        {"GenMentor": [goal_management, learning_path, knowledge_document,
+                       learner_profile, sources, dashboard]},
+        position="sidebar", expanded=True)
     with st.sidebar:
-        _left, _center, _right = st.columns([2, 2, 2])
-        with _center:
-            if st.button("Reset", help="Clear local history (keeps timestamped backups)"):
+        st.divider()
+        _, center, _ = st.columns(3)
+        with center:
+            if st.button("Reset", help="Archive and clear your saved progress (a backup is kept server-side)"):
                 show_reset_dialog()
+        st.caption("Your data lives on the GenMentor backend and follows your account.")
     # Look the goal up by its "id" field rather than list position: an older or
     # hand-edited data store can leave selected_goal_id out of range, which a
     # bare list index would turn into an app-wide crash.

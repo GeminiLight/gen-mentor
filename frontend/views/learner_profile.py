@@ -36,26 +36,6 @@ def render_learner_profile():
                     st.rerun()
 
 def render_learner_profile_info(goal):
-    st.markdown("""
-        <style>
-        .section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-        }
-        .progress-indicator {
-            color: #28a745;
-            font-weight: bold;
-        }
-        .skill-in-progress {
-            color: #ffc107;
-        }
-        .skill-required {
-            color: #dc3545;
-        }
-        </style>
-    """, unsafe_allow_html=True)
     learner_profile = goal["learner_profile"]
     with st.container(border=True):
         # Learner Information

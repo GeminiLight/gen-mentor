@@ -395,27 +395,47 @@ def render_content_preparation(goal):
     st.rerun()
     return learning_content
 
+SECTION_HEADER_RE = re.compile(r"^(#{2,6})\s", re.MULTILINE)
+
+
+def split_document_into_sections(document: str) -> list[str]:
+    """Split a markdown document into one section per H2 (``##``) header.
+
+    Pure function (no Streamlit) so the paging logic is testable on its own.
+    Boundaries are the actual header matches, not reconstructed positions: the
+    previous ``find(title) - 3`` slicing assumed exactly ``"## "`` before the
+    title and could match title words anywhere in the body, producing wrong
+    slices. Every exactly-level-2 header starts a new section (deeper ``###``
+    headers never do, matching the sidebar TOC's page counting); sections are
+    trimmed and empty slices dropped. Anything before the first H2 (document
+    title and overview) belongs to no section, as before — the session header
+    rendered above already covers it. Any newline style works. A non-empty
+    document always yields at least one page, so callers can index page 0 even
+    when there is no H2 header at all (the old splitter returned [] there).
+    """
+    if not isinstance(document, str) or not document:
+        return [""]
+    starts = [
+        match.start()
+        for match in SECTION_HEADER_RE.finditer(document)
+        if len(match.group(1)) == 2
+    ]
+    if not starts:
+        trimmed = document.strip()
+        return [trimmed] if trimmed else [""]
+    bounds = starts + [len(document)]
+    sections = [document[bounds[i]:bounds[i + 1]].strip() for i in range(len(starts))]
+    sections = [section for section in sections if section]
+    return sections or [document.strip()]
+
+
 def render_document_content_by_section(document):
     selected_gid = st.session_state["selected_goal_id"]
     session_id = st.session_state["selected_session_id"]
     if "current_page" not in st.session_state or not isinstance(st.session_state["current_page"], dict):
         st.session_state["current_page"] = {}
 
-    titles = re.findall(r'^(#+)\s*(.*)', document, re.MULTILINE)
-
-    section_starts = []
-    start_idx = 0
-    for title in titles:
-        if title[0] == "#":
-            continue
-        elif title[0] == "##":
-            start_idx = document.find(title[1], start_idx)
-            section_starts.append(start_idx-3)
-    section_documents = []
-    for i in range(len(section_starts)):
-        start_idx = section_starts[i]
-        end_idx = section_starts[i + 1] if i + 1 < len(section_starts) else len(document)
-        section_documents.append(document[start_idx:end_idx-1].strip())
+    section_documents = split_document_into_sections(document)
 
     page_key = f"{selected_gid}-{session_id}"
     # st.query_params is dict-like and returns plain string values on every
@@ -867,9 +887,9 @@ def render_quiz_judgments(judgments, quiz_data):
                 continue
             st.write(f"**{judgment['number']}. {q['question']}**")
             if judgment.get("verdict") == "correct":
-                st.success("Correct!")
+                st.markdown("✅ Correct")
             elif judgment.get("verdict") == "incorrect":
-                st.error("Incorrect.")
+                st.markdown("❌ Incorrect — expected answer shown below")
             else:
                 st.caption("Not answered.")
             expected = format_expected_answer(judgment.get("expected_answer"))
@@ -918,26 +938,30 @@ def render_questions(quiz_data):
     question_counts = {list_key: len(quiz_data.get(list_key) or []) for _kind, list_key, _prefix in QUIZ_KIND_FIELDS}
 
     for i, q in enumerate(quiz_data['single_choice_questions']):
-        st.write(f"**{i + 1}. {q['question']}**")
-        selections["single_choice"].append(
-            st.radio("Options", q['options'], key=f"single_{i}", index=None, label_visibility="hidden"))
+        with st.container(border=True):
+            st.write(f"**{i + 1}. {q['question']}**")
+            selections["single_choice"].append(
+                st.radio("Options", q['options'], key=f"single_{i}", index=None, label_visibility="hidden"))
 
     for i, q in enumerate(quiz_data['multiple_choice_questions']):
-        st.write(f"**{question_counts['single_choice_questions'] + i + 1}. {q['question']}**")
-        selections["multiple_choice"].append([
-            option for j, option in enumerate(q['options'])
-            if st.checkbox(option, key=f"multi_{i}_option_{j}")
-        ])
+        with st.container(border=True):
+            st.write(f"**{question_counts['single_choice_questions'] + i + 1}. {q['question']}**")
+            selections["multiple_choice"].append([
+                option for j, option in enumerate(q['options'])
+                if st.checkbox(option, key=f"multi_{i}_option_{j}")
+            ])
 
     for i, q in enumerate(quiz_data['true_false_questions']):
-        st.write(f"**{question_counts['single_choice_questions'] + question_counts['multiple_choice_questions'] + i + 1}. {q['question']}**")
-        selections["true_false"].append(
-            st.radio("True or False?", ["True", "False"], key=f"tf_{i}", label_visibility="hidden", index=None))
+        with st.container(border=True):
+            st.write(f"**{question_counts['single_choice_questions'] + question_counts['multiple_choice_questions'] + i + 1}. {q['question']}**")
+            selections["true_false"].append(
+                st.radio("True or False?", ["True", "False"], key=f"tf_{i}", label_visibility="hidden", index=None))
 
     for i, q in enumerate(quiz_data['short_answer_questions']):
-        st.write(f"**{question_counts['single_choice_questions'] + question_counts['multiple_choice_questions'] + question_counts['true_false_questions'] + i + 1}. {q['question']}**")
-        selections["short_answer"].append(
-            st.text_input("Your Answer", key=f"short_{i}", label_visibility="hidden"))
+        with st.container(border=True):
+            st.write(f"**{question_counts['single_choice_questions'] + question_counts['multiple_choice_questions'] + question_counts['true_false_questions'] + i + 1}. {q['question']}**")
+            selections["short_answer"].append(
+                st.text_input("Your Answer", key=f"short_{i}", label_visibility="hidden"))
 
     if st.button("Submit Answers", key="submit-all-answers", type="primary",
                  icon=":material/fact_check:", use_container_width=True):
