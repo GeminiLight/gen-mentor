@@ -45,7 +45,8 @@ def render_topbar():
             settings()
         st.session_state["checked_backend"] = True
     with col1:
-        if st.button("", icon=":material/settings:", use_container_width=False):
+        if st.button("Settings", icon=":material/settings:", use_container_width=False,
+                     help="Backend endpoint and connection settings"):
             settings()
 
     available_models = st.session_state.get("available_models", [])
@@ -57,7 +58,7 @@ def render_topbar():
     with col2:
         # st.button("GenMentor")
         llm_label = st.selectbox(
-            "LLM Type",
+            "Model",
             available_models,
             index=index,
             label_visibility="collapsed",
