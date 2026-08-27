@@ -1,7 +1,6 @@
 import streamlit as st
 import config
 import logging
-from pathlib import Path
 
 from utils import data_store
 
@@ -37,11 +36,6 @@ PERSIST_KEYS = [
 ]
 
 
-def _get_data_store_path():
-    """SQLite store (WAL). The pre-SQLite JSON store auto-migrates on first load."""
-    return Path(__file__).resolve().parents[1] / "user_data" / "data_store.db"
-
-
 def _persistable_keys():
     """PERSIST_KEYS plus any quiz_results_* keys currently in session state.
 
@@ -54,15 +48,22 @@ def _persistable_keys():
     ]
 
 
-def load_persistent_state():
-    """Restore persisted keys from the SQLite store into st.session_state.
+def _current_user_id() -> str:
+    return str(st.session_state.get("userId", "TestUser"))
 
-    Only keys listed in PERSIST_KEYS (plus quiz_results_*) are restored.
-    Returns False if there is nothing to restore or the store could not be
-    read; a store that exists but is unreadable is logged rather than ignored.
+
+def load_persistent_state():
+    """Restore persisted keys from the BACKEND state store into st.session_state.
+
+    The backend owns the database (keyed by user id); this side keeps only a
+    session cache. Returns False when there is nothing to restore or the
+    backend is unreachable (logged; the app then starts fresh).
     """
-    snapshot = data_store.load_snapshot(_get_data_store_path())
-    if not snapshot:
+    snapshot = data_store.load_state(_current_user_id())
+    # None = backend unreachable. Remember it: saving the (empty) session over
+    # server data after a failed read would destroy the user's state.
+    st.session_state["_state_backend_ok"] = snapshot is not None
+    if snapshot is None:
         return False
     restored = False
     for k, v in snapshot.items():
@@ -73,14 +74,25 @@ def load_persistent_state():
 
 
 def save_persistent_state():
-    """Persist whitelisted st.session_state keys to the SQLite store.
+    """Push whitelisted st.session_state keys to the backend state store.
 
     Returns True on success. Failures are logged and reported as False; callers
     that can show UI (see `_autosave` in main.py) surface them to the user.
     """
+    if not st.session_state.get("_state_backend_ok", False):
+        # Never overwrite the server store from a session that never read it
+        # successfully — an unreachable backend at startup must not turn the
+        # first autosave into a wipe.
+        if not st.session_state.get("_state_save_guard_warned", False):
+            st.session_state["_state_save_guard_warned"] = True
+            logger.warning(
+                "Skipping state save: the backend store was never read successfully "
+                "this session (guarding server data against an empty overwrite)."
+            )
+        return False
     keys = _persistable_keys()
     snapshot = {k: st.session_state[k] for k in keys if k in st.session_state}
-    return data_store.save_snapshot(_get_data_store_path(), snapshot)
+    return data_store.save_state(_current_user_id(), snapshot)
 
 
 def initialize_session_state():

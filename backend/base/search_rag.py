@@ -318,6 +318,20 @@ class SearchRagManager:
         logger.info("Unpinned %d KB chunks for goal %s", len(ids), goal_id)
         return len(ids)
 
+    def unpin_goal(self, goal_id: str) -> int:
+        """Drop a goal's entire knowledge base (called when the goal is deleted)."""
+        if self.kb_vectorstore is None:
+            return 0
+        fetched = self.kb_vectorstore._collection.get(
+            where={KB_GOAL_KEY: str(goal_id)}, include=[]
+        )
+        ids = fetched.get("ids") or []
+        if not ids:
+            return 0
+        self.kb_vectorstore._collection.delete(ids=ids)
+        logger.info("Cascade-unpinned %d KB chunks for deleted goal %s", len(ids), goal_id)
+        return len(ids)
+
     def prune_kb(self, goal_id: str) -> int:
         """Cap a goal's KB at kb_max_chunks_per_goal, evicting oldest first."""
         if self.kb_vectorstore is None:

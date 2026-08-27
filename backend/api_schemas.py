@@ -166,8 +166,16 @@ class TailoredContentGenerationRequest(BaseRequest):
     goal_id: Optional[str] = None  # pins search results into the goal's knowledge base
 
 
+class StateSnapshotRequest(BaseRequest):
+    """A full session-state snapshot pushed by a frontend client."""
+
+    user_id: str = "TestUser"
+    snapshot: JsonLike = Field(default_factory=dict)
+
+
 __all__ = [
     "JsonLike",
+    "StateSnapshotRequest",
     "BaseRequest",
     "ChatWithTutorRequest",
     "ChatWithAutorRequest",

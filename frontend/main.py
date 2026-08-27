@@ -1,13 +1,11 @@
 import logging
-import shutil
 import time
-from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
 from streamlit.errors import StreamlitAPIException
 
-from utils.state import initialize_session_state, save_persistent_state, _get_data_store_path
+from utils.state import initialize_session_state, save_persistent_state
 from utils import data_store
 from config import asset_path
 
@@ -45,22 +43,6 @@ def _switch_page(page: str) -> bool:
     return True
 
 
-def _reset_data_store(path: Path) -> None:
-    """Archive the SQLite data store under a timestamped name, then delete it.
-
-    The archive is written first on purpose: if it cannot be created the store is
-    left in place rather than destroyed without a backup. WAL/SHM siblings are
-    removed alongside the db file.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.exists():
-        return
-    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-    shutil.copy2(str(path), str(path.parent / f"data_storage-{ts}.db"))
-    for sibling in data_store.db_files(path):
-        sibling.unlink(missing_ok=True)
-
-
 initialize_session_state()
 st.session_state.setdefault("_autosave_enabled", True)
 
@@ -81,14 +63,12 @@ def show_reset_dialog():
     col_confirm, _space, col_cancel = st.columns([1, 2, 0.7])
     with col_confirm:
         if st.button("Confirm", type="primary"):
-            # Stop autosaving first, so nothing recreates the store we are about to remove.
+            # Stop autosaving first, so nothing recreates the server state we
+            # are about to remove.
             st.session_state["_autosave_enabled"] = False
-            data_path = _get_data_store_path()
-            try:
-                _reset_data_store(data_path)
-            except OSError as exc:
-                logger.error("Failed to reset data store at %s: %s", data_path, exc, exc_info=True)
-                st.error(f"Could not clear saved data: {exc}")
+            user_id = str(st.session_state.get("userId", "TestUser"))
+            if not data_store.reset_state(user_id):
+                st.error("Could not clear saved data: the backend did not confirm the reset.")
             st.session_state.clear()
             # switch_page targets run without re-executing this script, so the
             # defaults must be rebuilt here or every downstream key
