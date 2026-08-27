@@ -140,6 +140,24 @@ curl -X POST "http://localhost:5000/tailor-knowledge-content" \
   }'
 ```
 
+#### Streaming Tutor Chat
+
+`POST /chat-with-tutor/stream` — same payload as `/chat-with-tutor`; responds
+with a plain-text token stream instead of JSON.
+
+### State & Knowledge-Base Endpoints
+
+The backend owns all persisted state (per-user SQLite):
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/state?user_id=` | Fetch a user's full session-state snapshot |
+| `PUT` | `/state` | Persist a snapshot; removed/soft-deleted goals cascade out of the knowledge base |
+| `DELETE` | `/state/{user_id}` | Archive then wipe a user's state (frontend Reset flow) |
+| `GET` | `/knowledge-base/{goal_id}` | Pages pinned into that goal's durable knowledge base |
+| `DELETE` | `/knowledge-base/{goal_id}?source=` | Unpin one source page |
+| `GET` | `/stats` | Per-agent telemetry: calls, tokens, latency, validation retries |
+
 ## Configuration
 
 The application uses Hydra for configuration management. Key configuration files:
@@ -156,11 +174,15 @@ GenMentor supports multiple LLM providers. Configure them using environment vari
 
 **Environment Variables (Recommended for API Keys):**
 ```bash
-# DeepSeek (default)
-export DEEPSEEK_API_KEY="your-deepseek-api-key"
-
-# OpenAI
+# OpenAI / any OpenAI-compatible gateway (provider: openai)
 export OPENAI_API_KEY="your-openai-api-key"
+export OPENAI_BASE_URL="https://your-gateway/v1"   # optional
+
+# Tavily web search (search.provider: tavily) — free tier available
+export TAVILY_API_KEY="tvly-..."
+
+# DeepSeek direct (provider: deepseek)
+export DEEPSEEK_API_KEY="your-deepseek-api-key"
 
 # Anthropic
 export ANTHROPIC_API_KEY="your-anthropic-api-key"
@@ -172,10 +194,13 @@ export OLLAMA_BASE_URL="http://localhost:11434"
 **Configuration File (`config/default.yaml`):**
 ```yaml
 llm:
-  provider: deepseek  # Options: deepseek, openai, anthropic, ollama
+  provider: openai    # Options: deepseek, openai, anthropic, ollama
   model_name: deepseek-chat
-  base_url: null      # Custom base URL for API endpoints
-  temperature: 0      # Response randomness (0-1)
+  base_url: null      # Custom base URL for API endpoints (e.g. an OpenAI-compatible gateway;
+                      # OPENAI_BASE_URL in .env is also read natively by the OpenAI client)
+
+# NOTE: keys unknown to config/schemas.py raise at startup (the composed config is
+# merged into a structured schema), so typos fail fast instead of being ignored.
 ```
 
 #### Available LLM Models
@@ -194,27 +219,19 @@ llm:
 - `claude-3-sonnet` - Balanced performance and speed
 - `claude-3-haiku` - Fastest and most cost-effective
 
+> Provider packages beyond DeepSeek/OpenAI-community are optional extras:
+> `langchain-anthropic`, etc. Install the matching package for the provider you select.
+
 **Ollama Models (Local):**
-- `llama2` - Meta's Llama 2
-- `mistral` - Mistral AI model
-- `codellama` - Code-optimized Llama variant
+Any locally pulled tag works, e.g. `llama3.1`, `qwen2.5`, `mistral`.
 
 #### Model Selection Guidelines
 
-**For Educational Content:**
-- Use `deepseek-chat` or `claude-3-sonnet` for balanced quality and cost
-- Use `gpt-4o` for premium content quality
-- Use `deepseek-coder` for technical/programming topics
+Defaults are deliberately frugal (`deepseek-chat`). General guidance:
 
-**For Code Generation:**
-- `deepseek-coder` - Best for Chinese and English programming content
-- `claude-3-5-sonnet` - Excellent for complex coding tasks
-- `gpt-4o` - Reliable for general programming assistance
-
-**For Cost Optimization:**
-- `gpt-4o-mini` - Good performance at lower cost
-- `claude-3-haiku` - Fast responses, minimal cost
-- `deepseek-chat` - Competitive pricing with good quality
+- **Educational content**: mid-tier chat models are usually sufficient; step up only when drafting quality matters.
+- **Code-heavy topics**: prefer a code-tuned model when the gateway offers one.
+- **Cost control**: route cheaper models per request — every request accepts `model_provider`/`model_name`, and the frontend topbar switcher uses this.
 
 ### Embedding Configuration
 
@@ -223,11 +240,14 @@ Configure text embedding models for RAG functionality:
 ```yaml
 embedding:
   provider: huggingface
-  model_name: sentence-transformers/all-mpnet-base-v2
-  # Alternative models:
-  # - sentence-transformers/all-MiniLM-L6-v2 (faster, lighter)
-  # - text-embedding-ada-002 (OpenAI)
-  # - text-embedding-3-small (OpenAI, newer)
+  model_name: BAAI/bge-small-en-v1.5   # fast local default (384-dim)
+  # Alternatives:
+  # - BAAI/bge-m3                      # stronger multilingual, larger download
+  # - provider: openai + text-embedding-3-small   # API embeddings (needs a serving endpoint)
+
+# Changing the model changes the vector space: bump
+# vectorstore.collection_name (we did: genmentor -> genmentor_v2) so stale
+# collections are abandoned rather than mixed.
 ```
 
 ### Search and RAG Configuration
@@ -235,25 +255,35 @@ embedding:
 **Web Search:**
 ```yaml
 search:
-  provider: duckduckgo  # Options: duckduckgo, serper, google
+  provider: duckduckgo  # Options: tavily, serper, bing, brave, duckduckgo
   max_results: 5
   loader_type: web
-```
+  tavily_api_key: null        # falls back to TAVILY_API_KEY env var
+  tavily_search_depth: basic  # basic | advanced
+
+# Tavily returns page content with the search itself and skips per-page
+# crawling — dramatically faster end-to-end than DuckDuckGo.
 
 **Vector Store:**
 ```yaml
 vectorstore:
+  type: chroma
   persist_directory: data/vectorstore
-  collection_name: genmentor
+  collection_name: genmentor_v2   # _v2: vector spaces differ across embedding models
 ```
 
 **RAG Parameters:**
 ```yaml
 rag:
   chunk_size: 1000          # Text chunk size for retrieval
-  num_retrieval_results: 5  # Number of chunks to retrieve
-  allow_parallel: true      # Enable parallel processing
-  max_workers: 3           # Maximum parallel workers
+  num_retrieval_results: 5  # Number of chunks to retrieve per query
+  allow_parallel: true      # Enable parallel processing across knowledge points
+  max_workers: 3            # Thread-pool width for drafting/page fetching
+  max_stored_chunks: 2000   # Rolling cap on the search-result cache (oldest evicted)
+
+# A sibling <collection>_kb store accumulates each goal's durable knowledge
+# base (capped at kb_max_chunks_per_goal=400 by default); the tutor retrieves
+# from it alongside fresh search.
 ```
 
 ### Server Configuration
@@ -266,31 +296,23 @@ server:
 
 ### Environment-Specific Configuration
 
-Create environment-specific configs by copying `config/main.yaml` to `config/prod.yaml` or `config/dev.yaml`:
+`config/main.yaml` composes over `config/default.yaml` (defaults first, `_self_`
+last), so overrides live in `main.yaml` — server host/port, log level, and any
+module settings you want to pin:
 
 ```yaml
-# config/prod.yaml
+# config/main.yaml
 defaults:
   - default
   - _self_
 
-debug: false
-log_level: INFO
-
-llm:
-  provider: openai
-  model_name: gpt-4o
-  temperature: 0.1
-
 server:
-  host: 0.0.0.0
+  host: 0.0.0.0   # expose beyond localhost only behind real auth!
   port: 8080
 ```
 
-Run with specific config:
-```bash
-python main.py --config-name=prod
-```
+Deployment-relevant env vars: `GENMENTOR_UPLOAD_DIR` (CV upload directory),
+`GENMENTOR_STATE_DB` (state database path), plus the provider keys above.
 
 ### RAG and Search Configuration
 
@@ -332,9 +354,12 @@ backend/
 │   ├── adaptive_learner_modeling/
 │   ├── personalized_resource_delivery/
 │   └── learner_simulation/
+├── tests/                    # Pytest suite (CI runs it)
 └── utils/                    # Utility functions
-    ├── preprocess.py
-    └── llm_output.py
+    ├── preprocess.py         # PDF text extraction, name sanitising
+    ├── llm_output.py         # LLM response parsing (<think>, JSON extraction)
+    ├── telemetry.py          # Per-agent call/token/latency stats (GET /stats)
+    └── state_store.py        # Server-owned per-user state database
 ```
 
 ### Adding New Features
@@ -348,11 +373,16 @@ backend/
 
 ### Testing
 
-The project includes an `api_tester/` directory with testing utilities. Run tests using:
+A pytest suite lives in `tests/` (API contracts, schemas, JSON extraction,
+RAG scoping/pruning, search providers, parallel behaviour):
 
 ```bash
-python -m pytest test_config.py
+pytest tests -q          # from backend/
 ```
+
+Note: test runs finish cleanly, but chromadb's native extension can abort
+during interpreter teardown on some platforms — CI wraps pytest with
+`os._exit()` for this reason (see .github/workflows/ci.yml).
 
 ## Dependencies
 
@@ -362,8 +392,8 @@ Key dependencies include:
 - **Hydra**: Configuration management
 - **Pydantic**: Data validation
 - **ChromaDB**: Vector database
-- **Sentence Transformers**: Text embeddings
-- **DuckDuckGo Search**: Web search
+- **HuggingFace sentence-transformers / BGE**: Text embeddings
+- **ddgs / Tavily**: Web search providers
 
 ## License
 

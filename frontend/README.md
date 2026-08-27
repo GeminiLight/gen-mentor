@@ -9,7 +9,7 @@ Installation
 ```bash
 # from repository root or this folder
 cd frontend
-uv .venv
+uv venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
 ```
@@ -32,7 +32,7 @@ The app will open at <http://localhost:8501> by default.
 
 All UI-related toggles live in `config.py`:
 
-- `backend_endpoint`: Base URL for the backend API (default `http://127.0.0.1:5006/`).
+- `backend_endpoint`: Base URL for the backend API (default `http://127.0.0.1:5000/`).
 - `use_mock_data`: When `True`, the UI serves sample data from `assets/data_example/` and does not call the backend.
 - `use_search`: Allows knowledge drafting to use retrieval/search (sent to backend).
 
@@ -45,32 +45,34 @@ frontend/
   main.py                 # Streamlit entry. Builds navigation and loads CSS/logo
   config.py               # Frontend configuration flags and API base URL
   requirements.txt        # Python dependencies (Streamlit + extras)
-  data_store.json         # Persistent UI state (created/updated by the app)
+  user_data/              # Legacy local stores (auto-migrated to the backend; *.migrated)
   .streamlit/config.toml  # Streamlit theme/layout defaults
 
   assets/                 # Static assets and mock data
-    css/                  # UI styles
+    css/main.css          # Design system (tokens -> components -> chrome)
     data_example/         # JSON fixtures for mock mode
 
-  components/             # Reusable Streamlit components (chatbot, time tracking, etc.)
-  pages/                  # Multi-page app: onboarding, learning path, knowledge document, dashboard, ...
-  utils/                  # Helpers: API requests, formatting, PDF, state management, colors
+  components/             # Reusable Streamlit components (chatbot, topbar, gap cards, ...)
+  views/                  # App pages: onboarding, learning path, lesson viewer,
+                          # goal management, learner profile, knowledge sources, dashboard
+  utils/                  # API client, formatting, PDF, state cache, data-store client
 ```
 
-Key pages:
+Key pages (`views/`):
 
-- `pages/onboarding.py`: Collect learner info and set initial goal.
-- `pages/learning_path.py`: View, (re)schedule, and navigate sessions.
-- `pages/knowledge_document.py`: In-session reading experience with a document TOC, pagination, and quizzes.
-- `pages/goal_management.py`: Manage/refine goals.
-- `pages/dashboard.py`: Basic analytics overview.
+- `onboarding.py`: Collect learner info and set the initial goal.
+- `learning_path.py`: View, (re)schedule (session count selectable), and navigate sessions.
+- `knowledge_document.py`: Lesson viewer — checkpointed content pipeline, section TOC + pagination, quizzes with submit-all judging, per-goal review list.
+- `sources.py`: Knowledge Sources — pages pinned into the goal's durable knowledge base (unpin supported).
+- `goal_management.py` / `learner_profile.py` / `dashboard.py`: Goal CRUD, adaptive profile, analytics.
 
 ## How it works
 
-- UI state is stored in Streamlit `st.session_state` and persisted to `data_store.json` via utilities in `utils/state.py`.
-- Backend calls are made with `httpx` via `utils/request_api.py` using endpoints under `config.backend_endpoint`.
+- The **backend owns all persisted state** (per-user SQLite behind `/state`; goals deletion cascades into the knowledge base). This side keeps session state as a cache and pushes/pulls snapshots via `utils/data_store.py` -> `utils/state.py`.
+- Backend calls are made with `httpx` via `utils/request_api.py`; payloads are native JSON (the backend also accepts legacy string-encoded blobs).
 - When `use_mock_data=True`, the app reads JSON fixtures from `assets/data_example/` instead of calling the backend.
-- The knowledge document page supports section-by-section pagination, a clickable sidebar TOC, and auto-scroll to anchors.
+- Content generation is checkpointed per stage under the hood: refreshing or restarting resumes from the last completed stage.
+- The tutor dialog streams tokens as they are generated.
 
 ## Common tasks
 
@@ -107,7 +109,7 @@ Key pages:
 ## Development tips
 
 - Streamlit auto-reloads on file save. Keep logs visible in the terminal.
-- Keep new code in `components/` when it’s reusable, and page-specific logic under `pages/`.
+- Keep new code in `components/` when it’s reusable, and page-specific logic under `views/`.
 - Prefer small, focused functions in `utils/` for API calls and formatting.
 - Avoid heavy work on every rerun. Cache with `@st.cache_data` or `@st.cache_resource` when safe.
 

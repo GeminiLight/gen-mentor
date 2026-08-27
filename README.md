@@ -117,11 +117,17 @@ DEEPSEEK_API_KEY="your-deepseek-api-key"
 
 2. Configure api endpoint for frontend
 
-If you would like to run the backend on a different host/port, please update the API URL in `frontend/config.py`:
+If you would like to run the backend on a different host/port, update it either
+in the running app via **Settings (⚙️) → Backend endpoint**, or in
+`frontend/config.py`:
 
 ```python
 backend_endpoint = "http://127.0.0.1:5000/"
 ```
+
+> Optional: `TAVILY_API_KEY` in `backend/.env` switches web search from
+> DuckDuckGo to Tavily — noticeably faster content generation (see
+> `backend/README.md`).
 
 ### ▶️ Running Locally
 
