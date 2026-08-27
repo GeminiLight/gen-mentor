@@ -170,8 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
-// Scrollspy: highlight the nav item whose section is in view, using the
-// .navbar-item.is-active styles that already exist in index.css.
+// Scrollspy: deterministic scroll-position based highlighting. The nav
+// item of the last section whose top passed the reading line (just
+// below the fixed navbar) is active; at the very bottom the last
+// section is pinned so it can never be missed.
 document.addEventListener('DOMContentLoaded', () => {
   const navLinks = Array.from(document.querySelectorAll('.navbar-start a.navbar-item[href^="#"]'));
   const linkById = {};
@@ -179,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = Object.keys(linkById)
     .map(id => document.getElementById(id))
     .filter(Boolean);
+  if (!sections.length) return;
 
   // Close the mobile menu after tapping a nav item; Bulma leaves it open.
   navLinks.forEach(link => {
@@ -193,16 +196,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  if (!('IntersectionObserver' in window) || !sections.length) return;
   const setActive = (id) => {
     navLinks.forEach(link => link.classList.remove('is-active'));
-    const link = linkById[id];
+    const link = id && linkById[id];
     if (link) link.classList.add('is-active');
   };
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) setActive(entry.target.id);
+
+  // While a nav-driven smooth scroll is in flight, keep the clicked item
+  // highlighted instead of flickering through the intermediate sections.
+  let spyLockId = null;
+  let lockTimer = null;
+
+  const computeActive = () => {
+    if (spyLockId !== null) return spyLockId;
+    const line = window.scrollY + 140; // reading line below the navbar
+    let currentId = null;
+    for (const section of sections) {
+      if (section.offsetTop <= line) currentId = section.id;
+    }
+    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    if (atBottom) currentId = sections[sections.length - 1].id;
+    return currentId;
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      setActive(computeActive());
     });
-  }, { rootMargin: '-25% 0px -65% 0px', threshold: 0 });
-  sections.forEach(section => observer.observe(section));
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      spyLockId = link.getAttribute('href').slice(1);
+      setActive(spyLockId);
+      clearTimeout(lockTimer);
+      lockTimer = setTimeout(() => {
+        spyLockId = null;
+        onScroll();
+      }, 1200);
+    });
+  });
 });
