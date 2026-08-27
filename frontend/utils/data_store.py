@@ -1,21 +1,15 @@
-"""SQLite-backed persistence for the frontend session state.
+"""State persistence client: the store lives in the BACKEND, not here.
 
-Replaces the single JSON file (user_data/data_store.json): WAL journaling and
-per-key upserts make concurrent tabs last-write-wins per key instead of
-clobbering the whole file, and the mastery history becomes real-timestamped
-rows instead of wall-clock samples.
+The frontend keeps session_state as a cache and pushes/pulls whole snapshots
+over the state API (GET/PUT /state, DELETE /state/{user_id}). The backend owns
+the SQLite file, keys everything by user, and cascades goal deletion into the
+knowledge base.
 
-Layout (key -> table routing):
-    goals                    -> goals(id, data)
-    learned_skills_history   -> mastery_history(goal_id, ts, rate)
-    document_caches /        -> blobs(kind, uid, data)   one row per uid
-    content_pipeline_state /
-    session_learning_times
-    quiz_results_* (any key starting with that prefix)
-    everything else          -> kv(key, value)
-
-The first load migrates an existing data_store.json in place and renames it
-to .migrated (kept as a backup).
+One-time migration: the first successful contact with an EMPTY remote store
+uploads whatever legacy state exists locally (the old SQLite db or, older
+still, the JSON file) and parks the local copy as *.migrated — so upgrading
+users keep their data. If the backend is unreachable, callers degrade to a
+fresh session (logged) and the migration is retried on a later run.
 """
 
 from __future__ import annotations
@@ -23,236 +17,154 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
-import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, Optional
+
+import httpx
+
+import config
 
 logger = logging.getLogger(__name__)
 
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS goals (id INTEGER PRIMARY KEY, data TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS blobs (
-    kind TEXT NOT NULL,
-    uid TEXT NOT NULL,
-    data TEXT NOT NULL,
-    PRIMARY KEY (kind, uid)
-);
-CREATE TABLE IF NOT EXISTS mastery_history (
-    goal_id INTEGER NOT NULL,
-    ts REAL NOT NULL,
-    rate REAL NOT NULL,
-    PRIMARY KEY (goal_id, ts)
-);
-"""
+USER_DATA_DIR = Path(__file__).resolve().parents[1] / "user_data"
+_LOCAL_DB = USER_DATA_DIR / "data_store.db"
+_LOCAL_JSON = USER_DATA_DIR / "data_store.json"
 
-# Top-level session keys whose value is a {uid: blob} mapping.
 _DICT_OF_BLOBS = {"document_caches", "content_pipeline_state", "session_learning_times"}
 _QUIZ_PREFIX = "quiz_results_"
+_TIMEOUT = 30
 
 
-def _connect(path: Path) -> sqlite3.Connection:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path, timeout=5.0)
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA busy_timeout=3000")
-    conn.execute("PRAGMA synchronous=NORMAL")
-    return conn
-
-
-def _ensure_schema(conn: sqlite3.Connection) -> None:
-    conn.executescript(_SCHEMA)
-    conn.commit()
-
-
-def _dump(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False)
-
-
-def _load(value: str) -> Any:
-    return json.loads(value)
-
-
-def save_snapshot(path: Path, snapshot: Dict[str, Any]) -> bool:
-    """Persist one full state snapshot, routing each key to its table."""
+def _base_url() -> str:
+    # Local import keeps this module importable without streamlit (tests).
     try:
-        conn = _connect(path)
-        try:
-            _ensure_schema(conn)
-            with conn:
-                # goals (upsert; drop rows whose id disappeared this session)
-                goals = snapshot.get("goals") or []
-                keep_ids = []
-                for goal in goals if isinstance(goals, list) else []:
-                    gid = goal.get("id") if isinstance(goal, dict) else None
-                    if gid is None:
-                        continue
-                    keep_ids.append(int(gid))
-                    conn.execute(
-                        "INSERT INTO goals(id, data) VALUES(?, ?) "
-                        "ON CONFLICT(id) DO UPDATE SET data=excluded.data",
-                        (int(gid), _dump(goal)),
-                    )
-                if keep_ids:
-                    conn.execute(
-                        f"DELETE FROM goals WHERE id NOT IN ({','.join('?' * len(keep_ids))})",
-                        keep_ids,
-                    )
-                else:
-                    conn.execute("DELETE FROM goals")
+        import streamlit as st
 
-                # mastery history: replace-all (small table, real timestamps)
-                conn.execute("DELETE FROM mastery_history")
-                history = snapshot.get("learned_skills_history") or {}
-                if isinstance(history, dict):
-                    rows = []
-                    for gid, entries in history.items():
-                        if not isinstance(entries, list):
-                            continue
-                        for entry in entries:
-                            if isinstance(entry, dict) and "rate" in entry:
-                                rows.append((int(gid), float(entry.get("ts", 0.0) or 0.0),
-                                             float(entry["rate"])))
-                            elif isinstance(entry, (int, float)):
-                                # legacy plain-rate entries: stamp them now
-                                rows.append((int(gid), time.time(), float(entry)))
-                    conn.executemany(
-                        "INSERT OR REPLACE INTO mastery_history(goal_id, ts, rate) VALUES(?, ?, ?)",
-                        rows,
-                    )
+        endpoint = st.session_state.get("backend_endpoint") or config.backend_endpoint
+    except Exception:
+        endpoint = config.backend_endpoint
+    return str(endpoint).rstrip("/") + "/"
 
-                # uid-keyed blob maps and quiz_results_* keys
-                for key in _DICT_OF_BLOBS:
-                    mapping = snapshot.get(key)
-                    if not isinstance(mapping, dict):
-                        continue
-                    conn.execute("DELETE FROM blobs WHERE kind=?", (key,))
-                    conn.executemany(
-                        "INSERT OR REPLACE INTO blobs(kind, uid, data) VALUES(?, ?, ?)",
-                        [(key, str(uid), _dump(blob)) for uid, blob in mapping.items()],
-                    )
-                for key, value in snapshot.items():
-                    if key.startswith(_QUIZ_PREFIX):
-                        conn.execute(
-                            "INSERT OR REPLACE INTO blobs(kind, uid, data) VALUES(?, ?, ?)",
-                            ("quiz_results", key, _dump(value)),
-                        )
 
-                # simple keys -> kv
-                skip = _DICT_OF_BLOBS | {"goals", "learned_skills_history"}
-                kv_rows = [
-                    (key, _dump(value))
-                    for key, value in snapshot.items()
-                    if key not in skip and not key.startswith(_QUIZ_PREFIX)
-                ]
-                conn.executemany(
-                    "INSERT INTO kv(key, value) VALUES(?, ?) "
-                    "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
-                    kv_rows,
-                )
-        finally:
-            conn.close()
+def _remote_is_empty(snapshot: Dict[str, Any]) -> bool:
+    """True when the backend holds nothing meaningful for this user."""
+    if not isinstance(snapshot, dict):
         return True
-    except (sqlite3.Error, TypeError, ValueError) as exc:
-        logger.error("Could not persist state to %s: %s", path, exc, exc_info=True)
+    if snapshot.get("goals"):
+        return False
+    structural = {"goals", "learned_skills_history"}
+    return not any(k for k in snapshot if k not in structural)
+
+
+# ------------------------------------------------------------------
+# backend API
+# ------------------------------------------------------------------
+
+def load_state(user_id: str) -> Optional[Dict[str, Any]]:
+    """Fetch the user's snapshot.
+
+    Returns None when the backend is unreachable (distinct from {} which means
+    "reachable and genuinely empty") — callers use that distinction to refuse
+    saving an unvalidated empty session over server-side data.
+    """
+    try:
+        response = httpx.get(f"{_base_url()}state", params={"user_id": str(user_id)},
+                             timeout=_TIMEOUT)
+        response.raise_for_status()
+        snapshot = response.json().get("snapshot") or {}
+    except httpx.HTTPError as exc:
+        logger.warning("State backend unreachable, starting with empty state: %s", exc)
+        return None
+    if _remote_is_empty(snapshot):
+        migrated = _migrate_local_if_any(str(user_id))
+        if migrated:
+            return migrated
+    return snapshot
+
+
+def save_state(user_id: str, snapshot: Dict[str, Any]) -> bool:
+    try:
+        response = httpx.put(f"{_base_url()}state",
+                             json={"user_id": str(user_id), "snapshot": snapshot},
+                             timeout=_TIMEOUT)
+        return response.status_code == 200
+    except httpx.HTTPError as exc:
+        logger.warning("Could not persist state to backend: %s", exc)
         return False
 
 
-def load_snapshot(path: Path) -> Dict[str, Any]:
-    """Read the whole store back into the snapshot dict shape.
-
-    Migrates an existing JSON store on first use. Returns {} when there is
-    nothing to restore (fresh install or unreadable store — logged).
-    """
-    legacy_json = path.parent / "data_store.json"
+def reset_state(user_id: str) -> bool:
+    """Archive + wipe the user's server-side state (the Reset flow)."""
     try:
-        conn = _connect(path)
-        try:
-            _ensure_schema(conn)
-            fresh = conn.execute("SELECT COUNT(*) FROM kv").fetchone()[0] == 0 \
-                and conn.execute("SELECT COUNT(*) FROM goals").fetchone()[0] == 0
-            if fresh and legacy_json.exists():
-                _migrate_json(conn, legacy_json)
-            snapshot: Dict[str, Any] = {}
+        response = httpx.delete(f"{_base_url()}state/{user_id}", timeout=_TIMEOUT)
+        return response.status_code == 200
+    except httpx.HTTPError as exc:
+        logger.error("Could not reset backend state: %s", exc)
+        return False
 
-            for key, value in conn.execute("SELECT key, value FROM kv"):
-                snapshot[key] = _load(value)
-            snapshot["goals"] = [
-                _load(row[0]) for row in
-                conn.execute("SELECT data FROM goals ORDER BY id")
-            ]
-            history: Dict[str, List[Dict[str, Any]]] = {}
-            for gid, ts, rate in conn.execute(
-                "SELECT goal_id, ts, rate FROM mastery_history ORDER BY goal_id, ts"
-            ):
-                history.setdefault(str(gid), []).append({"ts": ts, "rate": rate})
-            snapshot["learned_skills_history"] = history
 
-            for kind in _DICT_OF_BLOBS:
-                mapping = {
-                    uid: _load(data) for uid, data in
-                    conn.execute("SELECT uid, data FROM blobs WHERE kind=?", (kind,))
-                }
-                if mapping or kind in snapshot:
-                    snapshot[kind] = mapping
-            for uid_key, data in conn.execute(
-                "SELECT uid, data FROM blobs WHERE kind='quiz_results'"
-            ):
-                snapshot[uid_key] = _load(data)
-            return snapshot
-        finally:
-            conn.close()
-    except (sqlite3.Error, ValueError) as exc:
-        logger.error("Could not read persisted state from %s: %s", path, exc, exc_info=True)
+# ------------------------------------------------------------------
+# one-time local -> backend migration
+# ------------------------------------------------------------------
+
+def _migrate_local_if_any(user_id: str) -> Dict[str, Any]:
+    """Upload legacy local state to the empty backend; returns it on success."""
+    snapshot = _read_local_snapshot()
+    if not snapshot or _remote_is_empty(snapshot):
         return {}
+    if not save_state(user_id, snapshot):
+        return {}  # backend flaked mid-migration: retry next run
+    for path in (_LOCAL_DB, Path(str(_LOCAL_DB) + "-wal"), Path(str(_LOCAL_DB) + "-shm")):
+        if path.exists():
+            path.rename(path.with_name(path.name + ".migrated"))
+    if _LOCAL_JSON.exists():
+        _LOCAL_JSON.rename(_LOCAL_JSON.with_name(_LOCAL_JSON.name + ".migrated"))
+    logger.info("Migrated local state to the backend store (local copy parked as .migrated).")
+    return snapshot
 
 
-def _migrate_json(conn: sqlite3.Connection, legacy_json: Path) -> None:
-    """Import the old flat-JSON store once, then park it as a backup."""
+def _read_local_snapshot() -> Dict[str, Any]:
+    """Read the legacy local store: SQLite first, falling back to the JSON file."""
+    if _LOCAL_DB.exists():
+        try:
+            return _read_local_sqlite(_LOCAL_DB)
+        except (sqlite3.Error, ValueError) as exc:
+            logger.error("Legacy store %s unreadable: %s", _LOCAL_DB, exc)
+    if _LOCAL_JSON.exists():
+        try:
+            data = json.loads(_LOCAL_JSON.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except (OSError, ValueError) as exc:
+            logger.error("Legacy store %s unreadable: %s", _LOCAL_JSON, exc)
+    return {}
+
+
+def _read_local_sqlite(path: Path) -> Dict[str, Any]:
+    conn = sqlite3.connect(path, timeout=5.0)
     try:
-        data = json.loads(legacy_json.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        logger.error("Legacy store %s unreadable, skipping migration: %s", legacy_json, exc)
-        return
-    if not isinstance(data, dict):
-        logger.error("Legacy store %s is not a JSON object, skipping migration.", legacy_json)
-        return
-    with conn:
-        for key, value in data.items():
-            if key == "goals" and isinstance(value, list):
-                for goal in value:
-                    if isinstance(goal, dict) and goal.get("id") is not None:
-                        conn.execute(
-                            "INSERT OR REPLACE INTO goals(id, data) VALUES(?, ?)",
-                            (int(goal["id"]), _dump(goal)),
-                        )
-            elif key == "learned_skills_history" and isinstance(value, dict):
-                for gid, entries in value.items():
-                    if isinstance(entries, list):
-                        for entry in entries:
-                            ts, rate = (time.time(), float(entry)) if isinstance(entry, (int, float)) \
-                                else (float(entry.get("ts", 0.0) or 0.0), float(entry.get("rate", 0.0)))
-                            conn.execute(
-                                "INSERT OR REPLACE INTO mastery_history(goal_id, ts, rate) VALUES(?, ?, ?)",
-                                (int(gid), ts, rate),
-                            )
-            elif key in _DICT_OF_BLOBS and isinstance(value, dict):
-                conn.executemany(
-                    "INSERT OR REPLACE INTO blobs(kind, uid, data) VALUES(?, ?, ?)",
-                    [(key, str(uid), _dump(blob)) for uid, blob in value.items()],
-                )
-            else:
-                conn.execute(
-                    "INSERT OR REPLACE INTO kv(key, value) VALUES(?, ?)", (key, _dump(value))
-                )
-    backup = legacy_json.with_suffix(".json.migrated")
-    try:
-        legacy_json.rename(backup)
-        logger.info("Migrated legacy JSON store to SQLite; original kept at %s", backup)
-    except OSError as exc:
-        logger.warning("Migrated store but could not rename %s: %s", legacy_json, exc)
-
-
-def db_files(path: Path) -> List[Path]:
-    """The db plus its WAL/SHM siblings (for archive/reset flows)."""
-    return [path, Path(str(path) + "-wal"), Path(str(path) + "-shm")]
+        snapshot: Dict[str, Any] = {}
+        for key, value in conn.execute("SELECT key, value FROM kv"):
+            snapshot[key] = json.loads(value)
+        snapshot["goals"] = [
+            json.loads(row[0]) for row in conn.execute("SELECT data FROM goals ORDER BY id")
+        ]
+        history: Dict[str, Any] = {}
+        for gid, ts, rate in conn.execute(
+            "SELECT goal_id, ts, rate FROM mastery_history ORDER BY goal_id, ts"
+        ):
+            history.setdefault(str(gid), []).append({"ts": ts, "rate": rate})
+        snapshot["learned_skills_history"] = history
+        for kind in _DICT_OF_BLOBS:
+            mapping = {
+                uid: json.loads(data) for uid, data in
+                conn.execute("SELECT uid, data FROM blobs WHERE kind=?", (kind,))
+            }
+            if mapping:
+                snapshot[kind] = mapping
+        for uid_key, data in conn.execute(
+            "SELECT uid, data FROM blobs WHERE kind='quiz_results'"
+        ):
+            snapshot[uid_key] = json.loads(data)
+        return snapshot
+    finally:
+        conn.close()
