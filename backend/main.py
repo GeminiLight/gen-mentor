@@ -198,6 +198,60 @@ def chat_with_tutor_stream(request: ChatWithTutorRequest):  # noqa: F405
     return StreamingResponse(generate(), media_type="text/plain; charset=utf-8")
 
 
+@app.get("/state")
+async def get_state(user_id: str = "TestUser"):
+    """Return the user's full persisted session-state snapshot."""
+    from utils import state_store
+
+    return {"user_id": user_id, "snapshot": state_store.load_snapshot(user_id)}
+
+
+@app.put("/state")
+async def put_state(request: StateSnapshotRequest):  # noqa: F405
+    """Persist a full session-state snapshot for the user.
+
+    Goals that disappeared (or were soft-deleted) since the previous snapshot
+    are cascaded out of the knowledge base.
+    """
+    from utils import state_store
+
+    if not isinstance(request.snapshot, dict):
+        # Treating a malformed payload as "empty" would wipe the user's whole
+        # server-side state (and cascade their knowledge base away).
+        raise HTTPException(status_code=400, detail="`snapshot` must be a JSON object.")
+    ok, removed_goals = state_store.save_snapshot(request.user_id, request.snapshot)
+    if not ok:
+        raise HTTPException(status_code=500, detail="Could not persist state.")
+    unpinned = 0
+    if removed_goals:
+        manager = get_search_rag_manager()
+        if manager is not None:
+            for gid in removed_goals:
+                unpinned += manager.unpin_goal(str(gid))
+    return {"user_id": request.user_id, "saved": True,
+            "cascaded_goals": sorted(removed_goals), "unpinned_chunks": unpinned}
+
+
+@app.delete("/state/{user_id}")
+async def reset_state(user_id: str):
+    """Archive then wipe the user's state (the frontend Reset flow).
+
+    The user's goals are collected before the wipe so their knowledge bases
+    can be cascade-unpinned afterwards.
+    """
+    from utils import state_store
+
+    goal_ids = state_store.goal_ids_for_user(user_id)
+    if not state_store.reset_user(user_id):
+        raise HTTPException(status_code=500, detail="Could not reset state.")
+    unpinned = 0
+    manager = get_search_rag_manager()
+    if manager is not None:
+        for gid in goal_ids:
+            unpinned += manager.unpin_goal(str(gid))
+    return {"user_id": user_id, "reset": True, "unpinned_chunks": unpinned}
+
+
 @app.get("/knowledge-base/{goal_id}")
 async def knowledge_base(goal_id: str):
     """List the pages pinned into a goal's knowledge base (newest first)."""
