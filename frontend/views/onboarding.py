@@ -30,36 +30,8 @@ def _init_onboarding_state():
     save_persistent_state()
 
 
-def _inject_card_css():
-    """Inject lightweight CSS to make sections look like cards and style nav buttons."""
-    st.markdown(
-        """
-        <style>
-        .gm-card { 
-            background: #ffffff; 
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 14px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-            padding: 24px 22px; 
-        }
-        .gm-side { position: sticky; top: 160px; }
-        .gm-side .gm-side-btn {
-            border: 1px solid rgba(0,0,0,0.12);
-            background: #ffffff;
-            color: #111827;
-            padding: 6px 10px; 
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            font-weight: 700;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
 def render_onboard():
     _init_onboarding_state()
-    _inject_card_css()
     left, center, right = st.columns([1, 5, 1])
     goal = st.session_state["to_add_goal"]
     if "refined_learning_goal" not in st.session_state:
