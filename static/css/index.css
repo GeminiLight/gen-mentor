@@ -1339,3 +1339,176 @@ html[data-theme='dark'] .slider-pagination .slider-page {
 html[data-theme='dark'] .slider-pagination .slider-page.is-active {
   background-color: hsl(204, 86%, 63%);
 }
+
+/* ---------- Visual polish: kickers, hero stats, pill tabs,
+   selection & scrollbar details ---------- */
+
+/* Section eyebrow labels */
+.section-kicker {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: hsl(204, 86%, 45%);
+  margin-bottom: 0.4rem !important;
+}
+
+html[data-theme='dark'] .section-kicker {
+  color: hsl(204, 86%, 68%);
+}
+
+/* Hero stat strip */
+.hero-stats {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 2.25rem;
+  margin-top: 2.25rem;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 15rem;
+}
+
+.stat-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #363636;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-unit {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #7a7a7a;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #7a7a7a;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.stat-divider {
+  width: 1px;
+  background: #dbdbdb;
+}
+
+html[data-theme='dark'] .stat-value {
+  color: #e8e9ea;
+}
+
+html[data-theme='dark'] .stat-unit,
+html[data-theme='dark'] .stat-label {
+  color: #9a9da6;
+}
+
+html[data-theme='dark'] .stat-divider {
+  background: #2b2d34;
+}
+
+@media screen and (max-width: 768px) {
+  .hero-stats {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+}
+
+/* Framework tabs: pill style, matching the results tabs */
+#arch-tabs {
+  border-bottom: none;
+  margin-bottom: 1.5rem;
+}
+
+#arch-tabs ul {
+  border-bottom: none;
+  gap: 0.6rem;
+}
+
+#arch-tabs li a {
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background-color: #ffffff;
+  padding: 0.55rem 1.4rem;
+  transition: all 0.25s ease;
+}
+
+#arch-tabs li a:hover {
+  background-color: rgba(72, 157, 246, 0.08);
+  border-color: hsl(204, 86%, 53%);
+  color: hsl(204, 86%, 45%);
+}
+
+#arch-tabs li.is-active a {
+  background-color: hsl(204, 86%, 47%);
+  border-color: hsl(204, 86%, 47%);
+  color: #ffffff !important;
+}
+
+html[data-theme='dark'] #arch-tabs li a {
+  background-color: #17181c;
+  border-color: #2b2d34;
+  color: #dbdbdb;
+}
+
+html[data-theme='dark'] #arch-tabs li a:hover {
+  background-color: rgba(102, 157, 246, 0.10);
+  border-color: hsl(204, 86%, 63%);
+  color: hsl(204, 86%, 68%);
+}
+
+/* Selection and scrollbar details */
+::selection {
+  background: hsl(204, 86%, 53%);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c3c5cb;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9a9da6;
+  background-clip: content-box;
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #3a3d45;
+  background-clip: content-box;
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: #4a4e58;
+  background-clip: content-box;
+}
+
+/* A kicker inserted directly inside a Bulma .columns flex row (where the
+   section title is not wrapped in its own .column) must take a full
+   flex row, or it sits beside the title. */
+.columns > .section-kicker {
+  flex-basis: 100%;
+}
