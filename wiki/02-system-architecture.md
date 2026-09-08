@@ -71,3 +71,13 @@ route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组�
 | `GENMENTOR_LLM_MODE` | `live` / `record` / `replay` | `live` |
 | `GENMENTOR_LLM_FIXTURES` | fixture 目录 | `../e2e/fixtures/llm` |
 | `TAVILY_API_KEY` | 可选，起草与导师对话的外部资源检索 | 不检索 |
+
+## 部署
+
+| 方式 | 做法 |
+|---|---|
+| 本地 | `make install && make dev`，只需 `app/.env.local` 里一个 LLM key |
+| Vercel | Root Directory 设为 `app`，环境变量同 `.env.example`；不设 `GENMENTOR_STANDALONE` |
+| 容器 | `docker build -t genmentor app/`，`docker run -p 3000:3000 --env-file app/.env.local genmentor`；镜像用 `.next/standalone` 单进程 |
+
+`GENMENTOR_LLM_MODE=replay` 加 `e2e/fixtures/llm` 可以在没有 key 的机器上完整演示已录制的旅程。

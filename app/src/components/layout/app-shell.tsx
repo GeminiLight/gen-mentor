@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { TutorSheet } from "@/features/tutor/tutor-sheet";
+import { CommandMenu } from "./command-menu";
 import { NAV } from "./nav";
 
 /** Desktop: a fixed rail. Phones: a top bar plus a bottom tab bar. Content is one column. */
@@ -19,6 +20,9 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-full flex-1">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:ring-3 focus:ring-ring/50">
+        Skip to content
+      </a>
       <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col border-r bg-sidebar px-3 py-4 md:flex">
         <Link href="/" className="px-2 text-sm font-semibold tracking-tight">
           GenMentor
@@ -44,9 +48,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="mt-auto flex items-center justify-between px-1">
-          {goal && <TutorSheet goal={goal} />}
-          <ThemeToggle />
+        <div className="mt-auto space-y-2 px-1">
+          <CommandMenu />
+          <div className="flex items-center justify-between">
+            {goal && <TutorSheet goal={goal} />}
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
 
@@ -60,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ThemeToggle />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8" data-hydrated={hydrated ? "" : undefined}>
+        <main id="main" className="mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8" data-hydrated={hydrated ? "" : undefined}>
           {children}
         </main>
         <nav className="fixed inset-x-0 bottom-0 flex border-t bg-background/95 backdrop-blur md:hidden" aria-label="Primary">

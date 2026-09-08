@@ -72,3 +72,14 @@
 | 测验即时判定与单次连击 | `app/src/features/session/quiz-view.tsx`、`quiz-question.tsx` | done |
 | 分类调色板经 dataviz 校验器通过 | `app/src/app/globals.css` | done |
 | e2e：空档案空态、seed 数值一致、连击行为 | `e2e/specs/gamification.spec.ts` | done |
+
+## M5 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| ⌘K 命令面板：页面、会话、切换目标、主题 | `app/src/components/layout/command-menu.tsx` | done |
+| 跳到内容链接、route 级 error / loading / 404 | `app/src/components/layout/app-shell.tsx`、`app/src/app/(app)/` | done |
+| 阅读页代码高亮（shiki 分词渲染 span，不用 innerHTML） | `app/src/features/session/code-block.tsx` | done |
+| 阶段列表与流水线到阅读的过渡动效，尊重 reduced motion | `stage-list.tsx`、`session-view.tsx` | done |
+| 200ms 内出现 skeleton / 乐观态的 spec | `e2e/specs/responsiveness.spec.ts` | done |
+| Dockerfile（standalone 单进程） | `app/Dockerfile` | done |

@@ -1,6 +1,7 @@
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Source } from "@/lib/schemas";
+import { CodeBlock } from "./code-block";
 
 /** The learning document, typeset for reading. Headings are the integrator's section structure. */
 export function DocumentView({ markdown, sources }: { markdown: string; sources: Source[] }) {
@@ -18,18 +19,28 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
           li: ({ children }) => <li className="marker:text-muted-foreground">{children}</li>,
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
           a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noreferrer" className="text-brand underline decoration-brand/40 underline-offset-4 hover:decoration-brand">
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand underline decoration-brand/40 underline-offset-4 hover:decoration-brand"
+            >
               {children}
             </a>
           ),
-          blockquote: ({ children }) => <blockquote className="mt-4 border-l-2 border-brand pl-4 text-muted-foreground">{children}</blockquote>,
-          code: ({ className, children }) =>
-            className ? (
-              <code className={`${className} font-mono text-sm`}>{children}</code>
+          blockquote: ({ children }) => (
+            <blockquote className="mt-4 border-l-2 border-brand pl-4 text-muted-foreground">{children}</blockquote>
+          ),
+          code: ({ className, children }) => {
+            const lang = /language-(\w+)/.exec(className ?? "")?.[1];
+            return lang ? (
+              <CodeBlock code={String(children).replace(/\n$/, "")} lang={lang} />
             ) : (
               <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">{children}</code>
-            ),
-          pre: ({ children }) => <pre className="mt-4 overflow-x-auto rounded-lg border bg-muted/60 p-4 text-sm leading-relaxed">{children}</pre>,
+            );
+          },
+          // Fenced blocks render through CodeBlock; the wrapping <pre> would double the frame.
+          pre: ({ children }) => <>{children}</>,
           table: ({ children }) => (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-sm">{children}</table>
@@ -49,7 +60,12 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
             {sources.map((s) => (
               <li key={`${s.index}-${s.source}`} className="flex gap-2">
                 <span className="num text-muted-foreground">[{s.index}]</span>
-                <a href={s.source} target="_blank" rel="noreferrer" className="truncate text-brand underline-offset-4 hover:underline">
+                <a
+                  href={s.source}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="truncate text-brand underline-offset-4 hover:underline"
+                >
                   {s.title || s.source}
                 </a>
               </li>

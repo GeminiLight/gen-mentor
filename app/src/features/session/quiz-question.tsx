@@ -10,15 +10,39 @@ export function VerdictMark({ v }: { v: Verdict | undefined }) {
   if (!v || v === "answered") return null;
   const good = v === "correct";
   return (
-    <span className={cn("ml-2 inline-flex items-center gap-1 text-xs font-medium", good ? "text-success" : v === "incorrect" ? "text-destructive" : "text-muted-foreground")} data-verdict={v}>
-      {good ? <Check className="size-3.5" aria-hidden /> : v === "incorrect" ? <X className="size-3.5" aria-hidden /> : null}
+    <span
+      className={cn(
+        "ml-2 inline-flex items-center gap-1 text-xs font-medium",
+        good ? "text-success" : v === "incorrect" ? "text-destructive" : "text-muted-foreground",
+      )}
+      data-verdict={v}
+    >
+      {good ? (
+        <Check className="size-3.5" aria-hidden />
+      ) : v === "incorrect" ? (
+        <X className="size-3.5" aria-hidden />
+      ) : null}
       {good ? "Correct" : v === "incorrect" ? "Incorrect" : "Not answered"}
     </span>
   );
 }
 
 /** One question: title with verdict, options (or free text), then the explanation once judged. */
-export function Question({ n, text, verdict, explanation, hint, children }: { n: number; text: string; verdict?: Verdict; explanation?: string | null; hint?: string; children: ReactNode }) {
+export function Question({
+  n,
+  text,
+  verdict,
+  explanation,
+  hint,
+  children,
+}: {
+  n: number;
+  text: string;
+  verdict?: Verdict;
+  explanation?: string | null;
+  hint?: string;
+  children: ReactNode;
+}) {
   return (
     <fieldset className="space-y-3" data-testid="question" data-verdict={verdict}>
       <legend className="font-medium">
@@ -27,13 +51,31 @@ export function Question({ n, text, verdict, explanation, hint, children }: { n:
         <VerdictMark v={verdict} />
       </legend>
       {children}
-      {verdict && verdict !== "unanswered" && explanation && <p className="text-sm leading-relaxed text-muted-foreground">{explanation}</p>}
+      {verdict && verdict !== "unanswered" && explanation && (
+        <p className="text-sm leading-relaxed text-muted-foreground">{explanation}</p>
+      )}
     </fieldset>
   );
 }
 
 /** A selectable option that shows right/wrong the moment the question is judged. */
-export function Option({ name, type, checked, correct, judged, onChange, children }: { name: string; type: "radio" | "checkbox"; checked: boolean; correct: boolean | null; judged: boolean; onChange: () => void; children: ReactNode }) {
+export function Option({
+  name,
+  type,
+  checked,
+  correct,
+  judged,
+  onChange,
+  children,
+}: {
+  name: string;
+  type: "radio" | "checkbox";
+  checked: boolean;
+  correct: boolean | null;
+  judged: boolean;
+  onChange: () => void;
+  children: ReactNode;
+}) {
   return (
     <Label
       className={cn(

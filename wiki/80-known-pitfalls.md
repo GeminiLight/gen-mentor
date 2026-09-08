@@ -83,3 +83,9 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 现象：导出导入测试里清空 localStorage 再刷新，页面仍然有数据。
 原因：`addInitScript` 每次导航都执行，判断的是"键不存在"。
 解法：要模拟空档案就写入一个空的 archive，而不是删键。
+
+## shiki 的 HTML 输出用不了
+
+现象：想用 `codeToHtml` 高亮代码块。
+原因：项目禁止 `dangerouslySetInnerHTML`。
+解法：`codeToTokens` 拿 token，逐个渲染 `<span>`，颜色走 `--shiki-light` / `--shiki-dark` 变量随主题切换。

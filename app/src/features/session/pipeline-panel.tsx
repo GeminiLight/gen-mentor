@@ -30,11 +30,17 @@ export function PipelinePanel({ view }: { view: PipelineView }) {
             key: s,
             label: view.status[s] === "done" ? STAGE_LABELS[s].done : STAGE_LABELS[s].running,
             status: view.status[s],
-            detail: s === "knowledge_drafts" && view.status[s] === "running" && view.points ? `${Object.keys(view.drafts).length} of ${view.points.length} points writing` : undefined,
+            detail:
+              s === "knowledge_drafts" && view.status[s] === "running" && view.points
+                ? `${Object.keys(view.drafts).length} of ${view.points.length} points writing`
+                : undefined,
           }))}
         />
         {view.error && (
-          <p role="alert" className="rounded-md border border-destructive/40 bg-destructive-soft p-3 text-sm text-destructive">
+          <p
+            role="alert"
+            className="rounded-md border border-destructive/40 bg-destructive-soft p-3 text-sm text-destructive"
+          >
             {view.error}
           </p>
         )}
@@ -58,15 +64,21 @@ export function PipelinePanel({ view }: { view: PipelineView }) {
         )}
         {Object.entries(view.drafts).map(([i, d]) => (
           <section key={i} className="space-y-1">
-            <p className="text-sm font-medium">{d.title ?? view.points?.[Number(i)]?.name ?? `Point ${Number(i) + 1}`}</p>
-            <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{d.content ?? "…"}</p>
+            <p className="text-sm font-medium">
+              {d.title ?? view.points?.[Number(i)]?.name ?? `Point ${Number(i) + 1}`}
+            </p>
+            <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+              {d.content ?? "…"}
+            </p>
           </section>
         ))}
         {view.document && (
           <section className="space-y-1">
             <p className="eyebrow">Document</p>
             <p className="text-sm font-medium">{view.document.title ?? "…"}</p>
-            {view.document.overview && <p className="text-sm leading-relaxed text-muted-foreground">{view.document.overview}</p>}
+            {view.document.overview && (
+              <p className="text-sm leading-relaxed text-muted-foreground">{view.document.overview}</p>
+            )}
           </section>
         )}
       </div>

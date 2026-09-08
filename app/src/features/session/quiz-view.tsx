@@ -15,7 +15,15 @@ import { Option, Question } from "./quiz-question";
  * streak of consecutive correct answers is visible while it lasts. Short answers are judged
  * on finish only. The final results go to the archive and, from there, to the profiler.
  */
-export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; results?: QuizResults; onSubmit: (r: QuizResults) => void }) {
+export function QuizView({
+  quiz,
+  results,
+  onSubmit,
+}: {
+  quiz: DocumentQuiz;
+  results?: QuizResults;
+  onSubmit: (r: QuizResults) => void;
+}) {
   const [sel, setSel] = useState<Selections>(() => emptySelections(quiz));
   const [order, setOrder] = useState<string[]>([]);
   const finished = !!results;
@@ -32,7 +40,11 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
     return run;
   }, [order, verdicts]);
   const answered = Object.values(live.verdicts).filter((v) => v !== "unanswered").length;
-  const total = quiz.single_choice_questions.length + quiz.multiple_choice_questions.length + quiz.true_false_questions.length + quiz.short_answer_questions.length;
+  const total =
+    quiz.single_choice_questions.length +
+    quiz.multiple_choice_questions.length +
+    quiz.true_false_questions.length +
+    quiz.short_answer_questions.length;
   const answer = (key: string, next: Selections) => {
     setSel(next);
     setOrder((o) => (o.includes(key) ? o : [...o, key]));
@@ -47,11 +59,20 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
         onSubmit(judge(quiz, sel));
       }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 px-4 py-2 text-sm" aria-live="polite">
+      <div
+        className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 px-4 py-2 text-sm"
+        aria-live="polite"
+      >
         <span className="num text-muted-foreground">
           {answered} / {total} answered
         </span>
-        <span className={cn("num inline-flex items-center gap-1.5 font-medium transition-colors", streak >= 2 ? "text-brand" : "text-muted-foreground")} data-testid="streak">
+        <span
+          className={cn(
+            "num inline-flex items-center gap-1.5 font-medium transition-colors",
+            streak >= 2 ? "text-brand" : "text-muted-foreground",
+          )}
+          data-testid="streak"
+        >
           <Flame className={cn("size-4", streak >= 2 && "fill-current")} aria-hidden />
           {streak >= 2 ? `${streak} in a row` : "streak"}
         </span>
@@ -63,7 +84,15 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
         return (
           <Question key={key} n={++n} text={q.question} verdict={verdicts[key]} explanation={q.explanation}>
             {q.options.map((opt, k) => (
-              <Option key={k} name={key} type="radio" checked={sel.single[i] === k} judged={judged(key)} correct={want === null ? null : k === want} onChange={() => answer(key, { ...sel, single: sel.single.map((x, j) => (j === i ? k : x)) })}>
+              <Option
+                key={k}
+                name={key}
+                type="radio"
+                checked={sel.single[i] === k}
+                judged={judged(key)}
+                correct={want === null ? null : k === want}
+                onChange={() => answer(key, { ...sel, single: sel.single.map((x, j) => (j === i ? k : x)) })}
+              >
                 {opt}
               </Option>
             ))}
@@ -76,7 +105,14 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
         const want = q.correct_options.map((c) => resolveOption(q.options, c));
         const locked = finished || verdicts[key] === "correct" || verdicts[key] === "incorrect";
         return (
-          <Question key={key} n={++n} text={q.question} hint="select all that apply, then confirm" verdict={locked ? verdicts[key] : undefined} explanation={q.explanation}>
+          <Question
+            key={key}
+            n={++n}
+            text={q.question}
+            hint="select all that apply, then confirm"
+            verdict={locked ? verdicts[key] : undefined}
+            explanation={q.explanation}
+          >
             {q.options.map((opt, k) => (
               <Option
                 key={k}
@@ -85,13 +121,26 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
                 checked={sel.multiple[i]?.includes(k) ?? false}
                 judged={locked}
                 correct={want.includes(k)}
-                onChange={() => setSel({ ...sel, multiple: sel.multiple.map((x, j) => (j === i ? (x.includes(k) ? x.filter((y) => y !== k) : [...x, k]) : x)) })}
+                onChange={() =>
+                  setSel({
+                    ...sel,
+                    multiple: sel.multiple.map((x, j) =>
+                      j === i ? (x.includes(k) ? x.filter((y) => y !== k) : [...x, k]) : x,
+                    ),
+                  })
+                }
               >
                 {opt}
               </Option>
             ))}
             {!locked && (
-              <Button type="button" variant="outline" size="sm" disabled={(sel.multiple[i]?.length ?? 0) === 0} onClick={() => setOrder((o) => (o.includes(key) ? o : [...o, key]))}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={(sel.multiple[i]?.length ?? 0) === 0}
+                onClick={() => setOrder((o) => (o.includes(key) ? o : [...o, key]))}
+              >
                 Confirm
               </Button>
             )}
@@ -105,7 +154,15 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
           <Question key={key} n={++n} text={q.question} verdict={verdicts[key]} explanation={q.explanation}>
             <div className="flex gap-3">
               {[true, false].map((val) => (
-                <Option key={String(val)} name={key} type="radio" checked={sel.tf[i] === val} judged={judged(key)} correct={val === q.correct_answer} onChange={() => answer(key, { ...sel, tf: sel.tf.map((x, j) => (j === i ? val : x)) })}>
+                <Option
+                  key={String(val)}
+                  name={key}
+                  type="radio"
+                  checked={sel.tf[i] === val}
+                  judged={judged(key)}
+                  correct={val === q.correct_answer}
+                  onChange={() => answer(key, { ...sel, tf: sel.tf.map((x, j) => (j === i ? val : x)) })}
+                >
                   {val ? "True" : "False"}
                 </Option>
               ))}
@@ -117,8 +174,22 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
       {quiz.short_answer_questions.map((q, i) => {
         const key = questionKey("short", i);
         return (
-          <Question key={key} n={++n} text={q.question} verdict={finished ? verdicts[key] : undefined} explanation={finished ? `Expected: ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}` : undefined}>
-            <Textarea rows={3} value={sel.short[i] ?? ""} disabled={finished} onChange={(e) => setSel({ ...sel, short: sel.short.map((x, j) => (j === i ? e.target.value : x)) })} aria-label={`Answer to question ${n}`} />
+          <Question
+            key={key}
+            n={++n}
+            text={q.question}
+            verdict={finished ? verdicts[key] : undefined}
+            explanation={
+              finished ? `Expected: ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}` : undefined
+            }
+          >
+            <Textarea
+              rows={3}
+              value={sel.short[i] ?? ""}
+              disabled={finished}
+              onChange={(e) => setSel({ ...sel, short: sel.short.map((x, j) => (j === i ? e.target.value : x)) })}
+              aria-label={`Answer to question ${n}`}
+            />
           </Question>
         );
       })}
