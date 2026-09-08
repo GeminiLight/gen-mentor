@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M3 -->
+<!-- Last verified: 2026-09-09 | Current stage: M4 -->
 
 # 项目路线图
 
@@ -9,8 +9,8 @@
 | M0 | 骨架、闸门通路、LLM 核心层、回放模式、E2E 工程 | done |
 | M1 | 九个 agent、prompts 逐字迁移、zod schema、十个 route | done |
 | M2 | 设计系统与 `/design` 靶子 | done |
-| M3 | 核心旅程与本地档案 | doing |
-| M4 | 游戏化层 | todo |
+| M3 | 核心旅程与本地档案 | done |
+| M4 | 游戏化层 | doing |
 | M5 | 精致度与部署 | todo |
 | M6 | prompt 优化（带 baseline 对照） | todo |
 | M7 | 删旧树、README、PR | todo |
@@ -48,3 +48,16 @@
 | 17 个 shadcn 原语（radix-nova） | `app/src/components/ui/` | done |
 | 主题切换、Toaster、TooltipProvider | `app/src/components/`、`layout.tsx` | done |
 | `/design` 视觉回归靶子 | `app/src/app/design/`、`app/src/features/design/` | done |
+
+## M3 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 本地档案：zustand persist、导出导入 | `app/src/lib/store/` | done |
+| 流式 API 客户端（`@@final` 协议） | `app/src/lib/client.ts` | done |
+| 内容流水线（探索 → 起草 → 整合 → 测验，按 checkpoint 恢复） | `app/src/lib/pipeline.ts` | done |
+| 测验判定与 `quiz_performance` | `app/src/lib/quiz.ts` | done |
+| 简历解析 `/api/parse-resume`（unpdf） | `app/src/app/api/parse-resume/` | done |
+| 应用壳：桌面导航栏、手机底栏、导师抽屉 | `app/src/components/layout/`、`app/src/features/tutor/` | done |
+| onboarding、goals、learning-path、session、library、progress、profile | `app/src/features/*`、`app/src/app/(app)/` | done |
+| E2E 旅程（seed 档案 + replay fixture） | `e2e/specs/journeys.spec.ts`、`e2e/specs/seed.ts` | done |

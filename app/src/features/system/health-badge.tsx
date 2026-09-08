@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getHealth, type Health } from "@/lib/client";
+import { api, type Health } from "@/lib/client";
 
 /** Tiny live indicator: whether this deployment can reach a model, and in which mode. */
 export function HealthBadge() {
   const [health, setHealth] = useState<Health | null | "error">(null);
   useEffect(() => {
-    getHealth().then(setHealth, () => setHealth("error"));
+    api.health().then(setHealth, () => setHealth("error"));
   }, []);
 
   const ready = health !== null && health !== "error" && health.serverKey;

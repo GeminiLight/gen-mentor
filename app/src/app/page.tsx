@@ -1,5 +1,6 @@
 import { ArrowRight, Compass, Route, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { ContinueLink } from "@/features/system/continue-link";
 import { HealthBadge } from "@/features/system/health-badge";
 
 const steps = [
@@ -33,6 +34,9 @@ export default function HomePage() {
             <ArrowRight className="size-4" aria-hidden />
           </Link>
           <span className="text-sm text-muted-foreground">No account. Your progress stays on this device.</span>
+        </div>
+        <div className="mt-4 min-h-6">
+          <ContinueLink />
         </div>
 
         <ol className="mt-20 grid gap-6 sm:grid-cols-3">

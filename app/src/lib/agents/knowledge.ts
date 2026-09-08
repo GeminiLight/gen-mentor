@@ -11,6 +11,9 @@ export function exploreKnowledge(input: { learner_profile: PromptValue; learning
   return runJSON({ tier: "smart", system: knowledgeExplorerSystem, task: knowledgeExplorerTask, vars: input }, KnowledgePoints);
 }
 
+/** Drafts and integrated documents are long; reasoning eats part of the budget before the JSON starts. */
+const LONG_FORM_TOKENS = 12_000;
+
 export interface DraftInput {
   learner_profile: PromptValue;
   learning_session: PromptValue;
@@ -37,6 +40,7 @@ export async function draftKnowledge(input: DraftInput, onDelta?: (d: string) =>
       tier: "smart",
       system: knowledgeDrafterSystem,
       task: knowledgeDrafterTask,
+      maxTokens: LONG_FORM_TOKENS,
       vars: {
         learner_profile: input.learner_profile,
         learning_session: input.learning_session,
@@ -64,6 +68,7 @@ export async function integrateDocument(input: IntegrateInput, onDelta?: (d: str
       tier: "smart",
       system: documentIntegratorSystem,
       task: documentIntegratorTask,
+      maxTokens: LONG_FORM_TOKENS,
       vars: {
         learner_profile: input.learner_profile,
         learning_path: input.learning_path,

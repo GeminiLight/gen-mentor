@@ -36,11 +36,12 @@ export type Source = z.infer<typeof Source>;
 export const KnowledgeDraft = z.object({ title: z.string(), content: z.string(), sources: z.array(Source).default([]) });
 export type KnowledgeDraft = z.infer<typeof KnowledgeDraft>;
 
+/** `summary` is the last field the model writes; when the budget runs out it is the one missing. */
 export const DocumentStructure = z.object({
   title: z.string(),
   overview: z.string(),
   content: z.string().default(""),
-  summary: z.string(),
+  summary: z.string().default(""),
 });
 export type DocumentStructure = z.infer<typeof DocumentStructure>;
 

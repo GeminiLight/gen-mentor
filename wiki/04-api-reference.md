@@ -22,6 +22,7 @@
 | POST | `/api/generate-quiz` | Quiz Generator | fast | `{ document_quiz }` | 120 |
 | POST | `/api/simulate-feedback` | Learner Feedback Simulator | fast | `{ feedback, suggestions }`；`target: path` 或 `content` | 120 |
 | POST | `/api/tutor` | AI Chatbot Tutor | fast | 纯文本流 | 60 |
+| POST | `/api/parse-resume` | 无（unpdf） | 无 | multipart `file` → `{ text, pages }`；PDF 之外按纯文本读 | 30 |
 
 Performance Evaluator 不在这份实现里。当前仓没有这个 agent 的 prompt（只有 KiddleMentor 有），
 而 profiler 的 update 任务本身接收 `quiz_performance` 并据此更新认知状态，这就是论文里评估反馈进

@@ -19,6 +19,10 @@ describe("schemas: knowledge", () => {
     expect(KnowledgePoints.parse(points)).toEqual(points);
     expect(KnowledgeDraft.parse({ title: "t", content: "c" }).sources).toEqual([]);
   });
+  it("tolerates a document whose summary was cut off by the token budget", async () => {
+    const { DocumentStructure } = await import("@/lib/schemas");
+    expect(DocumentStructure.parse({ title: "T", overview: "O", content: "C" }).summary).toBe("");
+  });
 });
 
 describe("agents: explorer / drafter / integrator", () => {

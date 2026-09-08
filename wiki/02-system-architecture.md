@@ -37,6 +37,18 @@ app/src
     └── store/           zustand 档案
 ```
 
+## 客户端数据流
+
+档案（`lib/store`）是唯一的状态来源：`goals[]`、`active_goal_id`，每个 goal 带技能差距、学习者
+profile、路径、按 `goalId:index` 键的会话状态（知识点、草稿、文档、测验、结果、打开与完成时间）、
+掌握度历史与导师对话。zustand `persist` 写 localStorage，`exportArchive` / `importArchive`
+以同一 JSON 结构进出。
+
+内容流水线跑在浏览器（`lib/pipeline.ts`）：探索知识点 → 并行起草每个点 → 整合文档 → 生成测验，
+每个阶段完成即 checkpoint 进档案，刷新后从缺失的阶段继续。流式路由的增量文本用
+`parsePartialJSON` 边收边渲染。完成会话时把 `quiz_performance` 并进 `learner_interactions`
+调 profile update，标记 `if_learned`，记一条掌握度点。
+
 ## LLM 调用链
 
 route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组装 prompt →
