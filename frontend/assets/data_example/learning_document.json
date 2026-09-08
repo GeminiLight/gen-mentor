@@ -1,7 +1,0 @@
-{
-    "learning_document": {
-        "title": "Working with Pandas DataFrames",
-        "overview": "Pandas is the foundational data manipulation library in Python, and the DataFrame is its central object. This session takes you from creating and inspecting DataFrames to grouping and summarizing a real sales dataset, closing with how to frame the findings for stakeholders.",
-        "summary": "You can now create DataFrames from dictionaries and CSV files, inspect them with head, info, describe, and shape, compute per-group statistics with groupby, and structure findings so decision-makers can act on them. The next session applies these tools to messy, real-world data cleaning."
-    }
-}

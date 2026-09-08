@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M7 -->
+<!-- Last verified: 2026-09-09 | Current stage: done -->
 
 # 项目路线图
 
@@ -13,7 +13,7 @@
 | M4 | 游戏化层 | done |
 | M5 | 精致度与部署 | done |
 | M6 | prompt 优化（带 baseline 对照） | done |
-| M7 | 删旧树、README、PR | doing |
+| M7 | 删旧树、README、PR | done |
 
 ## M0 功能索引
 
@@ -92,3 +92,11 @@
 | 评测运行器（切换 prompt 目录，同一 agent 代码） | `app/vitest.eval.config.mts`、`app/scripts/eval-prompts.eval.ts`、`scripts/eval-prompts.sh` | done |
 | 并排报告生成 | `scripts/eval-report.py` | done |
 | 评审与处置（quiz-generator 回退） | `wiki/reviews/review-2026-09-09-prompt-eval.md` | done |
+
+## M7 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 删除 `frontend/`、`backend/`、旧启动脚本与旧 CI | 仓库根 | done |
+| 论文实现标签 `paper-python-v1`（7a22a54） | git tag | done |
+| README 重写 | `README.md` | done |
