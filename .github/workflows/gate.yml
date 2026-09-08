@@ -1,0 +1,26 @@
+name: Gate
+
+on:
+  push:
+    branches: [main, rebuild/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gate:
+    name: make gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+      - name: Install
+        run: cd app && pnpm install --frozen-lockfile
+      - name: Gate
+        run: make gate

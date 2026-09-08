@@ -1,0 +1,29 @@
+<!-- Last verified: 2026-09-09 | Current stage: M0 -->
+
+# 项目路线图
+
+任务全文在 `docs/rebuild/GO.md`，这里只维护状态。状态取值：`todo` / `doing` / `done`。
+
+| 里程碑 | 内容 | 状态 |
+|---|---|---|
+| M0 | 骨架、闸门通路、LLM 核心层、回放模式、E2E 工程 | done |
+| M1 | 九个 agent、prompts 逐字迁移、zod schema、十个 route | doing |
+| M2 | 设计系统与 `/_design` 靶子 | todo |
+| M3 | 核心旅程与本地档案 | todo |
+| M4 | 游戏化层 | todo |
+| M5 | 精致度与部署 | todo |
+| M6 | prompt 优化（带 baseline 对照） | todo |
+| M7 | 删旧树、README、PR | todo |
+
+## M0 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| Next 16 工程、Tailwind v4、shadcn radix-nova | `app/` | done |
+| LLM 核心层：provider 适配、宽松 JSON、流式部分 JSON | `app/src/lib/llm/core.ts`、`partial-json.ts` | done |
+| fast / smart 双模型路由 | `app/src/lib/llm/index.ts` | done |
+| live / record / replay | `app/src/lib/llm/replay.ts` | done |
+| `/api/health` | `app/src/app/api/health/route.ts` | done |
+| 主题（class 模式，跟随系统） | `app/src/components/theme-provider.tsx` | done |
+| Playwright 截图、axe、健康检查 spec | `e2e/specs/` | done |
+| CI 跑 `make gate` | `.github/workflows/gate.yml` | done |

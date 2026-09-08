@@ -29,9 +29,15 @@ die()   { printf '\n%s%s%s\n' "$R" "$1" "$N"; exit 1; }
 
 stage "构建并启动"
 mkdir -p "$ART" /tmp/gm
+# `pnpm start` forks node, so killing the subshell alone leaves a listener behind and the
+# next run silently screenshots a stale build. Kill by port, before and after.
+kill_port() { lsof -ti "tcp:${PORT}" 2>/dev/null | xargs kill 2>/dev/null; return 0; }
 PID=""
-cleanup() { [ -n "$PID" ] && kill "$PID" 2>/dev/null; return 0; }
+cleanup() { [ -n "$PID" ] && kill "$PID" 2>/dev/null; kill_port; return 0; }
 trap cleanup EXIT INT TERM
+if lsof -ti "tcp:${PORT}" >/dev/null 2>&1; then
+  printf '  端口 %s 被占用，清理残留进程\n' "$PORT"; kill_port; sleep 1
+fi
 
 ( cd "$APP" && pnpm build >/tmp/gm/build.log 2>&1 ) \
   || { tail -30 /tmp/gm/build.log; die "next build 失败"; }

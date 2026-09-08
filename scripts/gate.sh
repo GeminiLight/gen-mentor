@@ -41,7 +41,7 @@ fi
 
 # ------------------------------------------------------------- 2. 文档结构
 stage "2. 文档结构（禁止随手扔的计划与总结）"
-DOC_OK='^(AGENTS|README)\.md$|^app/AGENTS\.md$|^docs/rebuild/GO\.md$'
+DOC_OK='^(AGENTS|README)\.md$|^app/(AGENTS|CLAUDE)\.md$|^docs/rebuild/GO\.md$'
 DOC_OK="${DOC_OK}"'|^wiki/[0-9]{2}-[a-z0-9-]+\.md$'
 DOC_OK="${DOC_OK}"'|^wiki/specs/spec-[a-z0-9-]+\.md$'
 DOC_OK="${DOC_OK}"'|^wiki/refs/[a-z0-9-]+\.md$'
@@ -109,12 +109,15 @@ stage "5. API route 必须用 zod 校验入参"
 ROUTES="$(tracked '^app/src/app/api/.*/route\.ts$')"
 if [ -z "$ROUTES" ]; then skip "尚无 API route"
 else
-  MISSING=""
+  MISSING=""; CHECKED=0
   while IFS= read -r f; do
     [ -z "$f" ] && continue
-    grep -q -E 'safeParse|\.parse\(' "$f" || MISSING="${MISSING}${f}"$'\n'
+    # GET-only routes have no body to validate; every route that accepts one must run it through zod.
+    grep -q -E 'export (async )?function (POST|PUT|PATCH)\b' "$f" || continue
+    CHECKED=$((CHECKED+1))
+    grep -q -E 'safeParse|parseBody\(|\.parse\(' "$f" || MISSING="${MISSING}${f}"$'\n'
   done < <(printf '%s\n' "$ROUTES")
-  if [ -z "$MISSING" ]; then pass "$(printf '%s\n' "$ROUTES" | grep -c .) 个 route 均有 zod 校验"
+  if [ -z "$MISSING" ]; then pass "${CHECKED} 个接收请求体的 route 均有 zod 校验"
   else fail "以下 route 未校验入参："; printf '%s' "$MISSING" | sed 's/^/        /'; fi
 fi
 
@@ -139,6 +142,11 @@ else
   ( cd "$APP" && npm run --silent lint >/tmp/gm_lint.log 2>&1 ) \
     && pass "eslint" \
     || { fail "eslint 未通过："; tail -25 /tmp/gm_lint.log | sed 's/^/        /'; }
+  if grep -q '"test":' "$APP/package.json"; then
+    ( cd "$APP" && npm run --silent test >/tmp/gm_unit.log 2>&1 ) \
+      && pass "unit tests" \
+      || { fail "unit tests 未通过："; tail -25 /tmp/gm_unit.log | sed 's/^/        /'; }
+  fi
   ( cd "$APP" && npm run --silent build >/tmp/gm_build.log 2>&1 ) \
     && pass "next build" \
     || { fail "next build 未通过："; tail -30 /tmp/gm_build.log | sed 's/^/        /'; }

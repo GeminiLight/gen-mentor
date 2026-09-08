@@ -32,8 +32,12 @@ gen-mentor/
 │   ├── src/components/ui/      #   shadcn 原语，代码归我们所有
 │   ├── src/features/<domain>/  #   按领域切分的业务组件
 │   └── src/lib/
-│       ├── llm-core.ts         #   provider 适配、结构化输出、流式
-│       ├── llm.ts              #   fast / smart 双模型路由
+│       ├── llm/core.ts         #   可移植：类型、provider 请求形状、宽松 JSON、jsonCall
+│       ├── llm/partial-json.ts #   流式部分 JSON 解析
+│       ├── llm/replay.ts       #   live / record / replay
+│       ├── llm/index.ts        #   服务端 LLM：环境变量、fast / smart 路由、SDK 实例
+│       ├── api.ts              #   route 辅助：parseBody、fail、taskStream
+│       ├── client.ts           #   浏览器端 API 客户端
 │       ├── prompts/            #   全部 prompt 文本的唯一来源
 │       ├── schemas/            #   zod，全系统唯一的数据契约
 │       ├── agents/             #   九个 agent 的编排
@@ -80,7 +84,7 @@ OpenAI 兼容端点，凭证读 `OPENAI_API_KEY` 与 `OPENAI_BASE_URL`。模型�
 
 不在 `src/lib/prompts/` 之外写 prompt 文本。route 和组件里不出现提示词字符串。
 
-API route 的入参必须经过 zod 校验才使用。
+接收请求体的 route 用 `parseBody(req, schema)` 校验后才使用入参。
 
 不硬编码颜色。色值只在 `app/src/app/globals.css` 用 OKLCH 定义，组件里一律用语义 token。
 对外 SVG 需要 hex 时用脚本换算，不手调。
