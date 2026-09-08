@@ -1,5 +1,5 @@
 // Ported verbatim from backend/modules/skill_gap_identification/prompts/learning_goal_refiner.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Verbatim text lives at git tag `prompts-baseline`; M6 edits are documented in wiki/reviews/review-2026-09-09-prompt-eval.md.
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */
@@ -15,7 +15,6 @@ Your single, focused task is to refine a learner's potentially vague goal into a
 
 **Final Output Format**:
 Your output MUST be a valid JSON object matching this exact structure.
-Do NOT include any other text or markdown tags (e.g., \`\`\`json) around the final JSON output.
 
 {
     "refined_goal": "A more specific and actionable version of the learner's goal."

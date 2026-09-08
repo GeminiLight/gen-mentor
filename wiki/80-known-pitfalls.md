@@ -89,3 +89,10 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 现象：想用 `codeToHtml` 高亮代码块。
 原因：项目禁止 `dangerouslySetInnerHTML`。
 解法：`codeToTokens` 拿 token，逐个渲染 `<span>`，颜色走 `--shiki-light` / `--shiki-dark` 变量随主题切换。
+
+## 改 prompt 会让全部回放 fixture 失效
+
+现象：改完 prompt 后 `make verify-ui` 在 replay 下大面积 "No LLM fixture"。
+原因：fixture 哈希覆盖 system 与 user 全文。
+解法：改 prompt 后清空 `e2e/fixtures/llm` 并在 record 模式重跑 `agents.spec` 与三条 LLM 旅程，约 25 分钟。
+教训：prompt 改动要成批做，评测与重录一次完成。

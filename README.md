@@ -3,190 +3,112 @@
     <img src="resources/logo.png" alt="GenMentor Logo" width="300"/>
   </p>
   <p><b>LLM-powered & Goal-oriented Tutoring System</b></p>
-
   <p>
     <a href="https://www.tianfuwang.tech/gen-mentor">Website</a> &nbsp;·&nbsp;
     <a href="https://arxiv.org/pdf/2501.15749">Paper</a> &nbsp;·&nbsp;
-    <a href="https://gen-mentor.streamlit.app/">Demo</a> &nbsp;·&nbsp;
     <a href="https://youtu.be/vTdtGZop-Zc">Video</a>
   </p>
-
 </div>
 
 ---
 
-> [!IMPORTANT]  
-> :sparkles: Welcome to visit the [GenMentor website](https://www.tianfuwang.tech/gen-mentor) to learn more about our work!
+GenMentor is the official implementation of *LLM-powered Multi-agent Framework for Goal-oriented
+Learning in Intelligent Tutoring System* (WWW 2025, Industry Track, oral). You tell it where you
+want to be; a set of coordinated agents refines the goal, finds the gap between it and your
+background, schedules a path of sessions, writes each session's reading and quiz for you, and
+rebuilds your learner profile from what you actually did.
 
-This is official code of our paper "*LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System*", accepted by **WWW 2025 (Industry Track) as an Oral Presentation**.
+This repository is a single Next.js application. There is no account and no server-side
+database: the learner's archive lives in the browser and can be exported and imported as one
+JSON file. Agent calls run inside the app's API routes against any OpenAI-compatible endpoint
+or the Anthropic API.
 
-In this paper, we propose GenMentor, a large language model (LLM)-powered multi-agent framework designed for goal-oriented learning in Intelligent Tutoring Systems (ITS). This framework emphasizes personalization, adaptive learning, and goal-aligned content delivery, making it a robust solution for professional and lifelong learning scenarios.
-
-
-## 🏫 ITS Paradigm Comparison
+## Paradigms and agents
 
 <div align="center">
-  <p align="center">
-    <img src="resources/its-paradigms.png" alt="GenMentor Overview" width="500" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px;"/>
-  </p>
+  <img src="resources/its-paradigms.png" alt="ITS paradigms" width="500"/>
 </div>
 
 | Paradigm | Typical characteristics | Primary focus |
 |---|---|---|
-| 🏫 Traditional MOOC | Static syllabus; pre-recorded lectures; fragmented learning | Broad access, low personalization |
-| 🤖 Chatbot ITS | Reactive Q&A; rule/LLM-driven; session-based help | Instant support, limited long-term adaptation |
-| 🎯 Goal-oriented ITS | Proactive planning; personalized paths; goal-aligned assessments | Targeted skill acquisition, continual adaptation |
-
-
-
-
-**🤖 Key Agent Modules**
+| Traditional MOOC | Static syllabus; pre-recorded lectures; fragmented learning | Broad access, low personalization |
+| Chatbot ITS | Reactive Q&A; rule/LLM-driven; session-based help | Instant support, limited long-term adaptation |
+| **Goal-oriented ITS** | Proactive planning; personalized paths; goal-aligned assessments | Targeted skill acquisition, continual adaptation |
 
 <div align="center">
-  <p align="center">
-    <img src="resources/genmentor-framework.png" alt="GenMentor Overview" width="700" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px;"/>
-  </p>
+  <img src="resources/genmentor-framework.png" alt="GenMentor framework" width="700"/>
 </div>
 
-- 🧭 `Skill Gap Identifier`: Analyzes learner's current knowledge to identify gaps.
-- 👤 `Adaptive Learner Modeler`: Builds and updates learner profiles based on interactions.
-- 🗓️ `Learning Path Scheduler`: Creates personalized learning paths and schedules.
-- 📝 `Tailored Content Generator`: Produces customized learning materials and assessments.
-- 🧑‍🏫 `AI Chatbot Tutor`: Engages learners in dialogue, answering questions and providing support.
+| Agent | Route | What it does |
+|---|---|---|
+| Goal Refiner | `POST /api/refine-goal` | Turns a vague goal into an actionable one |
+| Skill Mapper + Skill Gap Identifier | `POST /api/identify-skill-gap` | Maps the goal to skills, infers the learner's level for each |
+| Adaptive Learner Profiler | `POST /api/profile` | Builds the profile, then rebuilds it after every session with quiz evidence |
+| Learning Path Scheduler | `POST /api/schedule-path` | Creates, refines and reschedules the session sequence (streamed) |
+| Knowledge Explorer | `POST /api/explore-knowledge` | Picks the knowledge points a session needs |
+| Knowledge Drafter | `POST /api/draft-knowledge` | Drafts each point, optionally grounded in web search (streamed) |
+| Document Integrator | `POST /api/integrate-document` | Synthesizes the drafts into one document (streamed) |
+| Quiz Generator | `POST /api/generate-quiz` | Writes questions from the document |
+| Learner Feedback Simulator | `POST /api/simulate-feedback` | Role-plays the learner to critique a path or content |
+| AI Chatbot Tutor | `POST /api/tutor` | Streams grounded answers during a session |
 
-**Key Demo Interfaces**
+The prompts are the paper's prompts. The verbatim port is preserved at git tag
+`prompts-baseline`; later edits are evaluated side by side against it
+(`scripts/eval-prompts.sh`, `wiki/reviews/`).
 
-<div align="center">
-  <p align="center">
-    <img src="resources/genmentor_demo_1.png" alt="GenMentor Demo Interface-1" width="400" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px; margin: 8px;"/>
-    <img src="resources/genmentor_demo_2.png" alt="GenMentor Demo Interface-2" width="400" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px; margin: 8px;"/>
-    <img src="resources/genmentor_demo_3.png" alt="GenMentor Demo Interface-3" width="400" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px; margin: 8px;"/>
-    <img src="resources/genmentor_demo_4.png" alt="GenMentor Demo Interface-4" width="400" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px; margin: 8px;"/>
-    <img src="resources/genmentor_demo_5.png" alt="GenMentor Demo Interface-5" width="400" style="box-shadow: 0 8px 24px rgba(0,0,0,0.15); border-radius: 8px; margin: 8px;"/>
-  </p>
-</div>
+## Quick start
 
-## 🚀 Quick start
-
-Here, we briefly describe how to set up and run the GenMentor system locally. Please see more details in the respective `backend/` and `frontend/` directories.
-
-### 🛠️ Installation
-
-1. Backend environment setup
+Requirements: Node 24, pnpm 11, and one LLM credential.
 
 ```bash
-cd backend
-uv venv
-source .venv/bin/activate  # on Windows: .venv\Scripts\activate
-uv pip install -r requirements.txt
+make install                      # pnpm install in app/
+cp app/.env.example app/.env.local
+# set LLM_API_KEY and LLM_BASE_URL (or OPENAI_API_KEY / ANTHROPIC_API_KEY)
+make dev                          # http://localhost:3000
 ```
 
-2. Frontend environment setup
+`LLM_FAST_MODEL` and `LLM_SMART_MODEL` split the work between a cheap model (tutor, quizzes,
+goal refinement) and a stronger one (skill gap, scheduling, content). Defaults and the other
+knobs are documented in `app/.env.example`.
+
+No key at hand? `GENMENTOR_LLM_MODE=replay make dev` serves the recorded journeys in
+`e2e/fixtures/llm` for the sample goal used by the tests.
+
+### Deploy
+
+| Target | How |
+|---|---|
+| Vercel | Import the repo, set **Root Directory** to `app`, add the environment variables |
+| Container | `docker build -t genmentor app && docker run -p 3000:3000 --env-file app/.env.local genmentor` |
+
+## Repository layout
+
+```
+app/          the Next.js application (routes, agents, prompts, schemas, UI)
+e2e/          Playwright journeys, axe checks, screenshot evidence, recorded LLM fixtures
+wiki/         product proposal, roadmap, architecture, design principles, API reference, pitfalls
+scripts/      gate.sh and verify-ui.sh (acceptance gates), eval-prompts.sh (prompt evaluation)
+docs/rebuild/ the plan this rebuild followed
+```
+
+`make gate` runs the static acceptance gate (layout, docs, size budgets, banned patterns,
+types, lint, unit tests, build). `make verify-ui` builds the app, drives every journey in the
+browser, checks accessibility in both themes and screenshots every page in three viewports.
+`AGENTS.md` holds the constraints every contributor, human or agent, works under.
+
+## Reproducing the paper
+
+The Python implementation used for the paper (FastAPI backend, Streamlit frontend, LangChain
+agents) is preserved at git tag **`paper-python-v1`**:
 
 ```bash
-cd frontend
-uv venv
-source .venv/bin/activate  # on Windows: .venv\Scripts\activate
-uv pip install -r requirements.txt
+git checkout paper-python-v1
 ```
 
-### ⚙️ Configuration
+Its README describes how to run it. The current application keeps the same nine agents and the
+same prompts (see `prompts-baseline`), rewritten in TypeScript.
 
-1. Configure LLM secrets (at least one) for backend
-
-*Option A*: update a `.env` file in `backend/`
-
-```plaintext
-# Example for OpenAI:
-OPENAI_API_KEY="your-openai-api-key"
-
-# Example for DeepSeek:
-DEEPSEEK_API_KEY="your-deepseek-api-key"
-```
-
-*Option B*: export environment variables in your shell
-
-```bash
-# Example for OpenAI:
-export OPENAI_API_KEY="your-openai-api-key"
-
-# Example for DeepSeek:
-export DEEPSEEK_API_KEY="your-deepseek-api-key"
-DEEPSEEK_API_KEY="your-deepseek-api-key"
-```
-
-2. Configure api endpoint for frontend
-
-If you would like to run the backend on a different host/port, update it either
-in the running app via **Settings (⚙️) → Backend endpoint**, or in
-`frontend/config.py`:
-
-```python
-backend_endpoint = "http://127.0.0.1:5000/"
-```
-
-> Optional: `TAVILY_API_KEY` in `backend/.env` switches web search from
-> DuckDuckGo to Tavily — noticeably faster content generation (see
-> `backend/README.md`).
-
-### ▶️ Running Locally
-
-> [!NOTE]
-> The default ports are 5000 for backend, 8501 for frontend by default
-
-*Option A*: Manual (preferred when using separate venvs)
-
-```bash
-# start backend
-cd backend
-source .venv/bin/activate  # on Windows: .venv\Scripts\activate
-uvicorn main:app --reload --port 5000
-```
-
-```bash
-# start frontend
-cd frontend
-source .venv/bin/activate  # on Windows: .venv\Scripts\activate
-streamlit run main.py --server.port 8501
-```
-
-*Option B*: Helper scripts (single shell; assumes uvicorn/streamlit on PATH)
-
-```bash
-# start backend
-bash ./scripts/start_backend.sh [PORT]
-
-# start frontend
-bash ./scripts/start_frontend.sh [PORT]
-
-# stop all
-bash ./scripts/stop_all.sh
-```
-
-### 🌐 Accessing the App
-
-Finally, you can access:
-
-- Backend API: http://127.0.0.1:5000/
-- Frontend UI: http://127.0.0.1:8501/
-
-## 🚀 Demo Version of Web Application
-
-Welcome to explore the demo version of the GenMentor web application:
-
-[GenMentor Web App](https://gen-mentor.streamlit.app/)
-
-This interactive demo showcases GenMentor's core functionalities, including:
-
-- Skill Gap Identification: Precisely map learner goals to required skills.
-- Adaptive Learner Modeling: Capture learner progress and preferences.
-- Personalized Content Delivery: Generate tailored learning resources.
-
-You could also watch the demo video for a quick overview (click the image below):
-
-[![Video Preview](https://img.youtube.com/vi/vTdtGZop-Zc/0.jpg)](https://youtu.be/vTdtGZop-Zc)
-
-## 📚 Citation
+## Citation
 
 ```bibtex
 @inproceedings{wang2025llm,
@@ -196,3 +118,7 @@ You could also watch the demo video for a quick overview (click the image below)
   year={2025}
 }
 ```
+
+## License
+
+See `LICENSE`.

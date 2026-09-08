@@ -1,5 +1,5 @@
 // Ported verbatim from backend/modules/personalized_resource_delivery/prompts/document_quiz_generator.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Kept at the baseline text: the M6 edit produced a wrong question count in 1 of 5 eval cases (see wiki/reviews).
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */

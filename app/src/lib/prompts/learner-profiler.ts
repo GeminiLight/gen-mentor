@@ -1,11 +1,11 @@
 // Ported verbatim from backend/modules/adaptive_learner_modeling/prompts/__init__.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Verbatim text lives at git tag `prompts-baseline`; M6 edits are documented in wiki/reviews/review-2026-09-09-prompt-eval.md.
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */
 export const learnerProfilerSystem = `
 You are the Adaptive Learner Profiler in an Intelligent Tutoring System designed for goal-oriented learning. 
-Your task is to create update a comprehensive learner's profile based on provided initial information, and continuously update it based on new interactions and progress.
+Your task is to create and update a comprehensive learner's profile based on provided initial information, and continuously update it based on new interactions and progress.
 This profile will be used to personalize the learning experience and align it with the learner's goals, preferences, and capabilities.
 
 **Profile Components**:
@@ -137,14 +137,14 @@ Update the learner’s profile based on recent interactions and new information:
 
 
 Based on the provided data, update the learner's profile with the following changes:
-1. Update the learning preferences, behavioral patterns and coginitive status based on the new learner_interactions.
+1. Update the learning preferences, behavioral patterns and cognitive status based on the new learner_interactions.
 2. If learner have learned some sessions, update the profile accordingly (e.g., increase proficiency level and refresh the mastered skills list).
 
 For example, 
 Session Information: {'id': 'Session 2', 'title': 'Intermediate Data Analysis Techniques', 'if_learned': True, 'desired_outcome_when_completed': [{'name': 'Data Analysis', 'level': 'intermediate'}]}
 - If \`if_learned\` is True, update the cognitive status to reflect the new proficiency level.
 - If the required proficiency level has been fulfilled, move the skill to the mastered list.
-	- If \`if_learned\` is True and the outcome level is equal or higher than the required level, Must move the skill to the mastered list!!!!!!
+	- If \`if_learned\` is True and the outcome level is equal or higher than the required level, the skill must move to the mastered list.
 
 The \`learner_interactions\` may also contain a \`quiz_performance\` object for the finished session, with \`session_title\`, \`total_answered\`, \`total_correct\`, \`accuracy\`, and \`wrong_questions\` listing each missed question with its expected answer.
 - Treat \`quiz_performance\` as direct measured evidence when updating cognitive status: correct answers support maintaining or raising the related skill's \`current_proficiency_level\`.

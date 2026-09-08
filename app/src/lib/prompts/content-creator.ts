@@ -1,5 +1,5 @@
 // Ported verbatim from backend/modules/personalized_resource_delivery/prompts/learning_content_creator.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Verbatim text lives at git tag `prompts-baseline`; M6 edits are documented in wiki/reviews/review-2026-09-09-prompt-eval.md.
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */
@@ -63,7 +63,6 @@ You MUST follow the specific JSON output format for the task you are given.
 ---
 
 Your final output MUST be only the valid JSON for the requested task.
-Do NOT include any other text or markdown tags (e.g., \`\`\`json).
 `;
 
 /** task; placeholders: external_resources, learner_profile, learning_path, learning_session */

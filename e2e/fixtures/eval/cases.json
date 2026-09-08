@@ -1,0 +1,32 @@
+[
+  {
+    "id": "analyst-to-ds",
+    "learning_goal": "Transition into a junior data scientist role within a year by mastering Python-based data analysis, SQL, and statistics.",
+    "learner_information": "Marketing analyst, 3 years. Builds weekly Excel reports and Tableau dashboards for campaign performance; comfortable with pivot tables, VLOOKUP and basic DAX. Has written a few Python scripts with pandas to clean CSV exports but never used NumPy, scikit-learn or a notebook workflow. BSc Business Administration. Runs simple SELECT queries against a Redshift warehouse but avoids joins. No formal statistics beyond descriptive summaries.",
+    "question": "I keep confusing loc and iloc in pandas. Can you explain the difference with a tiny example?"
+  },
+  {
+    "id": "backend-to-ml-eng",
+    "learning_goal": "Become a machine learning engineer who can take a trained model to production, with a focus on model serving, monitoring and MLOps on Kubernetes.",
+    "learner_information": "Backend engineer, 6 years, Go and Python. Owns a payments microservice: gRPC APIs, PostgreSQL, Kafka consumers, Terraform on GCP, on-call rotation. Solid Docker and Kubernetes (Helm, HPA, GKE). Took Andrew Ng's ML specialization two years ago and trained a scikit-learn churn model as a side project but has never deployed one. Unfamiliar with feature stores, model registries, drift monitoring, or PyTorch.",
+    "question": "What is the difference between a model registry and a feature store, and do I need both for a first deployment?"
+  },
+  {
+    "id": "nurse-to-informatics",
+    "learning_goal": "Move from bedside nursing into a clinical informatics analyst role within 18 months, able to work with EHR data, HL7/FHIR standards and healthcare dashboards.",
+    "learner_information": "Registered nurse, 8 years in an ICU. Superuser for the hospital's Epic rollout: trained colleagues, wrote workflow documentation, filed change requests. Comfortable in Excel, curious about data, no programming. Has heard of HL7 and FHIR but never read a specification. BSN degree, considering a graduate certificate. Available roughly six hours a week on weekends.",
+    "question": "In plain terms, what does a FHIR resource look like and how is it different from an HL7 v2 message?"
+  },
+  {
+    "id": "pm-to-product-analytics",
+    "learning_goal": "Learn to run rigorous product experiments and analytics as a product manager: A/B test design, statistical significance, metric definition and SQL for self-serve analysis.",
+    "learner_information": "Product manager, 4 years at a B2C mobile app with 2M MAU. Writes PRDs, prioritizes roadmaps, reads dashboards built by the data team. Has requested A/B tests but relies on analysts to interpret them; once shipped a change on a result that later turned out to be noise. Knows basic SQL SELECT and WHERE from a weekend course. Undergraduate degree in psychology, so remembers t-tests vaguely.",
+    "question": "How do I decide how long an A/B test needs to run before I can trust the result?"
+  },
+  {
+    "id": "designer-to-frontend",
+    "learning_goal": "Become a front-end developer who can ship production React and TypeScript features independently, including accessibility and testing.",
+    "learner_information": "Product designer, 5 years, Figma expert with a mature design-system practice (tokens, variants, auto-layout). Writes HTML and CSS for prototypes and knows Flexbox and Grid well. Has followed React tutorials and built a to-do app with useState but has not used TypeScript, tests, a bundler or Git beyond committing. Strong on accessibility principles from the design side (WCAG contrast, focus order) but has never used a screen reader for QA.",
+    "question": "When should a piece of state live in React state versus in the URL?"
+  }
+]

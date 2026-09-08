@@ -15,9 +15,9 @@ describe("fill", () => {
 });
 
 describe("ported prompts", () => {
-  it("keep the paper's wording verbatim", () => {
+  it("keep the paper's core wording (baseline text is at tag prompts-baseline)", () => {
     expect(goal.goalRefinerSystem).toContain("You are the **Learning Goal Refiner** agent in the GenMentor Intelligent Tutoring System.");
-    expect(scheduler.pathSchedulerSystem).toContain("[cite_start]**Personalized**");
+    expect(scheduler.pathSchedulerSystem).toContain("**Personalized**: You MUST adapt the path based on the `learner_profile`");
     expect(scheduler.pathSchedulerCreateTask).toContain("The number of sessions should be within [1, 10]; if the requested count falls\noutside that range, clamp it to the nearest bound.");
   });
   it("resolved Python's doubled braces in task prompts", () => {

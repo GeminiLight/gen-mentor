@@ -10,7 +10,7 @@
  * prompt edit invalidates its fixtures instead of replaying stale text.
  */
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { LLMError, type ChatOpts } from "./core";
 
@@ -56,6 +56,8 @@ export function readFixture(o: ChatOpts, model: string): Fixture {
       500,
     );
   }
+  // Optional usage log so a full replay run can tell which fixtures are still reachable.
+  if (process.env.GENMENTOR_LLM_FIXTURE_LOG) appendFileSync(process.env.GENMENTOR_LLM_FIXTURE_LOG, `${hash}\n`);
   return JSON.parse(readFileSync(file, "utf8")) as Fixture;
 }
 

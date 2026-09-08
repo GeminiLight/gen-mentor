@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M6 -->
+<!-- Last verified: 2026-09-09 | Current stage: M7 -->
 
 # 项目路线图
 
@@ -12,8 +12,8 @@
 | M3 | 核心旅程与本地档案 | done |
 | M4 | 游戏化层 | done |
 | M5 | 精致度与部署 | done |
-| M6 | prompt 优化（带 baseline 对照） | doing |
-| M7 | 删旧树、README、PR | todo |
+| M6 | prompt 优化（带 baseline 对照） | done |
+| M7 | 删旧树、README、PR | doing |
 
 ## M0 功能索引
 
@@ -83,3 +83,12 @@
 | 阶段列表与流水线到阅读的过渡动效，尊重 reduced motion | `stage-list.tsx`、`session-view.tsx` | done |
 | 200ms 内出现 skeleton / 乐观态的 spec | `e2e/specs/responsiveness.spec.ts` | done |
 | Dockerfile（standalone 单进程） | `app/Dockerfile` | done |
+
+## M6 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 五个固定评测用例 | `e2e/fixtures/eval/cases.json` | done |
+| 评测运行器（切换 prompt 目录，同一 agent 代码） | `app/vitest.eval.config.mts`、`app/scripts/eval-prompts.eval.ts`、`scripts/eval-prompts.sh` | done |
+| 并排报告生成 | `scripts/eval-report.py` | done |
+| 评审与处置（quiz-generator 回退） | `wiki/reviews/review-2026-09-09-prompt-eval.md` | done |

@@ -1,5 +1,5 @@
 // Ported verbatim from backend/modules/personalized_resource_delivery/prompts/goal_oriented_knowledge_explorer.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Verbatim text lives at git tag `prompts-baseline`; M6 edits are documented in wiki/reviews/review-2026-09-09-prompt-eval.md.
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */
@@ -17,7 +17,6 @@ Your role is to analyze a single learning session and, based on the learner's pr
 
 **Final Output Format**:
 Your output MUST be a valid JSON object matching this exact structure.
-Do NOT include any other text or markdown tags (e.g., \`\`\`json) around the final JSON output.
 
 {
 "knowledge_points":

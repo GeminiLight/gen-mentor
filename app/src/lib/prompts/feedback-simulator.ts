@@ -1,5 +1,5 @@
 // Ported verbatim from backend/modules/personalized_resource_delivery/prompts/learner_feedback_simulation.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Verbatim text lives at git tag `prompts-baseline`; M6 edits are documented in wiki/reviews/review-2026-09-09-prompt-eval.md.
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */
@@ -15,7 +15,6 @@ Your role is to mimic a learner's responses and provide proactive, qualitative f
 
 **Final Output Format**:
 Your output MUST be a valid JSON object matching this exact structure.
-Do NOT include any other text or markdown tags (e.g., \`\`\`json) around the final JSON output.
 `;
 
 /** task; placeholders: learner_profile, learning_path */

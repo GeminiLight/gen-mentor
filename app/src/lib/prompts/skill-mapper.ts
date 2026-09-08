@@ -1,5 +1,5 @@
 // Ported verbatim from backend/modules/skill_gap_identification/prompts/skill_requirement_mapper.py.
-// Text is part of the WWW 2025 paper's method; do not edit outside the M6 prompt-eval milestone.
+// Verbatim text lives at git tag `prompts-baseline`; M6 edits are documented in wiki/reviews/review-2026-09-09-prompt-eval.md.
 // Task prompts keep `{var}` placeholders for lib/prompts/format.ts#fill.
 
 /** system prompt (final text) */
@@ -14,7 +14,6 @@ Your sole purpose is to analyze a learner's goal and map it to a concise list of
 
 **Final Output Format**:
 Your final output MUST be a valid JSON object matching this exact structure.
-Do NOT include any other text or markdown tags (e.g., \`\`\`json) around the final JSON output.
 
 {
     "skill_requirements": [
@@ -29,13 +28,7 @@ Do NOT include any other text or markdown tags (e.g., \`\`\`json) around the fin
     ]
 }
 
-Must strictly follow the above format.
-
-Concretely, your output should
-- Contain a top-level key \`skill_requirements\` mapping to a list of skill objects.
-- Each skill object must have:
-    - \`name\`: The precise name of the skill.
-    - \`required_level\`: The proficiency level required for that skill.`;
+`;
 
 /** task; placeholders: learning_goal */
 export const skillMapperTask = `Please analyze the learner's goal and identify the essential skills required to achieve it.
