@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M5 -->
+<!-- Last verified: 2026-09-09 | Current stage: M6 -->
 
 # 项目路线图
 
@@ -11,8 +11,8 @@
 | M2 | 设计系统与 `/design` 靶子 | done |
 | M3 | 核心旅程与本地档案 | done |
 | M4 | 游戏化层 | done |
-| M5 | 精致度与部署 | doing |
-| M6 | prompt 优化（带 baseline 对照） | todo |
+| M5 | 精致度与部署 | done |
+| M6 | prompt 优化（带 baseline 对照） | doing |
 | M7 | 删旧树、README、PR | todo |
 
 ## M0 功能索引
