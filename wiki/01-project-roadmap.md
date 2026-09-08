@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M2 -->
+<!-- Last verified: 2026-09-09 | Current stage: M3 -->
 
 # 项目路线图
 
@@ -8,8 +8,8 @@
 |---|---|---|
 | M0 | 骨架、闸门通路、LLM 核心层、回放模式、E2E 工程 | done |
 | M1 | 九个 agent、prompts 逐字迁移、zod schema、十个 route | done |
-| M2 | 设计系统与 `/_design` 靶子 | doing |
-| M3 | 核心旅程与本地档案 | todo |
+| M2 | 设计系统与 `/design` 靶子 | done |
+| M3 | 核心旅程与本地档案 | doing |
 | M4 | 游戏化层 | todo |
 | M5 | 精致度与部署 | todo |
 | M6 | prompt 优化（带 baseline 对照） | todo |
@@ -39,3 +39,12 @@
 | Tavily 搜索（可选） | `app/src/lib/search.ts` | done |
 | 单元测试（fake LLM） | `app/src/lib/agents/__tests__/` | done |
 | E2E 在 replay 下打通全部 route | `e2e/specs/agents.spec.ts` + `e2e/fixtures/llm/` | done |
+
+## M2 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| OKLCH token、六级字号三种字重由 `@theme` 强制 | `app/src/app/globals.css` | done |
+| 17 个 shadcn 原语（radix-nova） | `app/src/components/ui/` | done |
+| 主题切换、Toaster、TooltipProvider | `app/src/components/`、`layout.tsx` | done |
+| `/design` 视觉回归靶子 | `app/src/app/design/`、`app/src/features/design/` | done |

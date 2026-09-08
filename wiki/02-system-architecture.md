@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M0 -->
+<!-- Last verified: 2026-09-09 | Current stage: M2 -->
 
 # 系统架构
 

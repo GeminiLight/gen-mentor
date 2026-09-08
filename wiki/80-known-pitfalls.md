@@ -59,3 +59,15 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 
 现象：启动日志有 `⚠ "next start" does not work with "output: standalone"`，页面仍能服务但行为不可靠。
 解法：只有容器镜像构建时设 `GENMENTOR_STANDALONE=1` 才输出 standalone，本地与 Vercel 都不设。
+
+## 动态拼接的 Tailwind 类名不会被生成
+
+现象：`/design` 上一半色块空白。
+原因：`bg-${name}` 这类运行时拼接的类名 Tailwind 扫不到，只有恰好在别处静态出现过的才有样式。
+解法：把完整类名写在源码里（映射表），不拼接。
+
+## 半透明文字过不了对比度
+
+现象：axe 报 tab 未激活态 `color-contrast`，实测 4.42:1。
+原因：shadcn 用 `text-foreground/60` 做次级文字，混色结果取决于底色，不可控。
+解法：次级文字一律用实色 `text-muted-foreground`，该 token 在两套主题下都按 ≥ 4.5:1 调过。

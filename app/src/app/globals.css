@@ -4,130 +4,297 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ────────────────────────────────────────────────────────────────────────────
+   GenMentor design tokens. This file is the only place a color, width or
+   duration is defined. Components use semantic utilities (bg-card, text-muted-
+   foreground, w-(--w-rail), duration-(--dur-base)); gate.sh fails any raw
+   value in .ts/.tsx.
+
+   Direction: a quiet study desk. Cool near-neutral greys, hairline borders,
+   one teal signal reserved for progress and the primary action. Six type
+   sizes, three weights, three durations. Both themes are first-class.
+   ──────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Type scale: exactly six sizes. Anything else fails to compile. */
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 2.125rem;
+  --text-2xl: 2.5rem;
+  --text-2xl--line-height: 2.75rem;
+
+  /* Weights: exactly three. */
+  --font-weight-*: initial;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Shadows are rare; borders carry structure. */
+  --shadow-*: initial;
+  --shadow-xs: 0 1px 2px oklch(0.2 0.01 260 / 0.06);
+  --shadow-sm: 0 1px 3px oklch(0.2 0.01 260 / 0.08), 0 1px 2px oklch(0.2 0.01 260 / 0.04);
+  --shadow-md: 0 6px 16px -6px oklch(0.2 0.01 260 / 0.14), 0 2px 6px -2px oklch(0.2 0.01 260 / 0.06);
+  --shadow-lg: 0 16px 40px -12px oklch(0.2 0.01 260 / 0.22), 0 4px 12px -4px oklch(0.2 0.01 260 / 0.08);
+}
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* GenMentor semantic additions */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-soft: var(--brand-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-level-0: var(--level-0);
+  --color-level-1: var(--level-1);
+  --color-level-2: var(--level-2);
+  --color-level-3: var(--level-3);
+  --color-kt-foundational: var(--kt-foundational);
+  --color-kt-practical: var(--kt-practical);
+  --color-kt-strategic: var(--kt-strategic);
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 3);
+  --radius-4xl: calc(var(--radius) * 4);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  color-scheme: light;
+
+  /* Neutrals: cool, low chroma */
+  --background: oklch(0.99 0.003 250);
+  --foreground: oklch(0.21 0.012 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: var(--foreground);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: var(--foreground);
+  --secondary: oklch(0.955 0.005 250);
+  --secondary-foreground: oklch(0.3 0.012 260);
+  --muted: oklch(0.955 0.005 250);
+  --muted-foreground: oklch(0.45 0.012 260);
+  --accent: oklch(0.945 0.006 250);
+  --accent-foreground: var(--foreground);
+  --border: oklch(0.905 0.006 250);
+  --input: oklch(0.88 0.007 250);
+
+  /* The one signal color: progress and the primary action only */
+  --brand: oklch(0.5 0.105 178);
+  --brand-foreground: oklch(0.99 0.01 178);
+  --brand-soft: oklch(0.94 0.035 178);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --ring: oklch(0.6 0.1 178);
+
+  /* Semantic. Also used as text on the -soft surfaces, so light L stays ≤ 0.5 for 4.5:1. */
+  --destructive: oklch(0.5 0.19 27);
+  --destructive-soft: oklch(0.95 0.035 27);
+  --success: oklch(0.48 0.13 150);
+  --success-soft: oklch(0.94 0.04 150);
+  --warning: oklch(0.5 0.12 70);
+  --warning-soft: oklch(0.95 0.05 80);
+
+  /* Mastery ramp: unlearned → advanced, driven by real learning records */
+  --level-0: oklch(0.85 0.006 250);
+  --level-1: oklch(0.8 0.06 178);
+  --level-2: oklch(0.65 0.1 178);
+  --level-3: oklch(0.45 0.1 178);
+
+  /* Knowledge types (explorer output), low chroma, distinct hue */
+  --kt-foundational: oklch(0.48 0.07 255);
+  --kt-practical: oklch(0.48 0.1 178);
+  --kt-strategic: oklch(0.5 0.11 70);
+
+  --chart-1: var(--brand);
+  --chart-2: oklch(0.6 0.06 255);
+  --chart-3: oklch(0.68 0.1 70);
+  --chart-4: oklch(0.55 0.1 330);
+  --chart-5: oklch(0.6 0.012 260);
+
+  --sidebar: oklch(0.975 0.004 250);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* Shape */
+  --radius: 0.5rem;
+
+  /* Widths: every fixed width in the app is one of these */
+  --w-rail: 15rem; /* desktop navigation rail */
+  --w-col: 30rem; /* single reading column on phones */
+  --w-content: 70rem; /* page content max */
+  --w-measure: 68ch; /* prose line length */
+  --w-dialog: 32.5rem; /* desktop dialogs */
+
+  /* Motion: state continuity only */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 240ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  color-scheme: dark;
+
+  --background: oklch(0.16 0.01 260);
+  --foreground: oklch(0.95 0.005 250);
+  --card: oklch(0.195 0.01 260);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.21 0.01 260);
+  --popover-foreground: var(--foreground);
+  --secondary: oklch(0.25 0.01 260);
+  --secondary-foreground: oklch(0.9 0.005 250);
+  --muted: oklch(0.25 0.01 260);
+  --muted-foreground: oklch(0.72 0.01 255);
+  --accent: oklch(0.27 0.01 260);
+  --accent-foreground: var(--foreground);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --input: oklch(1 0 0 / 14%);
+
+  --brand: oklch(0.78 0.11 178);
+  --brand-foreground: oklch(0.18 0.03 178);
+  --brand-soft: oklch(0.3 0.05 178);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --ring: oklch(0.7 0.1 178);
+
+  --destructive: oklch(0.7 0.17 25);
+  --destructive-soft: oklch(0.3 0.06 27);
+  --success: oklch(0.75 0.14 150);
+  --success-soft: oklch(0.28 0.05 150);
+  --warning: oklch(0.8 0.14 80);
+  --warning-soft: oklch(0.3 0.06 80);
+
+  --level-0: oklch(0.35 0.01 260);
+  --level-1: oklch(0.45 0.06 178);
+  --level-2: oklch(0.62 0.1 178);
+  --level-3: oklch(0.8 0.11 178);
+
+  --kt-foundational: oklch(0.72 0.07 255);
+  --kt-practical: oklch(0.75 0.1 178);
+  --kt-strategic: oklch(0.8 0.11 75);
+
+  --chart-1: var(--brand);
+  --chart-2: oklch(0.72 0.07 255);
+  --chart-3: oklch(0.8 0.11 75);
+  --chart-4: oklch(0.72 0.1 330);
+  --chart-5: oklch(0.65 0.01 260);
+
+  --sidebar: oklch(0.18 0.01 260);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply font-sans;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground;
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  html {
-    @apply font-sans;
+  /* One clock for every transition in the app. */
+  :where(.transition, .transition-all, .transition-colors, .transition-opacity, .transition-transform, .transition-shadow) {
+    transition-duration: var(--dur-base);
+    transition-timing-function: var(--ease-out);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --dur-fast: 0.01ms;
+      --dur-base: 0.01ms;
+      --dur-slow: 0.01ms;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Numbers that must line up: metrics, tables, timers. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  /* Small uppercase label above a group. */
+  .eyebrow {
+    @apply text-xs font-medium uppercase text-muted-foreground;
+    letter-spacing: 0.06em;
+  }
+  /* Long-form reading: the learning document. */
+  .reading {
+    max-width: var(--w-measure);
+    line-height: 1.7;
   }
 }
