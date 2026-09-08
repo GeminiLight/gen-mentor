@@ -11,7 +11,7 @@ log_level: INFO
 
 llm:
   provider: openai
-  model_name: deepseek-v4-flash
+  model_name: glm-5.3-flash
   base_url: null  # URL comes from OPENAI_BASE_URL in .env (read natively by ChatOpenAI)
 
 # Local embedding default switched to bge-small-en-v1.5: ~4x faster than the

@@ -18,3 +18,9 @@ data/
 
 pids/
 .DS_Store
+
+# 新布局：密钥、论文 PDF、E2E 产物
+.env
+.env.local
+*.pdf
+e2e/artifacts/
