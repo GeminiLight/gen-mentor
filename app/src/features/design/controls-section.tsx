@@ -101,14 +101,14 @@ export function ControlsSection() {
           <Badge variant="outline" className="border-warning/40 bg-warning-soft text-warning">
             Needs practice
           </Badge>
-          <Badge variant="outline" className="text-kt-foundational">
-            foundational
+          <Badge variant="outline">
+            <span className="size-2 rounded-full bg-kt-foundational" aria-hidden /> foundational
           </Badge>
-          <Badge variant="outline" className="text-kt-practical">
-            practical
+          <Badge variant="outline">
+            <span className="size-2 rounded-full bg-kt-practical" aria-hidden /> practical
           </Badge>
-          <Badge variant="outline" className="text-kt-strategic">
-            strategic
+          <Badge variant="outline">
+            <span className="size-2 rounded-full bg-kt-strategic" aria-hidden /> strategic
           </Badge>
         </div>
       </div>

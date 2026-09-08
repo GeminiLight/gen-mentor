@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M4 -->
+<!-- Last verified: 2026-09-09 | Current stage: M5 -->
 
 # 项目路线图
 
@@ -10,8 +10,8 @@
 | M1 | 九个 agent、prompts 逐字迁移、zod schema、十个 route | done |
 | M2 | 设计系统与 `/design` 靶子 | done |
 | M3 | 核心旅程与本地档案 | done |
-| M4 | 游戏化层 | doing |
-| M5 | 精致度与部署 | todo |
+| M4 | 游戏化层 | done |
+| M5 | 精致度与部署 | doing |
 | M6 | prompt 优化（带 baseline 对照） | todo |
 | M7 | 删旧树、README、PR | todo |
 
@@ -61,3 +61,14 @@
 | 应用壳：桌面导航栏、手机底栏、导师抽屉 | `app/src/components/layout/`、`app/src/features/tutor/` | done |
 | onboarding、goals、learning-path、session、library、progress、profile | `app/src/features/*`、`app/src/app/(app)/` | done |
 | E2E 旅程（seed 档案 + replay fixture） | `e2e/specs/journeys.spec.ts`、`e2e/specs/seed.ts` | done |
+
+## M4 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 技能树：目标 → 技能 → 会话，由 profile 与路径驱动 | `app/src/features/progress/skill-tree.tsx` | done |
+| 掌握度环（三段）与总进度环 | `app/src/features/progress/mastery-ring.tsx` | done |
+| 掌握度时间线与每会话分钟数（Recharts，单序列） | `app/src/features/progress/footprint.tsx` | done |
+| 测验即时判定与单次连击 | `app/src/features/session/quiz-view.tsx`、`quiz-question.tsx` | done |
+| 分类调色板经 dataviz 校验器通过 | `app/src/app/globals.css` | done |
+| e2e：空档案空态、seed 数值一致、连击行为 | `e2e/specs/gamification.spec.ts` | done |

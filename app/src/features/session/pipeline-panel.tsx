@@ -13,10 +13,11 @@ export interface PipelineView {
   error?: string;
 }
 
-const KT_CLASS: Record<KnowledgePoint["type"], string> = {
-  foundational: "text-kt-foundational",
-  practical: "text-kt-practical",
-  strategic: "text-kt-strategic",
+// Category color rides a dot, never the text: the hues are tuned as marks, not as type.
+const KT_DOT: Record<KnowledgePoint["type"], string> = {
+  foundational: "bg-kt-foundational",
+  practical: "bg-kt-practical",
+  strategic: "bg-kt-strategic",
 };
 
 /** What the agents are doing right now, with whatever has streamed in so far. */
@@ -47,7 +48,7 @@ export function PipelinePanel({ view }: { view: PipelineView }) {
               {view.points.map((kp, i) => (
                 <li key={kp.name}>
                   <Badge variant="outline" className={view.drafts[i]?.content ? "" : "text-muted-foreground"}>
-                    <span className={`mr-1 ${KT_CLASS[kp.type]}`}>●</span>
+                    <span className={`size-2 rounded-full ${KT_DOT[kp.type]}`} aria-hidden />
                     {kp.name}
                   </Badge>
                 </li>

@@ -87,8 +87,8 @@ test.describe("with a seeded archive", () => {
 
   test("progress shows numbers from the archive, not placeholders", async ({ page }) => {
     await page.goto("/progress");
-    await expect(page.getByTestId("stat-progress")).toHaveText(`${sample.learner_profile.cognitive_status.overall_progress}%`);
-    await expect(page.getByRole("row")).toHaveCount(1 + sample.learner_profile.cognitive_status.mastered_skills.length + sample.learner_profile.cognitive_status.in_progress_skills.length);
+    await expect(page.getByTestId("overall-ring-value")).toHaveText(`${sample.learner_profile.cognitive_status.overall_progress}%`);
+    await expect(page.getByTestId("mastery-rings").getByRole("listitem")).toHaveCount(sample.learner_profile.cognitive_status.mastered_skills.length + sample.learner_profile.cognitive_status.in_progress_skills.length);
   });
 
   test("tutor streams a reply and keeps it in the archive", async ({ page }) => {

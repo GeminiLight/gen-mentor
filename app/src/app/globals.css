@@ -149,16 +149,17 @@
   --level-2: oklch(0.65 0.1 178);
   --level-3: oklch(0.45 0.1 178);
 
-  /* Knowledge types (explorer output), low chroma, distinct hue */
-  --kt-foundational: oklch(0.48 0.07 255);
-  --kt-practical: oklch(0.48 0.1 178);
-  --kt-strategic: oklch(0.5 0.11 70);
+  /* Knowledge types and chart series: categorical, validated with dataviz/validate_palette.js
+     in both modes (CVD ΔE, chroma floor, lightness band). Re-run it before changing. */
+  --kt-foundational: oklch(0.5 0.13 255);
+  --kt-practical: oklch(0.6 0.15 55);
+  --kt-strategic: oklch(0.55 0.15 340);
 
-  --chart-1: var(--brand);
-  --chart-2: oklch(0.6 0.06 255);
-  --chart-3: oklch(0.68 0.1 70);
-  --chart-4: oklch(0.55 0.1 330);
-  --chart-5: oklch(0.6 0.012 260);
+  --chart-1: oklch(0.52 0.14 170);
+  --chart-2: oklch(0.5 0.13 285);
+  --chart-3: oklch(0.6 0.15 55);
+  --chart-4: oklch(0.55 0.15 340);
+  --chart-5: oklch(0.55 0.13 120);
 
   --sidebar: oklch(0.975 0.004 250);
   --sidebar-foreground: var(--foreground);
@@ -224,15 +225,15 @@
   --level-2: oklch(0.62 0.1 178);
   --level-3: oklch(0.8 0.11 178);
 
-  --kt-foundational: oklch(0.72 0.07 255);
-  --kt-practical: oklch(0.75 0.1 178);
-  --kt-strategic: oklch(0.8 0.11 75);
+  --kt-foundational: oklch(0.64 0.13 255);
+  --kt-practical: oklch(0.66 0.15 60);
+  --kt-strategic: oklch(0.64 0.15 340);
 
-  --chart-1: var(--brand);
-  --chart-2: oklch(0.72 0.07 255);
-  --chart-3: oklch(0.8 0.11 75);
-  --chart-4: oklch(0.72 0.1 330);
-  --chart-5: oklch(0.65 0.01 260);
+  --chart-1: oklch(0.64 0.12 178);
+  --chart-2: oklch(0.64 0.13 285);
+  --chart-3: oklch(0.66 0.15 60);
+  --chart-4: oklch(0.64 0.15 340);
+  --chart-5: oklch(0.64 0.13 120);
 
   --sidebar: oklch(0.18 0.01 260);
   --sidebar-foreground: var(--foreground);

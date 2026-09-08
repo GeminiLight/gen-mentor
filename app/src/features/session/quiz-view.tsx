@@ -1,30 +1,42 @@
 "use client";
 
-import { Check, X } from "lucide-react";
-import { useState } from "react";
+import { Flame } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { DocumentQuiz } from "@/lib/schemas";
-import { emptySelections, judge, questionKey, type Selections, type Verdict } from "@/lib/quiz";
+import { emptySelections, judge, questionKey, resolveOption, type Selections } from "@/lib/quiz";
 import type { QuizResults } from "@/lib/store/types";
 import { cn } from "@/lib/utils";
+import { Option, Question } from "./quiz-question";
 
-function VerdictMark({ v }: { v: Verdict | undefined }) {
-  if (!v || v === "answered") return null;
-  return (
-    <span className={cn("ml-2 inline-flex items-center gap-1 text-xs font-medium", v === "correct" ? "text-success" : v === "incorrect" ? "text-destructive" : "text-muted-foreground")}>
-      {v === "correct" ? <Check className="size-3.5" aria-hidden /> : v === "incorrect" ? <X className="size-3.5" aria-hidden /> : null}
-      {v === "correct" ? "Correct" : v === "incorrect" ? "Incorrect" : "Not answered"}
-    </span>
-  );
-}
-
-/** Radio / checkbox / true-false / short-answer questions with instant verdicts on submit. */
+/**
+ * Each choice question is judged the moment it is answered, so the verdict is instant and a
+ * streak of consecutive correct answers is visible while it lasts. Short answers are judged
+ * on finish only. The final results go to the archive and, from there, to the profiler.
+ */
 export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; results?: QuizResults; onSubmit: (r: QuizResults) => void }) {
   const [sel, setSel] = useState<Selections>(() => emptySelections(quiz));
-  const submitted = !!results;
-  const v = results?.verdicts ?? {};
+  const [order, setOrder] = useState<string[]>([]);
+  const finished = !!results;
+  // Live verdicts for what has been answered so far; the stored results win once finished.
+  const live = useMemo(() => judge(quiz, sel), [quiz, sel]);
+  const verdicts = results?.verdicts ?? live.verdicts;
+  const judged = (key: string) => finished || (verdicts[key] !== undefined && verdicts[key] !== "unanswered");
+  const streak = useMemo(() => {
+    let run = 0;
+    for (const key of [...order].reverse()) {
+      if (verdicts[key] === "correct") run += 1;
+      else break;
+    }
+    return run;
+  }, [order, verdicts]);
+  const answered = Object.values(live.verdicts).filter((v) => v !== "unanswered").length;
+  const total = quiz.single_choice_questions.length + quiz.multiple_choice_questions.length + quiz.true_false_questions.length + quiz.short_answer_questions.length;
+  const answer = (key: string, next: Selections) => {
+    setSel(next);
+    setOrder((o) => (o.includes(key) ? o : [...o, key]));
+  };
   let n = 0;
 
   return (
@@ -35,84 +47,89 @@ export function QuizView({ quiz, results, onSubmit }: { quiz: DocumentQuiz; resu
         onSubmit(judge(quiz, sel));
       }}
     >
-      {quiz.single_choice_questions.map((q, i) => (
-        <fieldset key={`s${i}`} disabled={submitted} className="space-y-3">
-          <legend className="font-medium">
-            <span className="num text-muted-foreground">{++n}.</span> {q.question}
-            <VerdictMark v={v[questionKey("single", i)]} />
-          </legend>
-          {q.options.map((opt, k) => (
-            <Label key={k} className="flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-normal has-checked:border-brand has-checked:bg-brand-soft/40">
-              <input type="radio" name={`single-${i}`} className="accent-brand" checked={sel.single[i] === k} onChange={() => setSel({ ...sel, single: sel.single.map((x, j) => (j === i ? k : x)) })} />
-              {opt}
-            </Label>
-          ))}
-          {submitted && q.explanation && <p className="text-sm text-muted-foreground">{q.explanation}</p>}
-        </fieldset>
-      ))}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 px-4 py-2 text-sm" aria-live="polite">
+        <span className="num text-muted-foreground">
+          {answered} / {total} answered
+        </span>
+        <span className={cn("num inline-flex items-center gap-1.5 font-medium transition-colors", streak >= 2 ? "text-brand" : "text-muted-foreground")} data-testid="streak">
+          <Flame className={cn("size-4", streak >= 2 && "fill-current")} aria-hidden />
+          {streak >= 2 ? `${streak} in a row` : "streak"}
+        </span>
+      </div>
 
-      {quiz.multiple_choice_questions.map((q, i) => (
-        <fieldset key={`m${i}`} disabled={submitted} className="space-y-3">
-          <legend className="font-medium">
-            <span className="num text-muted-foreground">{++n}.</span> {q.question} <span className="text-xs text-muted-foreground">(select all that apply)</span>
-            <VerdictMark v={v[questionKey("multiple", i)]} />
-          </legend>
-          {q.options.map((opt, k) => (
-            <Label key={k} className="flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-normal has-checked:border-brand has-checked:bg-brand-soft/40">
-              <input
-                type="checkbox"
-                className="accent-brand"
-                checked={sel.multiple[i]?.includes(k) ?? false}
-                onChange={(e) => setSel({ ...sel, multiple: sel.multiple.map((x, j) => (j === i ? (e.target.checked ? [...x, k] : x.filter((y) => y !== k)) : x)) })}
-              />
-              {opt}
-            </Label>
-          ))}
-          {submitted && q.explanation && <p className="text-sm text-muted-foreground">{q.explanation}</p>}
-        </fieldset>
-      ))}
-
-      {quiz.true_false_questions.map((q, i) => (
-        <fieldset key={`t${i}`} disabled={submitted} className="space-y-3">
-          <legend className="font-medium">
-            <span className="num text-muted-foreground">{++n}.</span> {q.question}
-            <VerdictMark v={v[questionKey("tf", i)]} />
-          </legend>
-          <div className="flex gap-3">
-            {[true, false].map((val) => (
-              <Label key={String(val)} className="flex flex-1 cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-normal has-checked:border-brand has-checked:bg-brand-soft/40">
-                <input type="radio" name={`tf-${i}`} className="accent-brand" checked={sel.tf[i] === val} onChange={() => setSel({ ...sel, tf: sel.tf.map((x, j) => (j === i ? val : x)) })} />
-                {val ? "True" : "False"}
-              </Label>
+      {quiz.single_choice_questions.map((q, i) => {
+        const key = questionKey("single", i);
+        const want = resolveOption(q.options, q.correct_option);
+        return (
+          <Question key={key} n={++n} text={q.question} verdict={verdicts[key]} explanation={q.explanation}>
+            {q.options.map((opt, k) => (
+              <Option key={k} name={key} type="radio" checked={sel.single[i] === k} judged={judged(key)} correct={want === null ? null : k === want} onChange={() => answer(key, { ...sel, single: sel.single.map((x, j) => (j === i ? k : x)) })}>
+                {opt}
+              </Option>
             ))}
-          </div>
-          {submitted && q.explanation && <p className="text-sm text-muted-foreground">{q.explanation}</p>}
-        </fieldset>
-      ))}
+          </Question>
+        );
+      })}
 
-      {quiz.short_answer_questions.map((q, i) => (
-        <fieldset key={`a${i}`} disabled={submitted} className="space-y-3">
-          <legend className="font-medium">
-            <span className="num text-muted-foreground">{++n}.</span> {q.question}
-          </legend>
-          <Textarea rows={3} value={sel.short[i] ?? ""} onChange={(e) => setSel({ ...sel, short: sel.short.map((x, j) => (j === i ? e.target.value : x)) })} aria-label={`Answer to question ${n}`} />
-          {submitted && (
-            <p className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">Expected:</span> {q.expected_answer}
-              {q.explanation ? ` — ${q.explanation}` : ""}
-            </p>
-          )}
-        </fieldset>
-      ))}
+      {quiz.multiple_choice_questions.map((q, i) => {
+        const key = questionKey("multiple", i);
+        const want = q.correct_options.map((c) => resolveOption(q.options, c));
+        const locked = finished || verdicts[key] === "correct" || verdicts[key] === "incorrect";
+        return (
+          <Question key={key} n={++n} text={q.question} hint="select all that apply, then confirm" verdict={locked ? verdicts[key] : undefined} explanation={q.explanation}>
+            {q.options.map((opt, k) => (
+              <Option
+                key={k}
+                name={`${key}-${k}`}
+                type="checkbox"
+                checked={sel.multiple[i]?.includes(k) ?? false}
+                judged={locked}
+                correct={want.includes(k)}
+                onChange={() => setSel({ ...sel, multiple: sel.multiple.map((x, j) => (j === i ? (x.includes(k) ? x.filter((y) => y !== k) : [...x, k]) : x)) })}
+              >
+                {opt}
+              </Option>
+            ))}
+            {!locked && (
+              <Button type="button" variant="outline" size="sm" disabled={(sel.multiple[i]?.length ?? 0) === 0} onClick={() => setOrder((o) => (o.includes(key) ? o : [...o, key]))}>
+                Confirm
+              </Button>
+            )}
+          </Question>
+        );
+      })}
 
-      {!submitted ? (
-        <Button type="submit" data-testid="submit-quiz">
-          Check answers
+      {quiz.true_false_questions.map((q, i) => {
+        const key = questionKey("tf", i);
+        return (
+          <Question key={key} n={++n} text={q.question} verdict={verdicts[key]} explanation={q.explanation}>
+            <div className="flex gap-3">
+              {[true, false].map((val) => (
+                <Option key={String(val)} name={key} type="radio" checked={sel.tf[i] === val} judged={judged(key)} correct={val === q.correct_answer} onChange={() => answer(key, { ...sel, tf: sel.tf.map((x, j) => (j === i ? val : x)) })}>
+                  {val ? "True" : "False"}
+                </Option>
+              ))}
+            </div>
+          </Question>
+        );
+      })}
+
+      {quiz.short_answer_questions.map((q, i) => {
+        const key = questionKey("short", i);
+        return (
+          <Question key={key} n={++n} text={q.question} verdict={finished ? verdicts[key] : undefined} explanation={finished ? `Expected: ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}` : undefined}>
+            <Textarea rows={3} value={sel.short[i] ?? ""} disabled={finished} onChange={(e) => setSel({ ...sel, short: sel.short.map((x, j) => (j === i ? e.target.value : x)) })} aria-label={`Answer to question ${n}`} />
+          </Question>
+        );
+      })}
+
+      {!finished ? (
+        <Button type="submit" data-testid="submit-quiz" disabled={answered === 0}>
+          Finish quiz
         </Button>
       ) : (
         <p className="num text-sm" data-testid="quiz-score">
           <span className="font-medium">{results.correct}</span> of {results.answered} answered correctly
-          {results.answered === 0 ? " (nothing was answered)" : ""}
         </p>
       )}
     </form>

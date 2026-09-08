@@ -34,8 +34,8 @@ OKLCH 定义，明暗各一套，`.dark` class 切换，默认跟随系统。
 | `brand` `brand-soft` `brand-foreground` | 唯一饱和色（色相 178）。`primary` 与 `ring` 指向它。只用于当前进度和主行动，用在第三处就说明它不该是强调色 |
 | `success` `warning` `destructive` 及 `-soft` | 语义色，必须配图标或文字，不单独承载含义 |
 | `level-0` 到 `level-3` | 掌握度阶梯 unlearned → advanced，由真实学习记录驱动 |
-| `kt-foundational` `kt-practical` `kt-strategic` | 知识点三类，低饱和、色相区分 |
-| `chart-1` 到 `chart-5` | 图表序列，`chart-1` 即 brand |
+| `kt-foundational` `kt-practical` `kt-strategic` | 知识点三类。只做色块与圆点，不做文字；已用 dataviz 校验器在两套主题下通过 CVD 与对比度检查 |
+| `chart-1` 到 `chart-5` | 分类图表序列，固定顺序不循环，已用校验器通过。改动前重新跑 `validate_palette.js` |
 
 ## 宽度与间距
 
