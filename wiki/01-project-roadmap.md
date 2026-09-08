@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: M0 -->
+<!-- Last verified: 2026-09-09 | Current stage: M2 -->
 
 # 项目路线图
 
@@ -7,8 +7,8 @@
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
 | M0 | 骨架、闸门通路、LLM 核心层、回放模式、E2E 工程 | done |
-| M1 | 九个 agent、prompts 逐字迁移、zod schema、十个 route | doing |
-| M2 | 设计系统与 `/_design` 靶子 | todo |
+| M1 | 九个 agent、prompts 逐字迁移、zod schema、十个 route | done |
+| M2 | 设计系统与 `/_design` 靶子 | doing |
 | M3 | 核心旅程与本地档案 | todo |
 | M4 | 游戏化层 | todo |
 | M5 | 精致度与部署 | todo |
@@ -27,3 +27,15 @@
 | 主题（class 模式，跟随系统） | `app/src/components/theme-provider.tsx` | done |
 | Playwright 截图、axe、健康检查 spec | `e2e/specs/` | done |
 | CI 跑 `make gate` | `.github/workflows/gate.yml` | done |
+
+## M1 功能索引
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 12 组 prompt 逐字迁移（含 mapper、content creator、feedback simulator） | `app/src/lib/prompts/` | done |
+| zod schema 对应全部 Pydantic 模型 | `app/src/lib/schemas/` | done |
+| agent 编排与校验修复重问 | `app/src/lib/agents/` | done |
+| 十个 POST route | `app/src/app/api/*/route.ts` | done |
+| Tavily 搜索（可选） | `app/src/lib/search.ts` | done |
+| 单元测试（fake LLM） | `app/src/lib/agents/__tests__/` | done |
+| E2E 在 replay 下打通全部 route | `e2e/specs/agents.spec.ts` + `e2e/fixtures/llm/` | done |

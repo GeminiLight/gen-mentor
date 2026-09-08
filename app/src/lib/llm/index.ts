@@ -115,8 +115,15 @@ async function* liveDeltas(o: ChatOpts, model: string): AsyncGenerator<string> {
   }
 }
 
+/**
+ * The fast tier is for short, well-specified tasks; extended thinking there only adds latency
+ * (measured on the GLM gateway: 30s → 18s for the same answer). Callers can still opt in.
+ */
+const withTierDefaults = (o: ChatOpts): ChatOpts => (o.tier === "fast" && o.thinking === undefined ? { ...o, thinking: false } : o);
+
 /** One-shot call. Honors record / replay. */
-export async function chatText(o: ChatOpts): Promise<string> {
+export async function chatText(input: ChatOpts): Promise<string> {
+  const o = withTierDefaults(input);
   const model = MODELS[o.tier];
   const mode = llmMode();
   if (mode === "replay") return readFixture(o, model).text;
@@ -126,7 +133,8 @@ export async function chatText(o: ChatOpts): Promise<string> {
 }
 
 /** Streaming call. In replay the recorded text is re-chunked so the UI path is exercised. */
-export function chatStream(o: ChatOpts): TextRun {
+export function chatStream(input: ChatOpts): TextRun {
+  const o = withTierDefaults(input);
   const model = MODELS[o.tier];
   const mode = llmMode();
   let acc = "";

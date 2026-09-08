@@ -18,6 +18,23 @@ describe("extractJSON", () => {
   it("repairs a truncated tail, keeping the partial string so streaming UIs can show it", () => {
     expect(extractJSON('{"skills": [{"name": "SQL", "level": "beg')).toEqual({ skills: [{ name: "SQL", level: "beg" }] });
   });
+  it("ignores code fences that live inside string values", () => {
+    const text = '{"title": "T", "content": "Run this:\\n```python\\nx = [1, 2]\\n```\\nDone."}\n}';
+    expect(extractJSON(text)).toEqual({ title: "T", content: "Run this:\n```python\nx = [1, 2]\n```\nDone." });
+  });
+  it("cuts a stray trailing brace", () => {
+    expect(extractJSON('{"a": {"b": 1}}\n}')).toEqual({ a: { b: 1 } });
+  });
+  it("never returns a fragment from inside a string when the document is broken", () => {
+    const broken = '{"content": "prices ```python\\n[19.99, 24.5]\\n``` and \\", \\"summary\\": \\"x';
+    let out: unknown;
+    try {
+      out = extractJSON(broken);
+    } catch (e) {
+      out = e;
+    }
+    expect(Array.isArray(out)).toBe(false);
+  });
   it("throws a retryable error when there is no JSON at all", () => {
     expect(() => extractJSON("no json here")).toThrowError(LLMError);
   });

@@ -45,3 +45,17 @@
 `var(--font-sans)`，而 `next/font` 注入的是 `--font-geist-sans`。自引用无效，浏览器回落默认字体。
 解法：`--font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, …`。换字体时同步
 `layout.tsx` 的 `variable` 名与这一行。
+
+## 网关很慢，`thinking: disabled` 也只是减半
+
+现象：`glm-5.3-flash` 对一个 37 token 的请求默认要 30 秒（2077 个 reasoning token），
+传 `thinking:{type:"disabled"}` 后 18 秒，但 `usage` 里仍有 618 个 reasoning token。
+profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟，E2E 默认 180 秒超时会挂。
+解法：fast 档默认 `thinking:false`（`lib/llm/index.ts#withTierDefaults`）；E2E agent spec 单测
+预算 480 秒、请求 420 秒；录制时 4 路并行。
+教训：这台网关上"关闭思考"是尽力而为，不是保证。真正解决延迟要靠流式输出让人看到进度。
+
+## `next start` 不支持 `output: "standalone"`
+
+现象：启动日志有 `⚠ "next start" does not work with "output: standalone"`，页面仍能服务但行为不可靠。
+解法：只有容器镜像构建时设 `GENMENTOR_STANDALONE=1` 才输出 standalone，本地与 Vercel 都不设。

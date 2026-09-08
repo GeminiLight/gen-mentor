@@ -82,7 +82,9 @@ export function escapeControlCharsInStrings(src: string): string {
 export function parsePartialJSON<T = unknown>(text: string): Partial<T> | null {
   let s = text;
   const fence = s.indexOf("```");
-  if (fence !== -1) s = s.slice(fence + 3).replace(/^json/i, "");
+  const firstBrace = Math.min(...["{", "["].map((c) => (s.indexOf(c) === -1 ? Infinity : s.indexOf(c))));
+  // Only a fence that precedes the document is a wrapper; later ones live inside string values.
+  if (fence !== -1 && fence < firstBrace) s = s.slice(fence + 3).replace(/^json/i, "");
   const start = Math.min(...["{", "["].map((c) => (s.indexOf(c) === -1 ? Infinity : s.indexOf(c))));
   if (start === Infinity) return null;
   s = fixUnescapedQuotes(escapeControlCharsInStrings(s.slice(start)));

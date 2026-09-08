@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Self-hosted deploys ship `.next/standalone`. Vercel does its own tracing and
-  // its builder breaks on standalone output, so skip it there.
-  output: process.env.VERCEL ? undefined : "standalone",
+  // The container image ships `.next/standalone` (see Dockerfile). Everywhere else
+  // `next start` is used, which does not work with standalone output.
+  output: process.env.GENMENTOR_STANDALONE ? "standalone" : undefined,
   reactStrictMode: true,
   poweredByHeader: false,
 };

@@ -78,11 +78,22 @@ export function openaiArgs(o: ChatOpts, model: string, tokenParam: TokenParam, d
   };
 }
 
+/**
+ * Drop a ```json fence only when it wraps the document. Drafts legitimately contain
+ * ```python fences inside string values; matching those would hand back a code sample.
+ */
+export function stripLeadingFence(s: string): string {
+  const fenceAt = s.indexOf("```");
+  const braceAt = Math.min(...["{", "["].map((c) => (s.indexOf(c) === -1 ? Infinity : s.indexOf(c))));
+  if (fenceAt === -1 || fenceAt > braceAt) return s;
+  const inner = s.slice(fenceAt + 3).replace(/^json/i, "");
+  const close = inner.lastIndexOf("```");
+  return (close === -1 ? inner : inner.slice(0, close)).trim();
+}
+
 /** Slice out the first balanced JSON object or array, skipping fences and prose. */
 function isolateJSON(text: string): string {
-  let s = text.trim();
-  const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (fence) s = fence[1].trim();
+  let s = stripLeadingFence(text.trim());
   const start = Math.min(...["{", "["].map((c) => (s.indexOf(c) === -1 ? Infinity : s.indexOf(c))));
   if (start === Infinity) throw new LLMError("Model returned no JSON", 502, true);
   s = s.slice(start);

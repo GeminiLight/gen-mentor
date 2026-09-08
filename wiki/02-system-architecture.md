@@ -58,3 +58,4 @@ route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组�
 | `LLM_OPENAI_TOKEN_PARAM` | `max_tokens` 或 `max_completion_tokens` | `max_tokens` |
 | `GENMENTOR_LLM_MODE` | `live` / `record` / `replay` | `live` |
 | `GENMENTOR_LLM_FIXTURES` | fixture 目录 | `../e2e/fixtures/llm` |
+| `TAVILY_API_KEY` | 可选，起草与导师对话的外部资源检索 | 不检索 |
