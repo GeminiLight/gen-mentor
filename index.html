@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
-    // Apply the color theme before first paint to avoid a flash: an explicit
+    // Apply the colour theme before first paint to avoid a flash: an explicit
     // choice from localStorage wins, otherwise follow the system preference.
     (function () {
       try {
@@ -16,139 +17,227 @@
       } catch (e) { /* private mode etc. — stay light */ }
     })();
   </script>
-  <!-- Meta tags for social media banners -->
+
+  <title>GenMentor: LLM-powered Goal-oriented Tutoring System (WWW 2025)</title>
   <meta name="description"
-    content="GenMentor: A goal-oriented tutoring system leveraging large language models (LLMs) for personalized learning experiences in educational contexts.">
-  <meta property="og:title" content="GenMentor: LLM-powered & Goal-oriented Tutor" />
+    content="Open-source LLM-powered multi-agent tutoring system for goal-oriented learning: goal-to-skill mapping, learner modeling, personalized paths. WWW 2025 Oral.">
+  <link rel="canonical" href="https://tianfuwang.tech/gen-mentor/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Tianfu Wang">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15161a">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GenMentor">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="GenMentor: LLM-powered Goal-oriented Tutoring System (WWW 2025)">
   <meta property="og:description"
-    content="GenMentor is a personalized tutoring system that leverages large language models to optimize learning paths based on individual goals and profiles." />
-  <meta property="og:url" content="https://www.tianfuwang.tech/gen-mentor/" />
-  <meta property="og:image" content="https://www.tianfuwang.tech/gen-mentor/static/images/og_banner.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-
-  <meta name="twitter:title" content="GenMentor: LLM-powered & Goal-oriented Tutor">
+    content="Open-source LLM-powered multi-agent tutoring system for goal-oriented learning: goal-to-skill mapping, learner modeling, personalized paths. WWW 2025 Oral.">
+  <meta property="og:url" content="https://tianfuwang.tech/gen-mentor/">
+  <meta property="og:image" content="https://tianfuwang.tech/gen-mentor/static/images/og_banner.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="GenMentor wordmark with the tagline LLM-powered and Goal-oriented Tutoring System, WWW 2025 Oral Presentation">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GenMentor: LLM-powered Goal-oriented Tutoring System (WWW 2025)">
   <meta name="twitter:description"
-    content="GenMentor optimizes personalized learning through AI, empowering users to achieve their learning goals efficiently.">
-  <!-- <meta name="twitter:image" content="static/images/genmentor_twitter_banner.png"> -->
-  <!-- <meta name="twitter:card" content="summary_large_image"> -->
-  <meta name="keywords" content="AI, Learning Path, Personalized Tutoring, Goal-oriented Learning, GenMentor, LLM">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    content="Open-source LLM-powered multi-agent tutoring system for goal-oriented learning: goal-to-skill mapping, learner modeling, personalized paths. WWW 2025 Oral.">
+  <meta name="twitter:image" content="https://tianfuwang.tech/gen-mentor/static/images/og_banner.png">
+  <meta name="twitter:image:alt" content="GenMentor wordmark with the tagline LLM-powered and Goal-oriented Tutoring System, WWW 2025 Oral Presentation">
 
-  <title>GenMentor: LLM-powered &amp; Goal-oriented Tutoring System</title>
+  <!-- Google Scholar / Highwire citation tags -->
+  <meta name="citation_title" content="LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System">
+  <meta name="citation_author" content="Wang, Tianfu">
+  <meta name="citation_author" content="Zhan, Yi">
+  <meta name="citation_author" content="Lian, Jianxun">
+  <meta name="citation_author" content="Hu, Zhengyu">
+  <meta name="citation_author" content="Yuan, Nicholas Jing">
+  <meta name="citation_author" content="Zhang, Qi">
+  <meta name="citation_author" content="Xie, Xing">
+  <meta name="citation_author" content="Xiong, Hui">
+  <meta name="citation_publication_date" content="2025/05/08">
+  <meta name="citation_conference_title" content="Companion Proceedings of the ACM on Web Conference 2025 (WWW Companion '25)">
+  <meta name="citation_publisher" content="ACM">
+  <meta name="citation_doi" content="10.1145/3701716.3715244">
+  <meta name="citation_arxiv_id" content="2501.15749">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2501.15749">
+  <meta name="citation_abstract_html_url" content="https://tianfuwang.tech/gen-mentor/">
+
   <link rel="icon" type="image/png" href="static/images/favicon.png">
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="apple-touch-icon" href="static/images/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Noto+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 
   <link rel="stylesheet" href="static/css/bulma.min.css">
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="static/js/fontawesome.all.min.js"></script>
-  <script src="static/js/bulma-carousel.min.js"></script>
-  <script src="static/js/bulma-slider.min.js"></script>
-  <script src="static/js/index.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://tianfuwang.tech/gen-mentor/#website",
+        "url": "https://tianfuwang.tech/gen-mentor/",
+        "name": "GenMentor",
+        "description": "GenMentor is an open-source, LLM-powered multi-agent tutoring system for goal-oriented learning.",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://tianfuwang.tech/#person" }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://tianfuwang.tech/gen-mentor/#webpage",
+        "url": "https://tianfuwang.tech/gen-mentor/",
+        "name": "GenMentor: LLM-powered Goal-oriented Tutoring System (WWW 2025)",
+        "description": "Open-source LLM-powered multi-agent tutoring system for goal-oriented learning: goal-to-skill mapping, learner modeling, personalized paths. WWW 2025 Oral.",
+        "inLanguage": "en",
+        "isPartOf": { "@id": "https://tianfuwang.tech/gen-mentor/#website" },
+        "about": { "@id": "https://tianfuwang.tech/gen-mentor/#article" },
+        "mainEntity": { "@id": "https://tianfuwang.tech/gen-mentor/#article" },
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": "https://tianfuwang.tech/gen-mentor/static/images/og_banner.png",
+          "width": 1200,
+          "height": 630
+        },
+        "datePublished": "2025-01-27",
+        "dateModified": "2026-09-09",
+        "author": { "@id": "https://tianfuwang.tech/#person" }
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://tianfuwang.tech/gen-mentor/#article",
+        "headline": "LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System",
+        "alternativeHeadline": "GenMentor",
+        "url": "https://doi.org/10.1145/3701716.3715244",
+        "sameAs": [
+          "https://doi.org/10.1145/3701716.3715244",
+          "https://arxiv.org/abs/2501.15749"
+        ],
+        "identifier": [
+          { "@type": "PropertyValue", "propertyID": "DOI", "value": "10.1145/3701716.3715244" },
+          { "@type": "PropertyValue", "propertyID": "arXiv", "value": "2501.15749" }
+        ],
+        "datePublished": "2025-05-08",
+        "publisher": { "@type": "Organization", "name": "Association for Computing Machinery" },
+        "isPartOf": {
+          "@type": "Periodical",
+          "name": "Companion Proceedings of the ACM on Web Conference 2025"
+        },
+        "image": "https://tianfuwang.tech/gen-mentor/static/images/genmentor-framework.png",
+        "keywords": ["intelligent tutoring system", "goal-oriented learning", "large language models", "multi-agent framework", "personalized learning path", "skill gap identification"],
+        "abstract": "Intelligent Tutoring Systems (ITSs) have revolutionized education by offering personalized learning experiences. However, as goal-oriented learning, which emphasizes efficiently achieving specific objectives, becomes increasingly important in professional contexts, existing ITSs often struggle to deliver this type of targeted learning experience. In this paper, we propose GenMentor, an LLM-powered multi-agent framework designed to deliver goal-oriented, personalized learning within ITS. GenMentor begins by accurately mapping learners' goals to required skills using a fine-tuned LLM trained on a custom goal-to-skill dataset. After identifying the skill gap, it schedules an efficient learning path using an evolving optimization approach, driven by a comprehensive and dynamic profile of learners' multifaceted status. Additionally, GenMentor tailors learning content with an exploration-drafting-integration mechanism to align with individual learner needs. Extensive automated and human evaluations demonstrate GenMentor's effectiveness in learning guidance and content quality. Furthermore, we have deployed it in practice and also implemented it as an application. Practical human study with professional learners further highlights its effectiveness in goal alignment and resource targeting, leading to enhanced personalization.",
+        "author": [
+          { "@id": "https://tianfuwang.tech/#person" },
+          { "@type": "Person", "name": "Yi Zhan", "affiliation": { "@type": "Organization", "name": "Microsoft" } },
+          { "@type": "Person", "name": "Jianxun Lian", "url": "https://www.microsoft.com/en-us/research/people/jialia/", "affiliation": { "@type": "Organization", "name": "Microsoft Research Asia" } },
+          { "@type": "Person", "name": "Zhengyu Hu", "url": "https://ppsmk388.github.io/", "affiliation": { "@type": "Organization", "name": "The Hong Kong University of Science and Technology (Guangzhou)" } },
+          { "@type": "Person", "name": "Nicholas Jing Yuan", "url": "https://www.microsoft.com/en-us/research/people/nicholasyuan/", "affiliation": { "@type": "Organization", "name": "Microsoft" } },
+          { "@type": "Person", "name": "Qi Zhang", "url": "https://www.microsoft.com/en-us/aprd/aboutus/leadership/qizhang", "affiliation": { "@type": "Organization", "name": "Microsoft" } },
+          { "@type": "Person", "name": "Xing Xie", "url": "https://www.microsoft.com/en-us/research/people/xingx/", "affiliation": { "@type": "Organization", "name": "Microsoft Research Asia" } },
+          { "@type": "Person", "name": "Hui Xiong", "url": "https://www.hkust-gz.edu.cn/people/hui-xiong/", "affiliation": { "@type": "Organization", "name": "The Hong Kong University of Science and Technology (Guangzhou)" } }
+        ]
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "https://tianfuwang.tech/gen-mentor/#code",
+        "name": "GenMentor",
+        "description": "Official implementation of GenMentor, an LLM-powered multi-agent framework for goal-oriented learning in intelligent tutoring systems.",
+        "url": "https://tianfuwang.tech/gen-mentor/",
+        "codeRepository": "https://github.com/GeminiLight/gen-mentor",
+        "programmingLanguage": "Python",
+        "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "author": { "@id": "https://tianfuwang.tech/#person" },
+        "citation": { "@id": "https://tianfuwang.tech/gen-mentor/#article" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://tianfuwang.tech/#person",
+        "name": "Tianfu Wang",
+        "url": "https://tianfuwang.tech/",
+        "affiliation": { "@type": "Organization", "name": "The Hong Kong University of Science and Technology (Guangzhou)" },
+        "sameAs": ["https://github.com/GeminiLight"]
+      }
+    ]
+  }
+  </script>
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
 
-  <nav class="navbar is-fixed-top is-light" role="navigation" aria-label="main navigation">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="navbar is-fixed-top site-nav" role="navigation" aria-label="Main navigation">
     <div class="container">
       <div class="navbar-brand">
-        <a class="navbar-item" href="#">
-          <img src="static/images/favicon.png" alt="GenMentor Logo" class="mr-2">
-          <span class="has-text-weight-bold is-size-4 gradient-text">GenMentor</span>
+        <a class="navbar-item" href="#" aria-label="GenMentor, back to top">
+          <img src="static/images/favicon.png" alt="" class="brand-mark" width="28" height="28">
+          <span class="brand-name gradient-text">GenMentor</span>
         </a>
 
-        <a class="button theme-toggle is-hidden-desktop navbar-theme-toggle" role="button" tabindex="0"
-          aria-label="Toggle dark mode" title="Toggle light/dark theme">
-          <span class="icon theme-icon theme-icon-moon"><i class="fas fa-moon"></i></span>
-          <span class="icon theme-icon theme-icon-sun"><i class="fas fa-sun"></i></span>
-        </a>
+        <button class="button theme-toggle is-hidden-desktop navbar-theme-toggle" type="button"
+          aria-label="Switch to dark theme" title="Switch to dark theme">
+          <span class="icon theme-icon theme-icon-moon" aria-hidden="true"><i class="fas fa-moon"></i></span>
+          <span class="icon theme-icon theme-icon-sun" aria-hidden="true"><i class="fas fa-sun"></i></span>
+        </button>
 
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+        <a role="button" class="navbar-burger" aria-label="Open menu" aria-expanded="false"
+          aria-controls="navbarMenu" href="#navbarMenu">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
         </a>
       </div>
 
-      <div id="navbarBasic" class="navbar-menu">
+      <div id="navbarMenu" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" href="#abstract">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-file-alt"></i>
-              </span>
-              <span>Abstract</span>
-            </span>
+            <span class="icon" aria-hidden="true"><i class="fas fa-file-alt"></i></span>
+            <span>Abstract</span>
           </a>
-
           <a class="navbar-item" href="#motivation">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-lightbulb"></i>
-              </span>
-              <span>Motivation</span>
-            </span>
+            <span class="icon" aria-hidden="true"><i class="fas fa-lightbulb"></i></span>
+            <span>Motivation</span>
           </a>
-
           <a class="navbar-item" href="#framework">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-project-diagram"></i>
-              </span>
-              <span>Framework</span>
-            </span>
+            <span class="icon" aria-hidden="true"><i class="fas fa-project-diagram"></i></span>
+            <span>Framework</span>
           </a>
-
           <a class="navbar-item" href="#results">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-chart-bar"></i>
-              </span>
-              <span>Results</span>
-            </span>
+            <span class="icon" aria-hidden="true"><i class="fas fa-chart-bar"></i></span>
+            <span>Results</span>
           </a>
-
           <a class="navbar-item" href="#demo">
-            <span class="icon-text">
-              <span class="icon">
-                <i class="fas fa-play-circle"></i>
-              </span>
-              <span>Video</span>
-            </span>
+            <span class="icon" aria-hidden="true"><i class="fas fa-play-circle"></i></span>
+            <span>Video</span>
           </a>
         </div>
 
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-primary" href="https://arxiv.org/pdf/2501.15749.pdf" target="_blank" rel="noopener">
-                <span class="icon">
-                  <i class="fas fa-file-pdf"></i>
-                </span>
+              <a class="button is-primary" href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener">
+                <span class="icon" aria-hidden="true"><i class="fas fa-file-pdf"></i></span>
                 <span>Paper</span>
               </a>
-              <a class="button is-dark" href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener">
-                <span class="icon">
-                  <i class="fab fa-github"></i>
-                </span>
+              <a class="button is-ghost-pill" href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener">
+                <span class="icon" aria-hidden="true"><i class="fab fa-github"></i></span>
                 <span>GitHub</span>
               </a>
-              <a class="button theme-toggle" id="theme-toggle" role="button" tabindex="0"
-                aria-label="Toggle dark mode" title="Toggle light/dark theme">
-                <!-- Both icons are rendered; CSS shows the one for the OTHER
-                     theme (moon in light mode, sun in dark mode). -->
-                <span class="icon theme-icon theme-icon-moon"><i class="fas fa-moon"></i></span>
-                <span class="icon theme-icon theme-icon-sun"><i class="fas fa-sun"></i></span>
-              </a>
+              <button class="button theme-toggle" id="theme-toggle" type="button"
+                aria-label="Switch to dark theme" title="Switch to dark theme">
+                <span class="icon theme-icon theme-icon-moon" aria-hidden="true"><i class="fas fa-moon"></i></span>
+                <span class="icon theme-icon theme-icon-sun" aria-hidden="true"><i class="fas fa-sun"></i></span>
+              </button>
             </div>
           </div>
         </div>
@@ -156,719 +245,637 @@
     </div>
   </nav>
 
-  <section class="hero">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered">
-          <div class="column has-text-centered">
-            <h1 class="publication-title">
-              <div class="title-main mb-2 gradient-text">
-                <img src="static/images/favicon.png" alt="GenMentor Logo" class="title-logo">
-                <span class="is-size-1 gradient-text">GenMentor</span>
-              </div>
-              <div class="title-subtitle is-size-3">
-                LLM-powered & Goal-oriented Tutoring System
-              </div>
-            </h1>
-            <div class="is-size-5 publication-authors">
-              <span class="author-block">
-                <a href="https://www.tianfuwang.tech" target="_blank">Tianfu Wang</a><sup>1</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://www.tianfuwang.tech/gen-mentor" target="_blank">Yi Zhan</a><sup>2</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://www.microsoft.com/en-us/research/people/jialia/" target="_blank">Jianxun
-                  Lian</a><sup>3</sup>
-              </span>
-              <span class="author-block">
-                <a href="https://ppsmk388.github.io/" target="_blank">Zhengyu Hu</a><sup>1</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://www.microsoft.com/en-us/research/people/nicholasyuan/" target="_blank">Nicholas Jing
-                  Yuan</a><sup>2,†</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://www.microsoft.com/en-us/aprd/aboutus/leadership/qizhang" target="_blank">Qi
-                  Zhang</a><sup>2</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://www.microsoft.com/en-us/research/people/xingx/" target="_blank">Xing
-                  Xie</a><sup>3</sup>,
-              </span>
-              <span class="author-block">
-                <a href="https://www.hkust-gz.edu.cn/people/hui-xiong/" target="_blank">Hui Xiong</a><sup>1,†</sup>
-              </span>
-            </div>
-            <div class="is-size-5 publication-authors">
-              <small>
-                <span class="author-block"><sup>1</sup>Hong Kong University of Science and Technology (Guangzhou)</span>
-                <span class="author-block"><sup>2</sup>Microsoft Inc.</span>
-                <span class="author-block"><sup>3</sup>Microsoft Research Asia</span>
-                <span class="eql-cntrb"><br><sup>†</sup>Indicates Corresponding Authors<br></span>
-              </small>
-              <span class="author-block venue-line">
-                <span class="venue-badge">
-                  <span class="icon"><i class="fas fa-trophy"></i></span>
-                  <span>WWW 2025 (Industry Track) &middot; <b>Oral Presentation</b></span>
-                </span>
-              </span>
-            </div>
+  <main id="main">
 
-            <div class="column has-text-centered">
-              <div class="publication-links">
-                <span class="link-block">
-                  <a href="https://arxiv.org/pdf/2501.15749.pdf" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                    </span>
-                    <span>Paper</span>
-                  </a>
-                </span>
-
-
-                <span class="link-block">
-                  <a href="https://gen-mentor.streamlit.app/" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fas fa-globe"></i>
-                    </span>
-                    <span>Demo</span>
-                  </a>
-                </span>
-
-                <span class="link-block">
-                  <a href="https://github.com/GeminiLight/gen-mentor" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fab fa-github"></i>
-                    </span>
-                    <span>Code</span>
-                  </a>
-                </span>
-
-                <!-- video -->
-                <span class="link-block">
-                  <a href="https://www.youtube.com/watch?v=vTdtGZop-Zc" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                    </span>
-                    <span>Video</span>
-                  </a>
-                </span>
-
-              </div>
-            </div>
-          </div>
-  </section>
-
-
-  <!-- Teaser video-->
-  <section class="hero teaser">
-    <div class="container is-max-desktop">
+    <!-- Title, authors, links -->
+    <section class="hero hero-intro" aria-labelledby="page-title">
       <div class="hero-body">
-        <!-- image -->
-        <h2 class="subtitle has-text-centered">
-          GenMentor achieves goal-oriented educational experiences by identifying knowledge gaps and tailoring learning
-          paths to
-          meet individual goals with precision.
-        </h2>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="stat-value">0.67</span>
-            <span class="stat-label">Goal-to-skill recall &mdash; +59% over the best prompt baseline</span>
-          </div>
-          <span class="stat-divider" aria-hidden="true"></span>
-          <div class="hero-stat">
-            <span class="stat-value">4.71<span class="stat-unit">/5</span></span>
-            <span class="stat-label">Learning-path engagement in evaluation</span>
-          </div>
-          <span class="stat-divider" aria-hidden="true"></span>
-          <div class="hero-stat">
-            <span class="stat-value">3</span>
-            <span class="stat-label">Adaptive agents for personalized tutoring</span>
+        <div class="container is-max-desktop has-text-centered">
+          <h1 class="publication-title" id="page-title">
+            <span class="title-main">
+              <img src="static/images/favicon.png" alt="" class="title-logo" width="68" height="68">
+              <span class="title-word gradient-text">GenMentor</span>
+            </span>
+            <span class="title-subtitle">LLM-powered &amp; Goal-oriented Tutoring System</span>
+          </h1>
+
+          <p class="hero-lede">
+            GenMentor is an open-source, LLM-powered multi-agent tutoring system for goal-oriented learning:
+            it maps a learner's goal to the skills required, schedules a personalized learning path and
+            generates tailored content. Accepted to WWW 2025 (Industry Track) as an oral presentation.
+          </p>
+
+          <p class="publication-authors">
+            <span class="author-block"><a href="https://tianfuwang.tech/" target="_blank" rel="noopener">Tianfu Wang</a><sup>1</sup>,</span>
+            <span class="author-block">Yi Zhan<sup>2</sup>,</span>
+            <span class="author-block"><a href="https://www.microsoft.com/en-us/research/people/jialia/" target="_blank" rel="noopener">Jianxun Lian</a><sup>3</sup>,</span>
+            <span class="author-block"><a href="https://ppsmk388.github.io/" target="_blank" rel="noopener">Zhengyu Hu</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://www.microsoft.com/en-us/research/people/nicholasyuan/" target="_blank" rel="noopener">Nicholas Jing Yuan</a><sup>2,&dagger;</sup>,</span>
+            <span class="author-block"><a href="https://www.microsoft.com/en-us/aprd/aboutus/leadership/qizhang" target="_blank" rel="noopener">Qi Zhang</a><sup>2</sup>,</span>
+            <span class="author-block"><a href="https://www.microsoft.com/en-us/research/people/xingx/" target="_blank" rel="noopener">Xing Xie</a><sup>3</sup>,</span>
+            <span class="author-block"><a href="https://www.hkust-gz.edu.cn/people/hui-xiong/" target="_blank" rel="noopener">Hui Xiong</a><sup>1,&dagger;</sup></span>
+          </p>
+          <p class="publication-affiliations">
+            <span class="affil-block"><sup>1</sup>Hong Kong University of Science and Technology (Guangzhou)</span>
+            <span class="affil-block"><sup>2</sup>Microsoft</span>
+            <span class="affil-block"><sup>3</sup>Microsoft Research Asia</span>
+            <span class="eql-cntrb"><sup>&dagger;</sup>Corresponding authors</span>
+          </p>
+
+          <p class="venue-line">
+            <span class="venue-badge">
+              <span class="icon" aria-hidden="true"><i class="fas fa-trophy"></i></span>
+              <span>WWW 2025 (Industry Track) &middot; <b>Oral Presentation</b></span>
+            </span>
+          </p>
+
+          <div class="publication-links">
+            <a href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener" class="button is-primary">
+              <span class="icon" aria-hidden="true"><i class="fas fa-file-pdf"></i></span>
+              <span>Paper</span>
+            </a>
+            <a href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener" class="button is-ghost-pill">
+              <span class="icon" aria-hidden="true"><i class="fab fa-github"></i></span>
+              <span>Code</span>
+            </a>
+            <a href="https://gen-mentor.streamlit.app/" target="_blank" rel="noopener" class="button is-ghost-pill">
+              <span class="icon" aria-hidden="true"><i class="fas fa-globe"></i></span>
+              <span>Demo</span>
+            </a>
+            <a href="https://www.youtube.com/watch?v=vTdtGZop-Zc" target="_blank" rel="noopener" class="button is-ghost-pill">
+              <span class="icon" aria-hidden="true"><i class="fab fa-youtube"></i></span>
+              <span>Video</span>
+            </a>
+            <a href="https://doi.org/10.1145/3701716.3715244" target="_blank" rel="noopener" class="button is-ghost-pill">
+              <span class="icon" aria-hidden="true"><i class="fas fa-book"></i></span>
+              <span>ACM DL</span>
+            </a>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
+    <!-- Tagline and headline numbers -->
+    <section class="hero teaser" aria-label="Key results">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <p class="teaser-tagline">
+            GenMentor delivers goal-oriented learning by identifying each learner's knowledge gap and
+            tailoring the learning path to meet their individual goal with precision.
+          </p>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="stat-value">0.67</span>
+              <span class="stat-label">Goal-to-skill recall, +59% over the best prompting baseline</span>
+            </div>
+            <span class="stat-divider" aria-hidden="true"></span>
+            <div class="hero-stat">
+              <span class="stat-value">4.71<span class="stat-unit">/5</span></span>
+              <span class="stat-label">Learning-path engagement rated by learners in the evaluation</span>
+            </div>
+            <span class="stat-divider" aria-hidden="true"></span>
+            <div class="hero-stat">
+              <span class="stat-value">3</span>
+              <span class="stat-label">Adaptive agents for personalized tutoring</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Image carousel -->
-  <section class="hero is-small">
-    <div class="hero-body">
+    <!-- Screenshot carousel -->
+    <section class="hero showcase" aria-label="Application screenshots">
+      <div class="hero-body">
+        <div class="container">
+          <div id="results-carousel" class="carousel results-carousel" data-items="1">
+            <div class="item">
+              <figure>
+                <img src="static/images/genmentor_demo_1.png" alt="GenMentor screen: goal and profile initialization"
+                  width="4455" height="2209" loading="lazy" decoding="async">
+                <figcaption>Goal &amp; Profile Initialization</figcaption>
+              </figure>
+            </div>
+            <div class="item">
+              <figure>
+                <img src="static/images/genmentor_demo_2.png" alt="GenMentor screen: skill gap identification"
+                  width="4451" height="2211" loading="lazy" decoding="async">
+                <figcaption>Skill Gap Identification</figcaption>
+              </figure>
+            </div>
+            <div class="item">
+              <figure>
+                <img src="static/images/genmentor_demo_3.png" alt="GenMentor screen: learning path scheduling"
+                  width="4447" height="2210" loading="lazy" decoding="async">
+                <figcaption>Learning Path Scheduling</figcaption>
+              </figure>
+            </div>
+            <div class="item">
+              <figure>
+                <img src="static/images/genmentor_demo_4.png" alt="GenMentor screen: learning content creation"
+                  width="4459" height="2210" loading="lazy" decoding="async">
+                <figcaption>Learning Content Creation</figcaption>
+              </figure>
+            </div>
+            <div class="item">
+              <figure>
+                <img src="static/images/genmentor_demo_5.png" alt="GenMentor screen: dynamic learner profile"
+                  width="4464" height="2210" loading="lazy" decoding="async">
+                <figcaption>Dynamic Learner Profile</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Abstract -->
+    <section class="site-section is-tinted" id="abstract" aria-labelledby="abstract-title">
+      <div class="container is-max-desktop">
+        <div class="section-head">
+          <p class="section-kicker">01 &middot; Overview</p>
+          <h2 class="title" id="abstract-title">Abstract</h2>
+        </div>
+        <div class="abstract-body">
+          <p>
+            Intelligent Tutoring Systems (ITSs) have revolutionized education by offering personalized learning
+            experiences. However, as goal-oriented learning, which emphasizes efficiently achieving specific
+            objectives, becomes increasingly important in professional contexts, existing ITSs often struggle to
+            deliver this type of targeted learning experience.
+          </p>
+          <p>
+            In this paper, we propose <strong>GenMentor, an LLM-powered multi-agent framework</strong> designed to
+            deliver goal-oriented, personalized learning within ITS. GenMentor begins by accurately mapping
+            learners' goals to required skills using a fine-tuned LLM trained on a custom goal-to-skill dataset.
+            After identifying the skill gap, it schedules an efficient learning path using an evolving optimization
+            approach, driven by a comprehensive and dynamic profile of learners' multifaceted status. Additionally,
+            GenMentor tailors learning content with an <strong>exploration-drafting-integration mechanism</strong>
+            to align with individual learner needs.
+          </p>
+          <p>
+            Extensive automated and human evaluations demonstrate GenMentor's effectiveness in learning guidance
+            and content quality. Furthermore, we have deployed it in practice and also implemented it as an
+            application. A practical human study with professional learners further highlights its effectiveness
+            in goal alignment and resource targeting, leading to enhanced personalization.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Motivation -->
+    <section class="site-section" id="motivation" aria-labelledby="motivation-title">
       <div class="container">
-        <div id="results-carousel" class="carousel results-carousel" data-items="1">
-          <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_1.png" alt="Goal & Profile Initialization" width="80%" loading="lazy"
-              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
-            <!-- </div> -->
-            <h2 class="subtitle has-text-centered">Goal & Profile Initialization</h2>
-          </div>
-          <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_2.png" alt="Skill Gap Identification" width="80%" loading="lazy"
-              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
-            <h2 class="subtitle has-text-centered">Skill Gap Identification</h2>
-          </div>
-          <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_3.png" alt="Learning Path Scheduling" width="80%" loading="lazy"
-              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
-            <h2 class="subtitle has-text-centered">Learning Path Scheduling</h2>
-          </div>
-          <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_4.png" alt="Learning Content Creation" width="80%" loading="lazy"
-              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
-            <h2 class="subtitle has-text-centered">Learning Content Creation</h2>
-          </div>
-          <div class="item has-text-centered">
-            <img src="static/images/genmentor_demo_5.png" alt="Dynamic Learner Profile" width="80%" loading="lazy"
-              style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" />
-            <h2 class="subtitle has-text-centered">Dynamic Learner Profile</h2>
-          </div>
+        <div class="section-head">
+          <p class="section-kicker">02 &middot; Motivation</p>
+          <h2 class="title" id="motivation-title">Goal-oriented Learning</h2>
+          <p class="section-intro">Why professional learners need a tutor that starts from the goal, not from the syllabus.</p>
+        </div>
+
+        <div class="card-grid">
+          <article class="info-card">
+            <h3>
+              <span class="icon-chip chip-warning" aria-hidden="true"><i class="fas fa-exclamation-triangle"></i></span>
+              Limitations of Traditional ITS
+            </h3>
+            <p>Existing ITSs rely on static curricula and reactive responses, lacking the ability to proactively guide learners toward specific professional objectives.</p>
+          </article>
+          <article class="info-card">
+            <h3>
+              <span class="icon-chip chip-info" aria-hidden="true"><i class="fas fa-briefcase"></i></span>
+              Professional Learning Needs
+            </h3>
+            <p>Modern professionals acquire targeted skills for specific goals; without clear guidance, the motivation and efficiency of learners may decline.</p>
+          </article>
+          <article class="info-card">
+            <h3>
+              <span class="icon-chip chip-success" aria-hidden="true"><i class="fas fa-bullseye"></i></span>
+              Goal-oriented Learning
+            </h3>
+            <p>Our approach emphasizes efficient goal achievement through personalized skill identification, adaptive learning paths, and targeted content delivery.</p>
+          </article>
+        </div>
+
+        <div class="figure-box is-narrow mt-6" tabindex="0" role="region" aria-label="Diagram: evolution of ITS paradigms (scrollable on small screens)">
+          <figure>
+            <p class="figure-title">Evolution of ITS Paradigms</p>
+            <img src="static/images/its-paradigms.png" class="plate is-wide"
+              alt="Diagram comparing traditional ITS, LLM-based ITS and goal-oriented ITS" width="1776" height="1176"
+              loading="lazy" decoding="async">
+            <figcaption class="paradigm-steps">
+              <span class="paradigm-step">Traditional ITS</span>
+              <span class="paradigm-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+              <span class="paradigm-step">LLM-based ITS</span>
+              <span class="paradigm-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+              <span class="paradigm-step is-current">Goal-oriented ITS</span>
+            </figcaption>
+          </figure>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-
-  <!-- Paper abstract -->
-  <section class="section hero is-light" id="abstract">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          <p class="section-kicker">01 · Overview</p>
-          <h2 class="title is-3">Abstract</h2>
-          <div class="content has-text-justified">
-            <p>
-              Intelligent Tutoring Systems (ITSs) have revolutionized education by offering personalized learning
-              experiences.
-              However, as goal-oriented learning, which emphasizes efficiently achieving specific objectives, becomes
-              increasingly important in professional contexts, existing ITSs often struggle to deliver this type of
-              targeted learning experience.
-              In this paper, we propose <strong>GenMentor, an LLM-powered multi-agent framework</strong> designed to
-              deliver
-              goal-oriented, personalized learning within ITS. GenMentor begins by accurately mapping learners' goals to
-              required skills using a fine-tuned LLM trained on a custom goal-to-skill dataset.
-              After identifying the skill gap, it schedules an efficient learning path using an evolving optimization
-              approach, driven by a comprehensive and dynamic profile of learners' multifaceted status.
-              Additionally, GenMentor tailors learning content with an
-              <strong>exploration-drafting-integration mechanism</strong> to
-              align with individual learner needs. Extensive automated and human evaluations demonstrate GenMentor's
-              effectiveness in learning guidance and content quality.
-              Furthermore, we have deployed it in practice and also implemented it as an application. Practical human
-              study with professional learners further highlights its effectiveness in goal alignment and resource
-              targeting, leading to enhanced personalization.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Goal-oriented Learning -->
-  <section class="hero is-small" id="motivation">
-    <div class="hero-body">
+    <!-- Framework -->
+    <section class="site-section is-tinted" id="framework" aria-labelledby="framework-title">
       <div class="container">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-12">
-            <p class="section-kicker">02 · Motivation</p>
-            <h2 class="title is-3">Goal-oriented Learning</h2>
-          </div>
+        <div class="section-head">
+          <p class="section-kicker">03 &middot; Architecture</p>
+          <h2 class="title" id="framework-title">GenMentor Framework</h2>
+          <p class="section-intro">Three cooperating agents turn a goal into a skill gap, a schedule and tailored content.</p>
         </div>
 
-        <!-- Motivation Cards -->
-        <div class="columns is-centered mb-6">
-          <div class="column is-10">
-            <div class="columns is-multiline">
-              <!-- Limitations Card -->
-              <div class="column is-4">
-                <div class="box has-background-white">
-                  <h4 class="title is-6 mb-4">
-                    <span class="feature-icon-chip chip-warning">
-                      <i class="fas fa-exclamation-triangle"></i>
-                    </span>
-                    Limitations of Traditional ITS
-                  </h4>
-                  <div class="content">
-                    <p>Existing ITSs rely on static curricula and reactive responses, lacking the ability to proactively guide learners toward specific professional objectives.</p>
-                  </div>
-                </div>
+        <div class="figure-box mb-6" tabindex="0" role="region" aria-label="Diagram: GenMentor framework overview (scrollable on small screens)">
+          <figure>
+            <img src="static/images/genmentor-framework.png" class="plate is-wide"
+              alt="GenMentor framework overview: skill gap identifier, adaptive learner modeler and personalized resource delivery"
+              width="2610" height="1308" loading="lazy" decoding="async">
+          </figure>
+        </div>
+
+        <div class="pill-tabs" role="tablist" aria-label="Framework components">
+          <button class="pill-tab" role="tab" id="tab-skill-identifier" aria-controls="skill-identifier"
+            aria-selected="true" type="button">
+            <span class="icon" aria-hidden="true"><i class="fas fa-brain"></i></span>
+            <span>Skill Identifier</span>
+          </button>
+          <button class="pill-tab" role="tab" id="tab-learner-profiler" aria-controls="learner-profiler"
+            aria-selected="false" tabindex="-1" type="button">
+            <span class="icon" aria-hidden="true"><i class="fas fa-user-graduate"></i></span>
+            <span>Learner Profiler</span>
+          </button>
+          <button class="pill-tab" role="tab" id="tab-content-creator" aria-controls="content-creator"
+            aria-selected="false" tabindex="-1" type="button">
+            <span class="icon" aria-hidden="true"><i class="fas fa-book"></i></span>
+            <span>Content Creator</span>
+          </button>
+        </div>
+
+        <div class="tab-content">
+          <div id="skill-identifier" class="tab-pane is-active" role="tabpanel" aria-labelledby="tab-skill-identifier">
+            <div class="component-box">
+              <div class="component-header">
+                <span class="icon-chip chip-info" aria-hidden="true"><i class="fas fa-brain"></i></span>
+                <h3>Skill Gap Identification</h3>
               </div>
-              
-              <!-- Challenges Card -->
-              <div class="column is-4">
-                <div class="box has-background-white">
-                  <h4 class="title is-6 mb-4">
-                    <span class="feature-icon-chip chip-info">
-                      <i class="fas fa-briefcase"></i>
-                    </span>
-                    Professional Learning Needs
-                  </h4>
-                  <div class="content">
-                    <p>Modern professionals acquire targeted skills for specific goals; without clear guidance, the motivation and efficiency of learners may decline.
-                    </p>
+              <div class="feature-grid">
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-database"></i></span>
+                    <h4>Dataset Construction</h4>
                   </div>
+                  <ul>
+                    <li>Custom goal-to-skill dataset</li>
+                    <li>Built from job postings</li>
+                    <li>Chain-of-thought reasoning tracks</li>
+                  </ul>
                 </div>
-              </div>
-              
-              <!-- Solution Card -->
-              <div class="column is-4">
-                <div class="box has-background-white">
-                  <h4 class="title is-6 mb-4">
-                    <span class="feature-icon-chip chip-success">
-                      <i class="fas fa-bullseye"></i>
-                    </span>
-                    Goal-oriented Learning
-                  </h4>
-                  <div class="content">
-                    <p>Our approach emphasizes efficient goal achievement through personalized skill identification, adaptive learning paths, and targeted content delivery.</p>
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-cogs"></i></span>
+                    <h4>LLM Fine-tuning</h4>
                   </div>
+                  <ul>
+                    <li>Goal-aligned skill mapping</li>
+                    <li>Improved accuracy and relevance</li>
+                    <li>Enhanced goal alignment</li>
+                  </ul>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-search"></i></span>
+                    <h4>Gap Analysis</h4>
+                  </div>
+                  <ul>
+                    <li>Skill competency assessment</li>
+                    <li>Systematic gap identification</li>
+                    <li>Skill and level gap as output</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Comparison Diagram -->
-        <div class="columns is-centered">
-          <div class="column is-three-fifths">
-            <div class="box">
-              <h4 class="title is-4 has-text-centered mb-4">Evolution of ITS Paradigms</h4>
-              <img src="static/images/its-paradigms.png" alt="ITS for Goal-oriented Learning" loading="lazy" />
-              <div class="content mt-4">
-                <div class="tags are-medium is-centered">
-                  <span class="tag is-light">Traditional ITS</span>
-                  <span class="tag is-light"><i class="fas fa-arrow-right mx-2"></i></span>
-                  <span class="tag is-light">LLM-based ITS</span>
-                  <span class="tag is-light"><i class="fas fa-arrow-right mx-2"></i></span>
-                  <span class="tag is-primary">Goal-oriented ITS</span>
+          <div id="learner-profiler" class="tab-pane" role="tabpanel" aria-labelledby="tab-learner-profiler" hidden>
+            <div class="component-box">
+              <div class="component-header">
+                <span class="icon-chip chip-violet" aria-hidden="true"><i class="fas fa-user-graduate"></i></span>
+                <h3>Adaptive Learner Modeling</h3>
+              </div>
+              <div class="feature-grid">
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-brain"></i></span>
+                    <h4>Cognitive Status</h4>
+                  </div>
+                  <ul>
+                    <li>Learning progress tracking</li>
+                    <li>Skill mastery assessment</li>
+                    <li>Knowledge retention analysis</li>
+                  </ul>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-sliders-h"></i></span>
+                    <h4>Learning Preferences</h4>
+                  </div>
+                  <ul>
+                    <li>Content style preferences</li>
+                    <li>Activity type preferences</li>
+                    <li>Learning pace optimization</li>
+                  </ul>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span>
+                    <h4>Behavioral Patterns</h4>
+                  </div>
+                  <ul>
+                    <li>Usage pattern analysis</li>
+                    <li>Engagement metrics tracking</li>
+                    <li>Adaptive feedback system</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- GenMentor Framework -->
-  <section class="hero-body is-light" id="framework">
-    <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-12">
-          <p class="section-kicker">03 · Architecture</p>
-          <h2 class="title is-3 has-text-centered">GenMentor Framework</h2>
-        </div>
-      </div>
-
-      <!-- Framework Overview -->
-      <div class="columns is-centered mb-6">
-        <div class="column is-10">
-          <div class="box framework-overview">
-            <figure class="image">
-              <img src="static/images/genmentor-framework.png" alt="GenMentor Framework Overview" class="framework-image" loading="lazy">
-            </figure>
-          </div>
-        </div>
-      </div>
-
-      <!-- Component Details -->
-      <div class="columns is-centered">
-        <div class="column is-10">
-          <!-- Tabs Navigation -->
-          <div class="tabs is-centered is-boxed" id="arch-tabs">
-            <ul>
-              <li class="is-active" data-target="skill-identifier">
-                <a>
-                  <span class="icon is-medium"><i class="fas fa-brain"></i></span>
-                  <span>Skill Identifier</span>
-                </a>
-              </li>
-              <li data-target="learner-profiler">
-                <a>
-                  <span class="icon is-medium"><i class="fas fa-user-graduate"></i></span>
-                  <span>Learner Profiler</span>
-                </a>
-              </li>
-              <li data-target="content-creator">
-                <a>
-                  <span class="icon is-medium"><i class="fas fa-book"></i></span>
-                  <span>Content Creator</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Tab Content -->
-          <div class="tab-content">
-            <!-- Skill Identifier Tab -->
-            <div id="skill-identifier" class="tab-pane is-active">
-              <div class="box component-box">
-                <div class="component-header">
-                  <span class="icon-wrapper has-background-primary-light">
-                    <i class="fas fa-brain has-text-primary"></i>
-                  </span>
-                  <h3 class="title is-4 has-text-primary-dark">Skill Gap Identification</h3>
-                </div>
-                <div class="content">
-                  <div class="feature-grid">
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-info">
-                          <i class="fas fa-database"></i>
-                        </span>
-                        <h4 class="title is-5">Dataset Construction</h4>
-                      </div>
-                      <ul>
-                        <li>Custom goal-to-skill dataset</li>
-                        <li>Build from job postings</li>
-                        <li>CoT reasoning tracks</li>
-                      </ul>
-                    </div>
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-success">
-                          <i class="fas fa-cogs"></i>
-                        </span>
-                        <h4 class="title is-5">LLM Fine-tuning</h4>
-                      </div>
-                      <ul>
-                        <li>Goal-aligned skill mapping</li>
-                        <li>Improved accuracy & relevance</li>
-                        <li>Enhanced goal alignment</li>
-                      </ul>
-                    </div>
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-warning">
-                          <i class="fas fa-search"></i>
-                        </span>
-                        <h4 class="title is-5">Gap Analysis</h4>
-                      </div>
-                      <ul>
-                        <li>Skill competency assessment</li>
-                        <li>Systematic gap identification</li>
-                        <li>Obtain skill & level gap</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+          <div id="content-creator" class="tab-pane" role="tabpanel" aria-labelledby="tab-content-creator" hidden>
+            <div class="component-box">
+              <div class="component-header">
+                <span class="icon-chip chip-success" aria-hidden="true"><i class="fas fa-book"></i></span>
+                <h3>Personalized Resource Delivery</h3>
               </div>
-            </div>
-
-            <!-- Learner Profiler Tab -->
-            <div id="learner-profiler" class="tab-pane">
-              <div class="box component-box">
-                <div class="component-header">
-                  <span class="icon-wrapper has-background-info-light">
-                    <i class="fas fa-user-graduate has-text-info"></i>
-                  </span>
-                  <h3 class="title is-4 has-text-info-dark">Adaptive Learner Modeling</h3>
-                </div>
-                <div class="content">
-                  <div class="feature-grid">
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-primary">
-                          <i class="fas fa-brain"></i>
-                        </span>
-                        <h4 class="title is-5">Cognitive Status</h4>
-                      </div>
-                      <ul>
-                        <li>Learning progress tracking</li>
-                        <li>Skill mastery assessment</li>
-                        <li>Knowledge retention analysis</li>
-                      </ul>
-                    </div>
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-info">
-                          <i class="fas fa-sliders-h"></i>
-                        </span>
-                        <h4 class="title is-5">Learning Preferences</h4>
-                      </div>
-                      <ul>
-                        <li>Content style preferences</li>
-                        <li>Activity type preferences</li>
-                        <li>Learning pace optimization</li>
-                      </ul>
-                    </div>
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-success">
-                          <i class="fas fa-chart-line"></i>
-                        </span>
-                        <h4 class="title is-5">Behavioral Patterns</h4>
-                      </div>
-                      <ul>
-                        <li>Usage patterns analysis</li>
-                        <li>Engagement metrics tracking</li>
-                        <li>Adaptive feedback system</li>
-                      </ul>
-                    </div>
+              <div class="feature-grid">
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-route"></i></span>
+                    <h4>Learning Path</h4>
                   </div>
+                  <ul>
+                    <li>Evolving optimization method</li>
+                    <li>Learner simulator feedback</li>
+                    <li>Dynamic path adjustment</li>
+                  </ul>
                 </div>
-              </div>
-            </div>
-
-            <!-- Content Creator Tab -->
-            <div id="content-creator" class="tab-pane">
-              <div class="box component-box">
-                <div class="component-header">
-                  <span class="icon-wrapper has-background-success-light">
-                    <i class="fas fa-book has-text-success"></i>
-                  </span>
-                  <h3 class="title is-4 has-text-success-dark">Personalized Resource Delivery</h3>
-                </div>
-                <div class="content">
-                  <div class="feature-grid">
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-primary">
-                          <i class="fas fa-route"></i>
-                        </span>
-                        <h4 class="title is-5">Learning Path</h4>
-                      </div>
-                      <ul>
-                        <li>Evolving optimization method</li>
-                        <li>Learner simulator feedback</li>
-                        <li>Dynamic path adjustment</li>
-                      </ul>
-                    </div>
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-info">
-                          <i class="fas fa-lightbulb"></i>
-                        </span>
-                        <h4 class="title is-5">Knowledge Creation</h4>
-                      </div>
-                      <ul>
-                        <li>Goal-oriented exploration</li>
-                        <li>RAG-based content drafting</li>
-                        <li>Iterative document refinement</li>
-                      </ul>
-                    </div>
-                    <div class="feature-card">
-                      <div class="feature-header">
-                        <span class="icon has-text-success">
-                          <i class="fas fa-sync-alt"></i>
-                        </span>
-                        <h4 class="title is-5">Adaptive Delivery</h4>
-                      </div>
-                      <ul>
-                        <li>Real-time content adaptation</li>
-                        <li>Personalized pacing</li>
-                        <li>Interactive feedback loops</li>
-                      </ul>
-                    </div>
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-lightbulb"></i></span>
+                    <h4>Knowledge Creation</h4>
                   </div>
+                  <ul>
+                    <li>Goal-oriented exploration</li>
+                    <li>RAG-based content drafting</li>
+                    <li>Iterative document refinement</li>
+                  </ul>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-header">
+                    <span class="icon" aria-hidden="true"><i class="fas fa-sync-alt"></i></span>
+                    <h4>Adaptive Delivery</h4>
+                  </div>
+                  <ul>
+                    <li>Real-time content adaptation</li>
+                    <li>Personalized pacing</li>
+                    <li>Interactive feedback loops</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-
-  <!-- Experiments Results -->
-  <section class="hero is-small is-light" id="results">
-    <div class="hero-body">
+    <!-- Results -->
+    <section class="site-section" id="results" aria-labelledby="results-title">
       <div class="container">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-12">
-            <p class="section-kicker">04 · Evaluation</p>
-            <h2 class="title is-3">Experimental Results</h2>
-          </div>
+        <div class="section-head">
+          <p class="section-kicker">04 &middot; Evaluation</p>
+          <h2 class="title" id="results-title">Experimental Results</h2>
+          <p class="section-intro">LLM-based automated evaluation of each component, plus an end-to-end study with professional learners.</p>
         </div>
 
-        <!-- Detailed Results -->
-        <div class="columns is-centered">
-          <div class="column is-10">
-            <div class="tabs is-centered is-boxed" id="results-tabs">
-              <ul>
-                <li class="is-active" data-target="automated-results">
-                  <a>
-                    <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                    <span>Performance Analysis</span>
-                  </a>
-                </li>
-                <li data-target="human-study">
-                  <a>
-                    <span class="icon"><i class="fas fa-clipboard-check"></i></span>
-                    <span>End-to-end User Study</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
+        <div class="pill-tabs" role="tablist" aria-label="Evaluation results">
+          <button class="pill-tab" role="tab" id="tab-automated-results" aria-controls="automated-results"
+            aria-selected="true" type="button">
+            <span class="icon" aria-hidden="true"><i class="fas fa-chart-bar"></i></span>
+            <span>Performance Analysis</span>
+          </button>
+          <button class="pill-tab" role="tab" id="tab-human-study" aria-controls="human-study"
+            aria-selected="false" tabindex="-1" type="button">
+            <span class="icon" aria-hidden="true"><i class="fas fa-clipboard-check"></i></span>
+            <span>End-to-end User Study</span>
+          </button>
+        </div>
 
-            <div class="tab-content">
-              <!-- Automated Results Tab -->
-              <div id="automated-results" class="tab-pane is-active">
-                <div class="box">
-                  <img src="static/images/automated-results.png" alt="LLM-based Automated Evaluation" class="mb-4" loading="lazy"/>
-                  <div class="content">
-                    <h5 class="title is-5">Key Performance Highlights:</h5>
-                    <div class="columns">
-                      <div class="column">
-                        <p class="has-text-weight-bold">Skill Identification</p>
-                        <ul>
-                          <li>High accuracy in goal-to-skill mapping</li>
-                          <li>Effective gap analysis</li>
-                        </ul>
-                      </div>
-                      <div class="column">
-                        <p class="has-text-weight-bold">Learning Path Quality</p>
-                        <ul>
-                          <li>Optimal progression structure</li>
-                          <li>Strong learner engagement</li>
-                        </ul>
-                      </div>
-                      <div class="column">
-                        <p class="has-text-weight-bold">Content Generation</p>
-                        <ul>
-                          <li>High relevance to goals</li>
-                          <li>Effective personalization</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+        <div class="tab-content">
+          <div id="automated-results" class="tab-pane is-active" role="tabpanel" aria-labelledby="tab-automated-results">
+            <div class="results-panel" tabindex="0" role="region" aria-label="Automated evaluation results (scrollable on small screens)">
+              <img src="static/images/automated-results.png" class="plate"
+                alt="LLM-based automated evaluation results for skill identification, learning path and content quality"
+                width="4609" height="2053" loading="lazy" decoding="async">
+              <h3>Key performance highlights</h3>
+              <div class="highlight-grid">
+                <div class="highlight">
+                  <h4>Skill Identification</h4>
+                  <ul>
+                    <li>High accuracy in goal-to-skill mapping</li>
+                    <li>Effective gap analysis</li>
+                  </ul>
+                </div>
+                <div class="highlight">
+                  <h4>Learning Path Quality</h4>
+                  <ul>
+                    <li>Optimal progression structure</li>
+                    <li>Strong learner engagement</li>
+                  </ul>
+                </div>
+                <div class="highlight">
+                  <h4>Content Generation</h4>
+                  <ul>
+                    <li>High relevance to goals</li>
+                    <li>Effective personalization</li>
+                  </ul>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- Human Study Tab -->
-              <div id="human-study" class="tab-pane">
-                <div class="box">
-                  <img src="static/images/questionnaire-results.png" alt="End-to-end Questionnaire Results" class="mb-4" loading="lazy"/>
-                  <div class="content">
-                    <h5 class="title is-5">User Study Insights:</h5>
-                    <div class="columns">
-                      <div class="column">
-                        <p class="has-text-weight-bold">Learning Experience</p>
-                        <ul>
-                          <li>Clear learning guidance</li>
-                          <li>Improved goal achievement</li>
-                        </ul>
-                      </div>
-                      <div class="column">
-                        <p class="has-text-weight-bold">System Design</p>
-                        <ul>
-                          <li>Intuitive interface</li>
-                          <li>High user satisfaction</li>
-                        </ul>
-                      </div>
-                      <div class="column">
-                        <p class="has-text-weight-bold">Professional Impact</p>
-                        <ul>
-                          <li>Enhanced skill acquisition</li>
-                          <li>Efficient goal completion</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+          <div id="human-study" class="tab-pane" role="tabpanel" aria-labelledby="tab-human-study" hidden>
+            <div class="results-panel" tabindex="0" role="region" aria-label="User study results (scrollable on small screens)">
+              <img src="static/images/questionnaire-results.png" class="plate"
+                alt="End-to-end questionnaire results from the user study with professional learners"
+                width="2776" height="942" loading="lazy" decoding="async">
+              <h3>User study insights</h3>
+              <div class="highlight-grid">
+                <div class="highlight">
+                  <h4>Learning Experience</h4>
+                  <ul>
+                    <li>Clear learning guidance</li>
+                    <li>Improved goal achievement</li>
+                  </ul>
+                </div>
+                <div class="highlight">
+                  <h4>System Design</h4>
+                  <ul>
+                    <li>Intuitive interface</li>
+                    <li>High user satisfaction</li>
+                  </ul>
+                </div>
+                <div class="highlight">
+                  <h4>Professional Impact</h4>
+                  <ul>
+                    <li>Enhanced skill acquisition</li>
+                    <li>Efficient goal completion</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-
-  <!-- Video presentation -->
-  <section class="hero is-small is-light" id="demo">
-    <div class="hero-body">
+    <!-- Demo video -->
+    <section class="site-section is-tinted" id="demo" aria-labelledby="demo-title">
       <div class="container">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-12">
-            <p class="section-kicker">05 · Demo</p>
-            <h2 class="title is-3">Demo Video Presentation</h2>
-          </div>
+        <div class="section-head">
+          <p class="section-kicker">05 &middot; Demo</p>
+          <h2 class="title" id="demo-title">Demo Video</h2>
         </div>
-        <div class="columns is-centered has-text-centered mb-5">
-          <div class="column is-three-fifths">
-            <div class="demo-note">
-              <span class="icon"><i class="fas fa-circle-info"></i></span>
-              <span>For privacy reasons the hosted demo is limited; the full system can be run locally via the
-                <a href="https://github.com/GeminiLight/gen-mentor#quick-start" target="_blank">README quick-start</a>.</span>
-            </div>
-          </div>
+        <div class="demo-note">
+          <span class="icon" aria-hidden="true"><i class="fas fa-info-circle"></i></span>
+          <span>For privacy reasons the hosted demo is limited. The full system runs locally by following the
+            <a href="https://github.com/GeminiLight/gen-mentor#quick-start" target="_blank" rel="noopener">README quick-start</a>.</span>
         </div>
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-four-fifths">
-            <div class="publication-video">
-              <iframe src="https://www.youtube.com/embed/vTdtGZop-Zc" frameborder="0" loading="lazy"
-                allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            </div>
-          </div>
+        <div class="publication-video">
+          <iframe src="https://www.youtube-nocookie.com/embed/vTdtGZop-Zc" title="GenMentor demo video on YouTube"
+            loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
+    <!-- FAQ -->
+    <section class="site-section" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">06 &middot; FAQ</p>
+          <h2 class="title" id="faq-title">Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list">
+          <article class="faq-item">
+            <h3>What is GenMentor?</h3>
+            <p>GenMentor is an LLM-powered multi-agent framework for goal-oriented learning in intelligent tutoring
+              systems (ITS). It maps a learner's goal to the skills required, identifies the skill gap, schedules a
+              personalized learning path and generates tailored content. The work was accepted to the WWW 2025
+              Industry Track as an oral presentation, and the code is open source on GitHub.</p>
+          </article>
+          <article class="faq-item">
+            <h3>How is GenMentor different from a chatbot tutor or a MOOC?</h3>
+            <p>A MOOC follows a static syllabus and a chatbot tutor answers questions reactively. GenMentor is
+              proactive: it starts from the learner's goal, plans the path to reach it and adapts that path as a
+              dynamic learner profile evolves, so every resource is tied to a concrete objective.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Which agents make up the framework?</h3>
+            <p>A Skill Gap Identifier, built on an LLM fine-tuned with a custom goal-to-skill dataset; an Adaptive
+              Learner Modeler that maintains a multifaceted learner profile; a Learning Path Scheduler driven by an
+              evolving optimization approach; a Tailored Content Generator that uses an exploration-drafting-integration
+              mechanism; and an AI tutor chatbot for in-context help.</p>
+          </article>
+          <article class="faq-item">
+            <h3>How was GenMentor evaluated?</h3>
+            <p>Through LLM-based automated evaluation of skill identification, learning-path quality and content
+              generation, plus an end-to-end user study with professional learners. In the automated evaluation,
+              goal-to-skill recall reached 0.67, and learners rated learning-path engagement 4.71 out of 5.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Can I run GenMentor myself?</h3>
+            <p>Yes. The repository's README quick-start covers local setup; you supply your own LLM API key
+              (OpenAI and DeepSeek are supported out of the box). A hosted Streamlit demo shows the core flow with
+              limited functionality for privacy reasons.</p>
+          </article>
+          <article class="faq-item">
+            <h3>How do I cite GenMentor?</h3>
+            <p>Cite the WWW 2025 paper, DOI <a href="https://doi.org/10.1145/3701716.3715244" target="_blank"
+                rel="noopener">10.1145/3701716.3715244</a>. A BibTeX entry is provided in the
+              <a href="#citation">Citation</a> section below.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-  <!-- BibTex citation -->
-
-  <section class="section" id="BibTeX">
-    <div class="container is-max-desktop content has-text-centered">
-      <p class="section-kicker">06 · Citation</p>
-      <h2 class="title">BibTeX</h2>
-      <div class="bibtex-box">
-        <button class="button is-small bibtex-copy" id="bibtex-copy" type="button" aria-label="Copy BibTeX entry">
-          <span class="icon"><i class="fas fa-copy"></i></span>
-          <span class="bibtex-copy-label">Copy</span>
-        </button>
-        <pre class="has-text-left"><code id="bibtex-code">@inproceedings{www-2025-genmentor,
-  title={LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System},
-  author={Wang, Tianfu and Zhan, Yi and Lian, Jianxun and Hu, Zhengyu and Yuan, Nicholas Jing and Zhang, Qi and Xie, Xing and Xiong, Hui},
-  booktitle={ACM Web Conference},
-  year={2025}
+    <!-- Citation -->
+    <section class="site-section is-tinted" id="citation" aria-labelledby="citation-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-kicker">07 &middot; Citation</p>
+          <h2 class="title" id="citation-title">Citation</h2>
+        </div>
+        <div class="citation-wrap">
+          <p class="doi-line">
+            Published in <em>Companion Proceedings of the ACM on Web Conference 2025</em> (WWW '25), Sydney.<br>
+            DOI <a href="https://doi.org/10.1145/3701716.3715244" target="_blank" rel="noopener">10.1145/3701716.3715244</a>
+            &middot; <a href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener">arXiv:2501.15749</a>
+          </p>
+          <div class="bibtex-box">
+            <button class="button is-small bibtex-copy" id="bibtex-copy" type="button" aria-label="Copy BibTeX entry">
+              <span class="icon" aria-hidden="true"><i class="fas fa-copy"></i></span>
+              <span class="bibtex-copy-label">Copy</span>
+            </button>
+            <pre><code id="bibtex-code">@inproceedings{www-2025-genmentor,
+  title     = {LLM-powered Multi-agent Framework for Goal-oriented Learning in Intelligent Tutoring System},
+  author    = {Wang, Tianfu and Zhan, Yi and Lian, Jianxun and Hu, Zhengyu and Yuan, Nicholas Jing and Zhang, Qi and Xie, Xing and Xiong, Hui},
+  booktitle = {Companion Proceedings of the ACM on Web Conference 2025 (WWW Companion '25)},
+  year      = {2025},
+  publisher = {ACM},
+  doi       = {10.1145/3701716.3715244}
 }</code></pre>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer class="footer">
+  </main>
+
+  <footer class="footer site-footer">
     <div class="container is-max-desktop has-text-centered">
-      <img src="static/images/favicon.png" alt="GenMentor Logo" class="footer-logo" loading="lazy">
-      <p class="footer-tagline"><span class="gradient-text has-text-weight-bold">GenMentor</span> — LLM-powered &amp;
-        Goal-oriented Tutoring System</p>
-      <p class="footer-nav">
+      <div class="footer-brand">
+        <img src="static/images/favicon.png" alt="" class="footer-logo" width="40" height="40" loading="lazy">
+        <p class="footer-tagline"><span class="brand-name gradient-text">GenMentor</span> &mdash; LLM-powered &amp;
+          Goal-oriented Tutoring System</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
         <a href="#abstract">Abstract</a>
-        <span aria-hidden="true">&middot;</span>
         <a href="#framework">Framework</a>
-        <span aria-hidden="true">&middot;</span>
         <a href="#results">Results</a>
-        <span aria-hidden="true">&middot;</span>
-        <a href="https://github.com/GeminiLight/gen-mentor" target="_blank">GitHub</a>
-        <span aria-hidden="true">&middot;</span>
-        <a href="#" id="back-to-top">Back to top &uarr;</a>
-      </p>
-      <p class="footer-attribution is-size-7">
+        <a href="#faq">FAQ</a>
+        <a href="#citation">Citation</a>
+        <a href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener">GitHub</a>
+        <a href="#">Back to top &uarr;</a>
+      </nav>
+
+      <div class="related-projects">
+        <p class="section-kicker">Related projects</p>
+        <a class="related-card" href="https://tianfuwang.tech/SocialCoach/" target="_blank" rel="noopener">
+          <span class="icon-chip chip-warm" aria-hidden="true"><i class="fas fa-comments"></i></span>
+          <span class="related-body">
+            <span class="related-name">SocialCoach <span class="related-tag">Sibling project</span></span>
+            <span class="related-desc">An AI social-skills coach for rehearsing difficult conversations against
+              characters who push back, with debriefs that quote what you actually said. No account needed.
+              From the paper arXiv:2606.04155.</span>
+          </span>
+          <span class="related-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+
+      <p class="footer-meta">
+        Last updated September 2026.<br>
         This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-          target="_blank">Academic Project Page Template</a> (adopted from the <a href="https://nerfies.github.io"
-          target="_blank">Nerfies</a> project page) and is licensed under a
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0
-          License</a>.
+          target="_blank" rel="noopener">Academic Project Page Template</a> (adapted from the
+        <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> project page) and is licensed
+        under <a rel="license noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>.
       </p>
     </div>
   </footer>
-
-  <!-- Add carousel initialization script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      bulmaCarousel.attach('#results-carousel', {
-        slidesToScroll: 1,
-        slidesToShow: 1,
-        centered: true,
-        loop: true
-      });
-    });
-  </script>
 
 </body>
 
