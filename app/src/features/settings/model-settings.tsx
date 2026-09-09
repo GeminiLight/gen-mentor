@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { ByokHeaders, type Byok } from "@/lib/llm/config";
@@ -64,13 +65,20 @@ export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
         }
       }}
     >
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button variant="ghost" size="icon" aria-label={t("settings.title")} data-testid="open-model-settings">
-            <KeyRound aria-hidden />
-          </Button>
-        )}
-      </DialogTrigger>
+      {trigger ? (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label={t("settings.title")} data-testid="open-model-settings">
+                <KeyRound aria-hidden />
+              </Button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>{t("settings.title")}</TooltipContent>
+        </Tooltip>
+      )}
       <DialogContent className="sm:max-w-(--w-dialog)">
         <DialogHeader>
           <DialogTitle>{t("settings.title")}</DialogTitle>

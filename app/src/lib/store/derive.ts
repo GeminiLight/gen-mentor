@@ -28,12 +28,23 @@ export function learnedCount(goal: Goal): number {
   return goal.learning_path.filter((s) => s.if_learned).length;
 }
 
-/** Minutes spent, from open timestamps to completion (or to the last open). */
+/** A gap longer than this between two timestamps means the learner left; it is not reading time. */
+const SITTING_GAP_MS = 90 * 60_000;
+
+/**
+ * Minutes spent, summed over sittings. Every open and the completion leave a timestamp;
+ * consecutive stamps within one sitting count, a two-day gap between visits does not.
+ * Without this a session opened on Monday and finished on Wednesday would claim 2,880 minutes.
+ */
 export function sessionMinutes(state: SessionState | undefined): number {
   if (!state || state.opened_at.length === 0) return 0;
-  const start = state.opened_at[0];
-  const end = state.completed_at ?? state.opened_at.at(-1) ?? start;
-  return Math.max(0, Math.round((end - start) / 60_000));
+  const stamps = [...state.opened_at, ...(state.completed_at ? [state.completed_at] : [])].sort((a, b) => a - b);
+  let ms = 0;
+  for (let i = 1; i < stamps.length; i++) {
+    const gap = stamps[i] - stamps[i - 1];
+    if (gap <= SITTING_GAP_MS) ms += gap;
+  }
+  return Math.round(ms / 60_000);
 }
 
 export function totalMinutes(goal: Goal): number {

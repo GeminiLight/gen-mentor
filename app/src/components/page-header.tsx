@@ -9,7 +9,7 @@ export function PageHeader({ eyebrow, title, description, actions }: { eyebrow?:
         <h1 className="text-lg font-semibold tracking-tight text-balance sm:text-xl">{title}</h1>
         {description && <p className="mt-1.5 max-w-(--w-measure) text-sm text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
 }

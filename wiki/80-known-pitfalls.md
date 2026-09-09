@@ -114,3 +114,11 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 现象：四片叶子只画出一片。
 原因：`<path id="leaf">` 与 `<linearGradient id="leaf">` 同名，`href="#leaf"` 解析到渐变。
 解法：图形元素与 paint 元素分别命名。
+
+## `vercel link` 在子目录里执行时 Root Directory 是仓库根
+
+现象：CLI 从 `app/` 部署成功，但 GitHub 推送触发的生产部署报错。
+原因：CLI 上传的是当前目录，而 Git 集成从仓库根构建；项目的 Root Directory 仍是空。
+解法：`vercel api -X PATCH` 不带 teamId 会静默失败，用 REST 直接改：
+`curl -X PATCH https://api.vercel.com/v9/projects/<id>?teamId=<team> -d '{"rootDirectory":"app"}'`，然后 `vercel redeploy` 验证。
+教训：CLI 部署绿不代表 Git 部署绿，两条路径都要各验一次。
