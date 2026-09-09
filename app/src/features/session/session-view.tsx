@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, RefreshCw } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -16,6 +16,8 @@ import type { StageStatus } from "@/components/stage-list";
 import { DocumentView } from "./document-view";
 import { PipelinePanel, type PipelineView } from "./pipeline-panel";
 import { QuizView } from "./quiz-view";
+import { ReadingProgress } from "./reading-progress";
+import { RegenerateButton } from "./regenerate-button";
 import { SessionHeader } from "./session-header";
 import { useCompleteSession } from "./use-complete-session";
 import { useT } from "@/lib/i18n";
@@ -152,13 +154,12 @@ export function SessionView({ index }: { index: number }) {
                 <TabsList>
                   <TabsTrigger value="read">{t("session.read")}</TabsTrigger>
                   <TabsTrigger value="quiz" data-testid="tab-quiz">
-                    {t("session.quiz")}{state?.quiz_results ? ` · ${state.quiz_results.correct}/${state.quiz_results.answered}` : ""}
+                    {t("session.quiz")}
+                    {state?.quiz_results ? ` · ${state.quiz_results.correct}/${state.quiz_results.answered}` : ""}
                   </TabsTrigger>
                 </TabsList>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => void start(true)} disabled={completing}>
-                    <RefreshCw aria-hidden /> {t("session.regenerate")}
-                  </Button>
+                  <RegenerateButton disabled={completing} onConfirm={() => void start(true)} />
                   {!session.if_learned && (
                     <Button
                       size="sm"
@@ -172,6 +173,7 @@ export function SessionView({ index }: { index: number }) {
                 </div>
               </div>
               <TabsContent value="read" className="pt-6">
+                <ReadingProgress />
                 <DocumentView markdown={doc.markdown} sources={sources} />
               </TabsContent>
               <TabsContent value="quiz" className="pt-6">

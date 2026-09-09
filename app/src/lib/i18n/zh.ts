@@ -122,6 +122,8 @@ export const zh: Dict = {
     read: "阅读",
     quiz: "测验",
     regenerate: "重新生成",
+    regenerateTitle: "重新生成这个会话？",
+    regenerateBody: "当前的文档、测验和你的答题会被丢弃，并根据你的画像重新撰写。",
     complete: "完成会话",
     completing: "正在更新画像…",
     completed: "会话已完成",

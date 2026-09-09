@@ -120,6 +120,8 @@ export const en = {
     read: "Read",
     quiz: "Quiz",
     regenerate: "Regenerate",
+    regenerateTitle: "Regenerate this session?",
+    regenerateBody: "The current document, quiz and your answers for this session are discarded and written again from your profile.",
     complete: "Complete session",
     completing: "Updating profile…",
     completed: "Session completed",
