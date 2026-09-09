@@ -110,7 +110,7 @@
           "height": 630
         },
         "datePublished": "2025-01-27",
-        "dateModified": "2026-09-09",
+        "dateModified": "2026-09-10",
         "author": { "@id": "https://tianfuwang.tech/#person" }
       },
       {
@@ -154,10 +154,22 @@
         "description": "Official implementation of GenMentor, an LLM-powered multi-agent framework for goal-oriented learning in intelligent tutoring systems.",
         "url": "https://tianfuwang.tech/gen-mentor/",
         "codeRepository": "https://github.com/GeminiLight/gen-mentor",
+        "installUrl": "https://genmentor.aurax.live/",
         "programmingLanguage": "Python",
         "license": "https://creativecommons.org/publicdomain/zero/1.0/",
         "author": { "@id": "https://tianfuwang.tech/#person" },
         "citation": { "@id": "https://tianfuwang.tech/gen-mentor/#article" }
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://genmentor.aurax.live/#app",
+        "name": "GenMentor Live Demo",
+        "url": "https://genmentor.aurax.live/",
+        "description": "Hosted demo of GenMentor: goal-oriented learning with a multi-agent AI mentor, from your goal to a skill gap, a learning path and tailored sessions.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web browser",
+        "isBasedOn": { "@id": "https://tianfuwang.tech/gen-mentor/#code" },
+        "author": { "@id": "https://tianfuwang.tech/#person" }
       },
       {
         "@type": "Person",
@@ -225,11 +237,17 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-primary" href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener">
+              <a class="button is-primary" href="https://genmentor.aurax.live/" target="_blank" rel="noopener">
+                <span class="icon" aria-hidden="true"><i class="fas fa-rocket"></i></span>
+                <span>Live Demo</span>
+              </a>
+              <a class="button is-ghost-pill is-icon-compact" href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener"
+                aria-label="Paper on arXiv" title="Paper on arXiv">
                 <span class="icon" aria-hidden="true"><i class="fas fa-file-pdf"></i></span>
                 <span>Paper</span>
               </a>
-              <a class="button is-ghost-pill" href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener">
+              <a class="button is-ghost-pill is-icon-compact" href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener"
+                aria-label="GitHub repository" title="GitHub repository">
                 <span class="icon" aria-hidden="true"><i class="fab fa-github"></i></span>
                 <span>GitHub</span>
               </a>
@@ -263,6 +281,7 @@
             GenMentor is an open-source, LLM-powered multi-agent tutoring system for goal-oriented learning:
             it maps a learner's goal to the skills required, schedules a personalized learning path and
             generates tailored content. Accepted to WWW 2025 (Industry Track) as an oral presentation.
+            Try it in your browser at <a href="https://genmentor.aurax.live/" target="_blank" rel="noopener">genmentor.aurax.live</a>.
           </p>
 
           <p class="publication-authors">
@@ -290,17 +309,17 @@
           </p>
 
           <div class="publication-links">
-            <a href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener" class="button is-primary">
+            <a href="https://genmentor.aurax.live/" target="_blank" rel="noopener" class="button is-primary">
+              <span class="icon" aria-hidden="true"><i class="fas fa-rocket"></i></span>
+              <span>Live Demo</span>
+            </a>
+            <a href="https://arxiv.org/abs/2501.15749" target="_blank" rel="noopener" class="button is-ghost-pill">
               <span class="icon" aria-hidden="true"><i class="fas fa-file-pdf"></i></span>
               <span>Paper</span>
             </a>
             <a href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener" class="button is-ghost-pill">
               <span class="icon" aria-hidden="true"><i class="fab fa-github"></i></span>
               <span>Code</span>
-            </a>
-            <a href="https://gen-mentor.streamlit.app/" target="_blank" rel="noopener" class="button is-ghost-pill">
-              <span class="icon" aria-hidden="true"><i class="fas fa-globe"></i></span>
-              <span>Demo</span>
             </a>
             <a href="https://www.youtube.com/watch?v=vTdtGZop-Zc" target="_blank" rel="noopener" class="button is-ghost-pill">
               <span class="icon" aria-hidden="true"><i class="fab fa-youtube"></i></span>
@@ -742,7 +761,9 @@
         </div>
         <div class="demo-note">
           <span class="icon" aria-hidden="true"><i class="fas fa-info-circle"></i></span>
-          <span>For privacy reasons the hosted demo is limited. The full system runs locally by following the
+          <span>Try GenMentor in your browser at
+            <a href="https://genmentor.aurax.live/" target="_blank" rel="noopener">genmentor.aurax.live</a>, or run the full system
+            locally by following the
             <a href="https://github.com/GeminiLight/gen-mentor#quick-start" target="_blank" rel="noopener">README quick-start</a>.</span>
         </div>
         <div class="publication-video">
@@ -788,10 +809,12 @@
               goal-to-skill recall reached 0.67, and learners rated learning-path engagement 4.71 out of 5.</p>
           </article>
           <article class="faq-item">
-            <h3>Can I run GenMentor myself?</h3>
-            <p>Yes. The repository's README quick-start covers local setup; you supply your own LLM API key
-              (OpenAI and DeepSeek are supported out of the box). A hosted Streamlit demo shows the core flow with
-              limited functionality for privacy reasons.</p>
+            <h3>Can I try or run GenMentor myself?</h3>
+            <p>Yes. A live demo runs at <a href="https://genmentor.aurax.live/" target="_blank" rel="noopener">genmentor.aurax.live</a>
+              with nothing to install. To run it locally, follow the repository's README quick-start and supply
+              your own LLM API key (OpenAI and DeepSeek are supported out of the box). A lightweight Streamlit
+              preview with limited functionality is also hosted at
+              <a href="https://gen-mentor.streamlit.app/" target="_blank" rel="noopener">gen-mentor.streamlit.app</a>.</p>
           </article>
           <article class="faq-item">
             <h3>How do I cite GenMentor?</h3>
@@ -849,6 +872,7 @@
         <a href="#results">Results</a>
         <a href="#faq">FAQ</a>
         <a href="#citation">Citation</a>
+        <a href="https://genmentor.aurax.live/" target="_blank" rel="noopener">Live Demo</a>
         <a href="https://github.com/GeminiLight/gen-mentor" target="_blank" rel="noopener">GitHub</a>
         <a href="#">Back to top &uarr;</a>
       </nav>
