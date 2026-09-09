@@ -1,0 +1,18 @@
+{
+  "hash": "2bcb5643b248866de35e5b37",
+  "model": "glm-5.3-flash",
+  "request": {
+    "tier": "smart",
+    "system": "You are the **Skill Mapper** agent in the GenMentor Intelligent Tutoring System.\nYour sole purpose is to analyze a learner's goal and map it to a concise list of essential skills required to achieve it.\n\n**Core Directives**:\n1.  **Focus on the Goal**: Your analysis must be strictly aligned with the provided 'learning_goal'.\n2.  **Be Concise**: Identify only the most critical skills. The total number of skills **must not exceed 10**. Less is more.\n3.  **Be Precise**: Skills should be specific, actionable competencies, not broad topics.\n4.  **Adhere to Levels**: The `required_level` must be one of: \"beginner\", \"intermediate\", or \"advanced\".\n\n**Final Output Format**:\nYour final output MUST be a valid JSON object matching this exact structure.\n\n{\n    \"skill_requirements\": [\n        {\n            \"name\": \"Skill Name 1\",\n            \"required_level\": \"beginner|intermediate|advanced\"\n        },\n        {\n            \"name\": \"Skill Name 2\",\n            \"required_level\": \"beginner|intermediate|advanced\"\n        }\n    ]\n}\n\n",
+    "maxTokens": 8000,
+    "user": "Please analyze the learner's goal and identify the essential skills required to achieve it.\n\n**Learner's Goal**:\nLeverage my marketing analyst background (Excel, Tableau, basic Python scripting) to transition into a junior data scientist role within a year by mastering Python-based data analysis (Pandas, NumPy), SQL for querying business data, and applied statistics for marketing and business analytics.",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Please analyze the learner's goal and identify the essential skills required to achieve it.\n\n**Learner's Goal**:\nLeverage my marketing analyst background (Excel, Tableau, basic Python scripting) to transition into a junior data scientist role within a year by mastering Python-based data analysis (Pandas, NumPy), SQL for querying business data, and applied statistics for marketing and business analytics."
+      }
+    ]
+  },
+  "text": "{\n    \"skill_requirements\": [\n        {\n            \"name\": \"Python Programming for Data Analysis\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Data Wrangling with Pandas\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Numerical Computing with NumPy\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"SQL Querying for Business Data\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Applied Statistics for Business & Marketing Analytics\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Hypothesis Testing & A/B Experimentation\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Regression Analysis & Predictive Modeling\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Exploratory Data Analysis (EDA)\",\n            \"required_level\": \"intermediate\"\n        },\n        {\n            \"name\": \"Data Visualization with Matplotlib & Seaborn\",\n            \"required_level\": \"beginner\"\n        },\n        {\n            \"name\": \"Foundational Machine Learning Concepts\",\n            \"required_level\": \"beginner\"\n        }\n    ]\n}",
+  "recordedAt": "2026-09-08T20:06:00.752Z"
+}

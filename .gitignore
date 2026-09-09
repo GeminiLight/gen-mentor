@@ -1,20 +1,9 @@
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py[cod]
-*$py.class
-frontend/components/__pycache__/
-frontend/pages/__pycache__/
-frontend/utils/__pycache__/
-frontend/assets/exp_results
-frontend/user_data/*
-frontend/assets/validation_dataset
-frontend/.env
-backend/.env
+# secrets
+.env
+.env.local
 
-# Runtime data (vector store, uploads) — matches at any depth
-data/
-
+# local artifacts
+e2e/artifacts/
+*.pdf
 pids/
 .DS_Store
