@@ -1,3 +1,4 @@
+import { polish } from "./en-polish";
 /** English UI copy. Short, plain, no explanations of the machinery. `zh.ts` mirrors every key. */
 import { command, settings } from "./en-shell";
 
@@ -102,7 +103,7 @@ export const en = {
     review: "Review",
     reschedule: "Replan",
     rescheduleTitle: "Replan the path?",
-    rescheduleBody: "Finished sessions stay. The rest is rebuilt from your current profile.",
+    rescheduleBody: "Completed sessions stay. Unfinished sessions may change; changed lessons will need new readings and quizzes.",
     feedbackLabel: "Anything to change?",
     feedbackPlaceholder: "Shorter sessions, more SQL, skip the basics…",
     scheduling: "Planning…",
@@ -260,6 +261,7 @@ export const en = {
   },
   settings,
   command,
+  polish,
 } as const;
 
 export type Dict = { [K in keyof typeof en]: { [P in keyof (typeof en)[K]]: string } };

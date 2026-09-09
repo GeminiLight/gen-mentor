@@ -2,6 +2,7 @@
 
 import { Flame } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { scoredCount } from "@/lib/quiz";
 import type { QuizResults } from "@/lib/store/types";
 import { cn } from "@/lib/utils";
 
@@ -11,8 +12,11 @@ export function QuizStatus({ total, answered, streak, results }: { total: number
   if (total === 0) return <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">{t("quiz.none")}</p>;
   if (results) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-success-soft/40 px-4 py-2 text-sm" data-testid="quiz-score">
-        <span className="num font-medium">{t("quiz.score", { correct: results.correct, answered: results.answered })}</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 px-4 py-2 text-sm" data-testid="quiz-score">
+        <div className="space-y-1">
+          <p className="num font-medium">{scoredCount(results) > 0 ? t("polish.scored", { correct: results.correct, scored: scoredCount(results) }) : t("polish.pendingReview", { n: results.answered })}</p>
+          <p className="text-xs text-muted-foreground">{t("polish.coverage", { answered: results.answered, total })}{results.answered > scoredCount(results) && scoredCount(results) > 0 ? ` · ${t("polish.pendingReview", { n: results.answered - scoredCount(results) })}` : ""}</p>
+        </div>
         <span className="num text-muted-foreground">{fmtDate(results.submittedAt, { dateStyle: "medium", timeStyle: "short" })}</span>
       </div>
     );

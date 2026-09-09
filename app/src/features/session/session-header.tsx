@@ -20,8 +20,8 @@ export function SessionHeader({ session, readingMinutes }: { session: SessionIte
         {session.id}
         {readingMinutes ? <span className="num ml-3 normal-case tracking-normal">{t("session.readingTime", { n: readingMinutes })}</span> : null}
       </p>
-      <h1 className="mt-1 text-xl font-semibold tracking-tight">{session.title}</h1>
-      <p className="mt-2 max-w-(--w-measure) text-sm leading-relaxed text-muted-foreground">{session.abstract}</p>
+      <h1 className="mt-2 max-w-(--w-measure) text-xl font-semibold tracking-tight">{session.title}</h1>
+
       <div className="mt-3 flex flex-wrap gap-1.5">
         {session.associated_skills.map((s) => (
           <Badge key={s} variant="secondary">

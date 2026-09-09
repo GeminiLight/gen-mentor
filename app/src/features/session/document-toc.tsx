@@ -27,10 +27,11 @@ export function tocFromMarkdown(markdown: string): TocItem[] {
     if (inFence) continue;
     const m = /^(##|###)\s+(.+?)\s*$/.exec(line);
     if (!m) continue;
-    const base = slugify(m[2]);
+    const text = m[2].replace(/!?\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/[`*_~]/g, "");
+    const base = slugify(text);
     const n = seen.get(base) ?? 0;
     seen.set(base, n + 1);
-    out.push({ id: n ? `${base}-${n}` : base, text: m[2], depth: m[1].length as 2 | 3 });
+    out.push({ id: n ? `${base}-${n}` : base, text, depth: m[1].length as 2 | 3 });
   }
   return out;
 }
@@ -61,6 +62,10 @@ export function DocumentToc({ items }: { items: TocItem[] }) {
           <li key={i.id}>
             <a
               href={`#${i.id}`}
+              aria-current={active === i.id ? "location" : undefined}
+              onClick={(e) => {
+                e.currentTarget.closest("details")?.removeAttribute("open");
+              }}
               className={cn(
                 "-ml-px block border-l py-1 pl-3 text-muted-foreground transition-colors hover:text-foreground",
                 i.depth === 3 && "pl-6 text-xs",

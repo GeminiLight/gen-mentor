@@ -1,5 +1,6 @@
 "use client";
 
+import { isValidElement } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Source } from "@/lib/schemas";
@@ -13,7 +14,7 @@ const textOf = (children: React.ReactNode): string =>
     ? children.map(textOf).join("")
     : typeof children === "string" || typeof children === "number"
       ? String(children)
-      : "";
+      : isValidElement<{ children?: React.ReactNode }>(children) ? textOf(children.props.children) : "";
 
 export function DocumentView({ markdown, sources }: { markdown: string; sources: Source[] }) {
   const { t } = useT();
@@ -26,14 +27,18 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
     return n ? `${base}-${n}` : base;
   };
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_14rem]">
-      <article className="reading text-base">
+    <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_var(--w-toc)]">
+      <details className="rounded-lg border bg-muted/30 px-4 py-3 xl:hidden">
+        <summary className="cursor-pointer text-sm font-medium">{t("session.contents")}</summary>
+        <div className="pt-4"><DocumentToc items={toc} /></div>
+      </details>
+      <article className="reading min-w-0 text-base">
         <Markdown
           remarkPlugins={[remarkGfm]}
           components={{
-            h1: ({ children }) => <h1 className="mt-2 text-xl font-semibold tracking-tight">{children}</h1>,
+            h1: () => null,
             h2: ({ children }) => (
-              <h2 id={idFor(children)} className="mt-12 scroll-mt-24 border-b pb-2 text-lg font-semibold">
+              <h2 id={idFor(children)} className="mt-10 scroll-mt-24 border-b pb-3 text-lg font-semibold">
                 {children}
               </h2>
             ),
@@ -103,7 +108,7 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
           </aside>
         )}
       </article>
-      <aside className="hidden lg:block">
+      <aside className="hidden xl:block">
         <div className="sticky top-8">
           <DocumentToc items={toc} />
         </div>

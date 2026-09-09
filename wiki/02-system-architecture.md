@@ -90,3 +90,20 @@ route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组�
 | 容器 | `docker build -t genmentor app/`，`docker run -p 3000:3000 --env-file app/.env.local genmentor`；镜像用 `.next/standalone` 单进程 |
 
 `GENMENTOR_LLM_MODE=replay` 加 `e2e/fixtures/llm` 可以在没有 key 的机器上完整演示已录制的旅程。
+
+## 学习状态与恢复（2026-09-09 精修）
+
+`SessionState.quiz_draft` 保存选择、简答与确认顺序，交卷后移除草稿，保留权威结果；
+`reading_anchor` 保存最近章节。两者随档案导出导入。界面和画像证据的自动正确率仅用
+correct / incorrect 两种 verdict 作分母，简答题显示待自评，无可评分题时 accuracy 为 null。
+
+创建目标草稿单独保存在 `genmentor.onboarding.v1`，包含表单和已成功的阶段结果；再次提交
+相同输入从 checkpoint 继续，修改输入重新生成。完成创建和删除全部学习数据都会清理此草稿。
+
+重排在一次 store 更新内同时替换路径并重新绑定 session：课程标题、摘要、关联技能和预期成果
+均一致才复用文档与测验。重排若改变或移除已完成课程会拒绝整次更新。当前仍使用索引 URL；
+跨目标稳定书签和稳定课程 UUID 另见 backlog，未声称本轮完成了身份迁移。
+
+导入通过 `schemas/archive.ts` 深校验，并检查目标 ID 唯一性、active_goal_id、session 归属及索引。
+已有目标时先预览替换数量，允许备份与取消；空档案可以直接恢复。模型返回的数据 schema 继续复用。
+教材与测验分别表达就绪状态，出题失败不会阻塞已经保存的教材。

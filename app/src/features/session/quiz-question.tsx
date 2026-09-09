@@ -45,6 +45,7 @@ export function Question({
   hint?: string;
   children: ReactNode;
 }) {
+  const { t } = useT();
   return (
     <fieldset className="space-y-3" data-testid="question" data-verdict={verdict}>
       <legend className="font-medium">
@@ -53,6 +54,7 @@ export function Question({
         <VerdictMark v={verdict} />
       </legend>
       {children}
+      {verdict === "answered" && <p className="text-sm text-muted-foreground">{t("polish.reviewPending")}</p>}
       {verdict && verdict !== "unanswered" && explanation && (
         <p className="text-sm leading-relaxed text-muted-foreground">{explanation}</p>
       )}

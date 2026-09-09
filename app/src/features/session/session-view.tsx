@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,10 +27,12 @@ export function SessionView({ index }: { index: number }) {
   const goal = useActiveGoal();
   const { hydrated, patchSession, openSession, submitQuiz } = useArchive();
   const { t } = useT();
+  const reduce = useReducedMotion();
   const [view, setView] = useState<PipelineView>(idle);
   const [running, setRunning] = useState(false);
   const [tab, setTab] = useState("read");
   const started = useRef<string | null>(null);
+  const inFlight = useRef(new Set<string>());
 
   const session = goal?.learning_path[index];
   const { complete, completing } = useCompleteSession(goal, session, index);
@@ -40,7 +42,8 @@ export function SessionView({ index }: { index: number }) {
 
   const start = useCallback(
     async (fresh = false) => {
-      if (!goal || !session || !uid) return;
+      if (!goal || !session || !uid || inFlight.current.has(uid)) return;
+      inFlight.current.add(uid);
       const base = fresh ? { opened_at: state?.opened_at ?? [] } : (state ?? { opened_at: [] });
       if (fresh)
         patchSession(uid, {
@@ -49,6 +52,8 @@ export function SessionView({ index }: { index: number }) {
           document: undefined,
           quiz: undefined,
           quiz_results: undefined,
+          quiz_draft: undefined,
+          reading_anchor: undefined,
         });
       setRunning(true);
       const v = idle();
@@ -87,6 +92,7 @@ export function SessionView({ index }: { index: number }) {
           ) as PipelineView["status"],
         }));
       } finally {
+        inFlight.current.delete(uid);
         setRunning(false);
       }
     },
@@ -133,23 +139,30 @@ export function SessionView({ index }: { index: number }) {
       <SessionHeader session={session} readingMinutes={minutes} />
 
       <AnimatePresence mode="wait" initial={false}>
-        {!doc || !quiz || running ? (
+        {!doc ? (
           <motion.div key="pipeline" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             {/* A retry resumes from the last checkpoint; only the stages that never finished run again. */}
             <PipelinePanel view={view} onRetry={running ? undefined : () => void start()} />
           </motion.div>
         ) : (
-          <motion.div key="reader" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}>
+          <motion.div key="reader" initial={{ opacity: 0, y: reduce ? 0 : 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.24, ease: [0.2, 0, 0, 1] }}>
             <SessionReader
+              key={uid}
               session={session}
               next={goal.learning_path[index + 1] ? { index: index + 1, title: goal.learning_path[index + 1].title } : undefined}
               markdown={doc.markdown}
               sources={state?.knowledge_drafts?.flatMap((d) => d.sources) ?? []}
               quiz={quiz}
               results={state?.quiz_results}
+              draft={state?.quiz_draft}
+              onDraft={(draft) => patchSession(uid, { quiz_draft: draft })}
+              readingAnchor={state?.reading_anchor}
+              onReadingAnchor={(anchor) => patchSession(uid, { reading_anchor: anchor })}
+              quizStatus={<div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border bg-muted/30 p-4 text-sm" data-loading={running ? "" : undefined} role="status"><p className="flex-1 text-muted-foreground">{t(view.error ? "polish.quizFailed" : "polish.quizPreparing")}</p>{view.error && !running && <Button size="sm" variant="outline" onClick={() => void start()}>{t("common.tryAgain")}</Button>}</div>}
               tab={tab}
               onTab={setTab}
               completing={completing}
+              generating={running}
               onComplete={() => void complete()}
               onRegenerate={() => void start(true)}
               onSubmitQuiz={(r) => submitQuiz(uid, r)}

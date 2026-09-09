@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { scoredCount } from "@/lib/quiz";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
@@ -14,6 +17,7 @@ import { sessionMinutes, sessionUid } from "@/lib/store/derive";
 
 /** Every document generated for the active goal, whether or not the session was completed. */
 export function LibraryView() {
+  const [query, setQuery] = useState("");
   const goal = useActiveGoal();
   const hydrated = useArchive((s) => s.hydrated);
   const { t } = useT();
@@ -24,14 +28,17 @@ export function LibraryView() {
     .map((s, i) => ({ session: s, index: i, state: goal.sessions[sessionUid(goal.id, i)] }))
     .filter((d) => d.state?.document);
 
+  const matches = docs.filter(({ session, state }) => `${session.title} ${state?.document?.markdown}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   return (
     <>
-      <PageHeader title={t("library.title")} />
+      <PageHeader title={t("library.title")} description={t("polish.libraryLede")} />
+      {docs.length > 0 && <Input type="search" className="mb-6 max-w-(--w-col)" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("polish.searchLibrary")} aria-label={t("polish.searchLibrary")} />}
+      {docs.length > 0 && matches.length === 0 && <p role="status" className="py-12 text-sm text-muted-foreground">{t("polish.noSearch")}</p>}
       {docs.length === 0 ? (
         <EmptyState title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {docs.map(({ session, index, state }) => (
+          {matches.map(({ session, index, state }) => (
             <Link key={index} href={`/session/${index}`} className="group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <Card className="h-full transition-colors group-hover:border-foreground/20" data-testid="library-card">
                 <CardHeader>
@@ -47,8 +54,8 @@ export function LibraryView() {
                   {(state!.knowledge_drafts?.some((d) => d.sources.length > 0) ?? false) && (
                     <span className="num">{t("library.sources", { n: state!.knowledge_drafts!.reduce((a, d) => a + d.sources.length, 0) })}</span>
                   )}
-                  {state!.quiz_results && (
-                    <span className="num">{t("library.quiz", { correct: state!.quiz_results.correct, answered: state!.quiz_results.answered })}</span>
+                  {state!.quiz_results && scoredCount(state!.quiz_results) > 0 && (
+                    <span className="num">{t("library.quiz", { correct: state!.quiz_results.correct, answered: scoredCount(state!.quiz_results) })}</span>
                   )}
                   {sessionMinutes(state) > 0 && <span className="num">{t("common.minutes", { n: sessionMinutes(state) })}</span>}
                 </CardContent>

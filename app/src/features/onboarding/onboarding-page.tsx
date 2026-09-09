@@ -26,9 +26,10 @@ export function OnboardingPage() {
         </div>
       </header>
       <div className="mb-10 max-w-(--w-measure)">
+        <p className="eyebrow mb-3">{t("polish.startSmall")}</p>
         <h1 className="text-xl font-semibold tracking-tight">{t("onboarding.title")}</h1>
       </div>
-      <OnboardingFlow />
+      <div className="rounded-xl border bg-card p-5 sm:p-8"><OnboardingFlow /></div>
     </main>
   );
 }

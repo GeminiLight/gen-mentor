@@ -17,7 +17,7 @@ export function OnboardingFlow() {
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <GoalForm disabled={running} onSubmit={submit} />
 
-      <aside className="space-y-6 lg:border-l lg:pl-10" aria-label="Progress">
+      <aside className="space-y-6 lg:border-l lg:pl-10" aria-label={t("progress.title")}>
         {!started ? (
           <div className="text-sm text-muted-foreground lg:pt-1">
             <p className="font-medium text-foreground">{t("onboarding.whatNext")}</p>

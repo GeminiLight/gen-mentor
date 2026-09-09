@@ -1,4 +1,5 @@
-/** Import / export of the whole archive as a JSON file. Validation is structural, not deep. */
+/** Import / export of the whole archive as a JSON file. Nested data and session references are validated before import. */
+import { ArchiveSchema } from "@/lib/schemas/archive";
 import type { Archive } from "./types";
 
 export function archiveToBlob(archive: Archive): Blob {
@@ -10,14 +11,5 @@ export function archiveFileName(archive: Archive): string {
 }
 
 export function parseArchive(text: string): Archive {
-  const data: unknown = JSON.parse(text);
-  if (!data || typeof data !== "object") throw new Error("Not a GenMentor archive");
-  const a = data as Partial<Archive>;
-  if (a.version !== 1 || !Array.isArray(a.goals)) throw new Error("Unsupported archive version");
-  for (const g of a.goals) {
-    if (!g || typeof g !== "object" || typeof g.id !== "string" || !g.learner_profile || !Array.isArray(g.learning_path)) {
-      throw new Error("Archive contains a malformed goal");
-    }
-  }
-  return { version: 1, exported_at: a.exported_at ?? Date.now(), active_goal_id: a.active_goal_id ?? null, goals: a.goals };
+  return ArchiveSchema.parse(JSON.parse(text));
 }

@@ -10,6 +10,7 @@ import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { learnedCount, sessionMinutes, sessionUid, totalMinutes } from "@/lib/store/derive";
 import { RescheduleDialog } from "./reschedule-dialog";
+import { CurrentSession } from "./current-session";
 import { SessionRow } from "./session-row";
 
 export function PathView() {
@@ -27,7 +28,8 @@ export function PathView() {
   const meta = [t("path.lede", { n: learned, total }), minutes > 0 ? t("common.minutes", { n: minutes }) : null].filter(Boolean).join(" · ");
   return (
     <>
-      <PageHeader eyebrow={t("path.eyebrow")} title={goal.learning_goal} description={meta} actions={<RescheduleDialog goal={goal} />} />
+      <PageHeader eyebrow={t("polish.currentGoal")} title={t("path.eyebrow")} description={goal.original_goal} actions={<RescheduleDialog goal={goal} />} />
+      <p className="num mb-3 text-xs text-muted-foreground">{meta}</p>
       <Progress value={(learned / Math.max(1, total)) * 100} className="mb-2 h-1" aria-label={meta} />
       {total > 0 && learned === total && (
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand/40 bg-brand-soft/40 px-4 py-3 text-sm" data-testid="path-all-done">
@@ -40,6 +42,9 @@ export function PathView() {
           </Button>
         </div>
       )}
+      <CurrentSession goal={goal} index={nextIndex} />
+      <h2 className="mt-10 mb-1 text-sm font-medium">{t("polish.coursePlan")}</h2>
+      <p className="mb-5 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p>
       <ol className="divide-y" data-testid="path-stats">
         {goal.learning_path.map((s, i) => (
           <SessionRow key={s.id + i} session={s} index={i} isNext={i === nextIndex} minutes={sessionMinutes(goal.sessions[sessionUid(goal.id, i)])} />

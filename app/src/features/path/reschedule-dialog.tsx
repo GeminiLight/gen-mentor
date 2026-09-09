@@ -11,6 +11,7 @@ import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { parsePartialJSON } from "@/lib/llm/partial-json";
 import type { LearningPath } from "@/lib/schemas";
+import { reconcilePath } from "@/lib/store/reconcile-path";
 import { useArchive, type Goal } from "@/lib/store";
 
 /** Task C of the scheduler: learned sessions are kept verbatim, the rest is regenerated. */
@@ -35,7 +36,7 @@ export function RescheduleDialog({ goal }: { goal: Goal }) {
         },
       );
       if (!final) throw new Error(t("onboarding.schedulerNoPath"));
-      updateGoal(goal.id, { learning_path: final.learning_path });
+      updateGoal(goal.id, (current) => reconcilePath(current, final.learning_path));
       toast.success(t("path.rescheduled"), { description: t("path.rescheduledBody", { n: final.learning_path.length }) });
       setOpen(false);
     } catch (e) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -45,7 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {goal.learning_goal}
           </Link>
         )}
-        <nav className="mt-6 flex flex-col gap-0.5" aria-label="Primary">
+        <nav className="mt-6 flex flex-col gap-0.5" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
@@ -82,14 +83,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             <CommandMenu compact />
             {tutor("icon")}
             <ModelSettings />
-            <LangToggle />
-            <ThemeToggle />
+            <details className="relative">
+              <summary className="flex size-11 cursor-pointer list-none items-center justify-center rounded-md hover:bg-muted" aria-label={t("polish.readingTools")}><Settings2 className="size-4" aria-hidden /></summary>
+              <div className="absolute right-0 z-40 mt-2 flex gap-2 rounded-lg border bg-popover p-3 shadow-sm"><LangToggle /><ThemeToggle /></div>
+            </details>
           </div>
         </header>
+        {goal && <Link href="/goals" className="truncate border-b px-4 py-2 text-xs text-muted-foreground md:hidden" title={goal.learning_goal}>{t("polish.currentGoal")} · {goal.original_goal}</Link>}
         <main id="main" className="mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8" data-hydrated={hydrated ? "" : undefined}>
           {children}
         </main>
-        <nav className="fixed inset-x-0 bottom-0 flex border-t bg-background/95 backdrop-blur md:hidden" aria-label="Primary">
+        <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t pb-[env(safe-area-inset-bottom)] bg-background/95 backdrop-blur md:hidden" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}

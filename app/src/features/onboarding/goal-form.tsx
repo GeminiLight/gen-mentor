@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
+import { useOnboardingDraft } from "@/lib/store/onboarding-draft";
 import { countWords } from "@/lib/utils";
 
 export interface GoalFormValues {
@@ -23,9 +24,10 @@ export interface GoalFormValues {
  * with focus moved there; a disabled button that never says why is the thing this avoids.
  */
 export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: (v: GoalFormValues) => void }) {
-  const [goal, setGoal] = useState("");
-  const [info, setInfo] = useState("");
-  const [count, setCount] = useState("5");
+  const { goal, info, count, patch } = useOnboardingDraft();
+  const setGoal = (goal: string) => patch({ goal });
+  const setInfo = (info: string) => patch({ info });
+  const setCount = (count: string) => patch({ count });
   const [parsing, setParsing] = useState(false);
   const [touched, setTouched] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -43,7 +45,8 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
     setParsing(true);
     try {
       const { text, pages } = await api.parseResume(file);
-      setInfo((prev) => (prev.trim() ? `${prev.trim()}\n\n${text}` : text));
+      const prev = useOnboardingDraft.getState().info;
+      setInfo(prev.trim() ? `${prev.trim()}\n\n${text}` : text);
       toast.success(t("onboarding.readPages", { pages, name: file.name }));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("onboarding.readFailed"));
@@ -81,6 +84,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           aria-describedby={goalInvalid ? "goal-error" : undefined}
           autoFocus
         />
+        <p className="text-xs leading-relaxed text-muted-foreground">{t("polish.goalHelp")}</p>
         {goalInvalid && (
           <p id="goal-error" className="text-xs text-destructive" role="alert">
             {t("onboarding.goalRequired")}
@@ -130,10 +134,11 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
             </SelectContent>
           </Select>
         </div>
-        <Button type="submit" size="lg" disabled={disabled}>
+        <Button type="submit" size="lg" className="h-11 px-5" disabled={disabled || parsing}>
           {t("onboarding.submit")}
         </Button>
       </div>
+      <p className="text-xs leading-relaxed text-muted-foreground">{goal || info ? t("polish.savedDraft") : t("polish.countHelp")}</p>
     </form>
   );
 }

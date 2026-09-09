@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/client";
 import { useT, type Key } from "@/lib/i18n";
 import { parsePartialJSON } from "@/lib/llm/partial-json";
 import type { LearnerProfile, LearningPath, SkillGaps, SkillRequirements } from "@/lib/schemas";
 import { useArchive } from "@/lib/store";
+import { useOnboardingDraft } from "@/lib/store/onboarding-draft";
 import { masteryRate } from "@/lib/store/derive";
 import type { StageStatus } from "@/components/stage-list";
 
@@ -51,15 +52,23 @@ export function useOnboarding() {
   const [preview, setPreview] = useState<Preview>({});
   const [error, setError] = useState<string | null>(null);
   const last = useRef<{ input: OnboardingInput; done: Done } | null>(null);
+  const generation = useRef(0);
+  useEffect(() => () => { generation.current++; }, []);
   const running = Object.values(status).some((s) => s === "running");
 
   const run = useCallback(
     async (input: OnboardingInput) => {
+      const token = ++generation.current;
+      const active = () => generation.current === token;
       const { learning_goal, learner_information, session_count } = input;
       // Same input again means a retry: keep what already succeeded. New input starts clean.
-      const done: Done = sameInput(last.current?.input ?? null, input) ? (last.current?.done ?? {}) : {};
+      const saved = last.current ?? useOnboardingDraft.getState().checkpoint;
+      const done: Done = sameInput(saved?.input ?? null, input) ? { ...saved?.done } : {};
       last.current = { input, done };
-      const mark = (k: Step, s: StageStatus) => setStatus((st) => ({ ...st, [k]: s }));
+      const mark = (k: Step, s: StageStatus) => {
+        setStatus((st) => ({ ...st, [k]: s }));
+        if (s === "done") useOnboardingDraft.getState().patch({ checkpoint: { input, done: { ...done } } });
+      };
       setError(null);
       setPreview({ refined_goal: done.refined_goal, gaps: done.gap?.skill_gaps });
       setStatus({ ...PENDING, refine: done.refined_goal ? "done" : "pending", gap: done.gap ? "done" : "pending", profile: done.learner_profile ? "done" : "pending" });
@@ -68,6 +77,7 @@ export function useOnboarding() {
         if (!done.refined_goal) {
           mark("refine", "running");
           done.refined_goal = (await api.refineGoal({ learning_goal, learner_information })).refined_goal;
+          if (!active()) return;
           setPreview((p) => ({ ...p, refined_goal: done.refined_goal }));
           mark("refine", "done");
         }
@@ -77,6 +87,7 @@ export function useOnboarding() {
         if (!done.gap) {
           mark("gap", "running");
           done.gap = await api.identifySkillGap({ learning_goal: refined_goal, learner_information });
+          if (!active()) return;
           setPreview((p) => ({ ...p, gaps: done.gap?.skill_gaps }));
           mark("gap", "done");
         }
@@ -86,6 +97,7 @@ export function useOnboarding() {
         if (!done.learner_profile) {
           mark("profile", "running");
           done.learner_profile = (await api.profile({ mode: "init", learning_goal: refined_goal, learner_information, skill_gaps: { skill_gaps: gap.skill_gaps } })).learner_profile;
+          if (!active()) return;
           mark("profile", "done");
         }
         const learner_profile = done.learner_profile;
@@ -94,8 +106,9 @@ export function useOnboarding() {
         mark("path", "running");
         const { final } = await api.schedulePath({ task: "create", learner_profile, session_count }, (text) => {
           const partial = parsePartialJSON<LearningPath>(text);
-          if (partial) setPreview((p) => ({ ...p, path: partial }));
+          if (active() && partial) setPreview((p) => ({ ...p, path: partial }));
         });
+        if (!active()) return;
         if (!final) throw new Error(t("onboarding.schedulerNoPath"));
         mark("path", "done");
 
@@ -114,9 +127,11 @@ export function useOnboarding() {
           tutor: [],
         });
         last.current = null;
+        useOnboardingDraft.getState().clear();
         toast.success(t("onboarding.ready"), { description: t("path.rescheduledBody", { n: final.learning_path.length }) });
         router.push("/learning-path");
       } catch (e) {
+        if (!active()) return;
         mark(step, "error");
         setError(e instanceof Error ? e.message : t("onboarding.genericError"));
       }

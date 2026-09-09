@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
+import { scoredCount } from "@/lib/quiz";
 import { learnedCount, skillLevels, totalMinutes } from "@/lib/store/derive";
 import { MasteryLine, MinutesBars } from "./footprint";
 import { MasteryRing, ProgressRing } from "./mastery-ring";
@@ -26,15 +27,15 @@ export function ProgressView() {
   const skills = skillLevels(profile);
   const learned = learnedCount(goal);
   const minutes = totalMinutes(goal);
-  const quizzes = Object.values(goal.sessions).filter((s) => s.quiz_results?.answered);
-  const accuracy = quizzes.length ? Math.round((quizzes.reduce((a, s) => a + s.quiz_results!.correct, 0) / quizzes.reduce((a, s) => a + s.quiz_results!.answered, 0)) * 100) : null;
+  const quizzes = Object.values(goal.sessions).filter((s) => s.quiz_results && scoredCount(s.quiz_results) > 0);
+  const accuracy = quizzes.length ? Math.round((quizzes.reduce((a, s) => a + s.quiz_results!.correct, 0) / quizzes.reduce((a, s) => a + scoredCount(s.quiz_results!), 0)) * 100) : null;
 
   return (
     <>
       <PageHeader title={t("progress.title")} />
 
       <div className="flex flex-wrap items-center gap-x-12 gap-y-6">
-        <ProgressRing value={profile.cognitive_status.overall_progress} size={104} />
+        <div className="space-y-2"><ProgressRing value={profile.cognitive_status.overall_progress} size={104} /><p className="text-center text-xs text-muted-foreground">{t("polish.progressEstimate")}</p></div>
         <dl className="flex flex-wrap gap-x-12 gap-y-4 text-sm">
           <Stat label={t("progress.skillsMastered")} value={`${profile.cognitive_status.mastered_skills.length} / ${skills.length}`} testid="stat-mastered" />
           <Stat label={t("progress.sessions")} value={`${learned} / ${goal.learning_path.length}`} sub={minutes > 0 ? t("progress.minutesReading", { n: minutes }) : undefined} testid="stat-sessions" />
@@ -42,6 +43,7 @@ export function ProgressView() {
         </dl>
       </div>
 
+      <p className="mt-5 max-w-(--w-measure) text-xs leading-relaxed text-muted-foreground">{t("polish.progressNote")}</p>
       <Section title={t("progress.treeTitle")}>
         <SkillTree goal={goal} />
         <p className="mt-3 text-xs text-muted-foreground">{t("progress.legend")}</p>

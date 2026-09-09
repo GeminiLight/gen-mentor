@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, Send, Square, Trash2 } from "lucide-react";
+import { MessageCircle, Send, Square } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Prose } from "@/components/prose";
@@ -12,6 +12,7 @@ import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import type { ChatTurn, SessionItem } from "@/lib/schemas";
 import { useArchive, type Goal } from "@/lib/store";
+import { ClearConversation } from "./clear-conversation";
 import { cn } from "@/lib/utils";
 
 /**
@@ -36,6 +37,8 @@ export function TutorSheet({
   const { t } = useT();
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
+  const [question, setQuestion] = useState<string | null>(null);
+  const follow = useRef(true);
   const listRef = useRef<HTMLDivElement>(null);
   const abort = useRef<AbortController | null>(null);
   // The sheet mounts its list on open; a stable callback ref lands the learner on the latest turn.
@@ -57,6 +60,8 @@ export function TutorSheet({
     abort.current = ctrl;
     let partial = "";
     setDraft("");
+    setQuestion(content);
+    follow.current = true;
     setPending("");
     try {
       const { raw } = await api.tutor(
@@ -64,7 +69,7 @@ export function TutorSheet({
         (text) => {
           partial = text;
           setPending(text);
-          listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+          if (follow.current) listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
         },
         ctrl.signal,
       );
@@ -84,6 +89,7 @@ export function TutorSheet({
     } finally {
       abort.current = null;
       setPending(null);
+      setQuestion(null);
     }
   };
 
@@ -116,19 +122,8 @@ export function TutorSheet({
           <SheetTitle>{t("tutor.title")}</SheetTitle>
           <SheetDescription>{t("tutor.lede", { context: context ? t("tutor.ledeContext") : "" })}</SheetDescription>
         </SheetHeader>
-        {goal.tutor.length > 0 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="absolute top-3 right-12 text-muted-foreground"
-            aria-label={t("tutor.clear")}
-            onClick={() => clearTutor(goal.id)}
-          >
-            <Trash2 aria-hidden />
-          </Button>
-        )}
-        <div ref={attachList} role="log" className="flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
+        {goal.tutor.length > 0 && <ClearConversation onClear={() => clearTutor(goal.id)} disabled={pending !== null} />}
+        <div ref={attachList} onScroll={(e) => { const el = e.currentTarget; follow.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80; }} role="log" className="flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
           {goal.tutor.length === 0 && pending === null && (
             <div className="space-y-3">
               <p className="text-muted-foreground">{t("tutor.empty")}</p>
@@ -149,7 +144,8 @@ export function TutorSheet({
           {goal.tutor.map((m, i) => (
             <Bubble key={i} turn={m} />
           ))}
-          {pending !== null && <Bubble turn={{ role: "assistant", content: pending || "…" }} streaming />}
+          {question && <Bubble turn={{ role: "user", content: question }} />}
+          {pending !== null && <Bubble turn={{ role: "assistant", content: pending || t("polish.sending") }} streaming />}
         </div>
         <form
           className="flex items-end gap-2 border-t p-4"
@@ -162,7 +158,7 @@ export function TutorSheet({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.nativeEvent.keyCode !== 229) {
                 e.preventDefault();
                 void send();
               }
