@@ -86,7 +86,7 @@ route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组�
 | 方式 | 做法 |
 |---|---|
 | 本地 | `make install && make dev`，只需 `app/.env.local` 里一个 LLM key |
-| Vercel | Root Directory 设为 `app`，环境变量同 `.env.example`；不设 `GENMENTOR_STANDALONE` |
+| Vercel | 项目 `gen-mentor`（team geminilights-projects），生产别名 https://gen-mentor.vercel.app ，Root Directory `app`，GitHub `main` 推送自动部署。生产环境不配任何 LLM 变量，访客自带 key（顶部横幅引导）。预览部署开着 Vercel Authentication，生产别名公开 |
 | 容器 | `docker build -t genmentor app/`，`docker run -p 3000:3000 --env-file app/.env.local genmentor`；镜像用 `.next/standalone` 单进程 |
 
 `GENMENTOR_LLM_MODE=replay` 加 `e2e/fixtures/llm` 可以在没有 key 的机器上完整演示已录制的旅程。
