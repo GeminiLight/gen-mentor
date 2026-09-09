@@ -25,7 +25,7 @@ export function QuizView({
   results?: QuizResults;
   onSubmit: (r: QuizResults) => void;
 }) {
-  const [sel, setSel] = useState<Selections>(() => emptySelections(quiz));
+  const [sel, setSel] = useState<Selections>(() => results?.selections ?? emptySelections(quiz));
   const [order, setOrder] = useState<string[]>([]);
   const { t } = useT();
   const finished = !!results;

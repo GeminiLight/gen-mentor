@@ -52,6 +52,7 @@ export function seedArchive() {
               correct: 2,
               wrong_questions: [{ question: "Which expression computes the mean sales per region?", expected_answer: "df.groupby('region')['sales'].mean()" }],
               verdicts: { "single:0": "correct", "single:1": "correct", "single:2": "incorrect", "tf:0": "unanswered" },
+              selections: { single: [0, 0, 1], multiple: [], tf: [null], short: [] },
               submittedAt: now - 2 * 86_400_000 + 30 * 60_000,
             },
           },

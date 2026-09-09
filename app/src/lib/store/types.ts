@@ -1,4 +1,5 @@
 /** Everything GenMentor remembers about a learner lives here, on the device. */
+import type { Selections } from "@/lib/quiz";
 import type { DocumentQuiz, DocumentStructure, KnowledgeDraft, KnowledgePoint, LearnerProfile, LearningPath, SkillGaps, SkillRequirements, ChatTurn } from "@/lib/schemas";
 
 export type SessionId = string;
@@ -12,6 +13,8 @@ export interface QuizResults {
   wrong_questions: { question: string; expected_answer: string }[];
   /** Per-question verdicts, aligned with the quiz lists. */
   verdicts: Record<string, "correct" | "incorrect" | "unanswered" | "answered">;
+  /** What the learner picked, so the finished quiz can show their answers, not just the right ones. */
+  selections?: Selections;
   submittedAt: number;
 }
 

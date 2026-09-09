@@ -37,7 +37,7 @@ export function resolveOption(options: string[], correct: number | string): numb
 export const questionKey = (kind: keyof Selections, i: number) => `${kind}:${i}`;
 
 export function judge(quiz: DocumentQuiz, sel: Selections): QuizResults {
-  const r: QuizResults = { answered: 0, correct: 0, wrong_questions: [], verdicts: {}, submittedAt: Date.now() };
+  const r: QuizResults = { answered: 0, correct: 0, wrong_questions: [], verdicts: {}, selections: sel, submittedAt: Date.now() };
   const mark = (key: string, answered: boolean, correct: boolean | null, question: string, expected: string) => {
     if (!answered) {
       r.verdicts[key] = "unanswered";
