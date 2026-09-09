@@ -55,7 +55,7 @@ export const zh: Dict = {
     goalHint: "",
     infoLabel: "背景",
     infoPlaceholder: "你的岗位、经验、工具、课程。也可以上传简历。",
-    infoHintShort: "",
+    infoHintShort: "一两句就够。写得越具体，技能差距越准。",
     infoWords: "{n} 字",
     upload: "上传简历",
     uploadFile: "上传简历文件",

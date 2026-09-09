@@ -24,8 +24,9 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
   const [parsing, setParsing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { t } = useT();
-  const goalOk = goal.trim().length >= 12;
-  const infoOk = info.trim().length >= 40;
+  // Short answers are allowed: the agents infer from whatever is there. The hint below nudges, never blocks.
+  const goalOk = goal.trim().length >= 3;
+  const infoOk = info.trim().length >= 3;
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
@@ -74,7 +75,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           rows={7}
           placeholder={t("onboarding.infoPlaceholder")}
         />
-        {info.trim().length >= 40 && <p className="text-xs text-muted-foreground">{t("onboarding.infoWords", { n: info.trim().split(/\s+/).length })}</p>}
+        <p className="text-xs text-muted-foreground">{info.trim().length < 40 ? t("onboarding.infoHintShort") : t("onboarding.infoWords", { n: info.trim().split(/\s+/).length })}</p>
       </div>
 
       <div className="flex flex-wrap items-end justify-between gap-4">

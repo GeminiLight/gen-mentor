@@ -53,7 +53,7 @@ export const en = {
     goalHint: "",
     infoLabel: "Background",
     infoPlaceholder: "Your role, experience, tools, courses. Or upload a résumé.",
-    infoHintShort: "",
+    infoHintShort: "A sentence or two is enough. More detail makes the skill gap more accurate.",
     infoWords: "{n} words",
     upload: "Upload résumé",
     uploadFile: "Upload résumé file",
