@@ -1,6 +1,5 @@
 "use client";
 
-import { Flame } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +9,7 @@ import { emptySelections, judge, questionKey, resolveOption, type Selections } f
 import type { QuizResults } from "@/lib/store/types";
 import { cn } from "@/lib/utils";
 import { Option, Question } from "./quiz-question";
+import { QuizStatus } from "./quiz-status";
 
 /**
  * Each choice question is judged the moment it is answered, so the verdict is instant and a
@@ -61,24 +61,7 @@ export function QuizView({
         onSubmit(judge(quiz, sel));
       }}
     >
-      <div
-        className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 px-4 py-2 text-sm"
-        aria-live="polite"
-      >
-        <span className="num text-muted-foreground">
-          {t("quiz.answered", { n: answered, total })}
-        </span>
-        <span
-          className={cn(
-            "num inline-flex items-center gap-1.5 font-medium transition-colors",
-            streak >= 2 ? "text-brand" : "text-muted-foreground",
-          )}
-          data-testid="streak"
-        >
-          <Flame className={cn("size-4", streak >= 2 && "fill-current")} aria-hidden />
-          {streak >= 2 ? t("quiz.inARow", { n: streak }) : t("quiz.streak")}
-        </span>
-      </div>
+      <QuizStatus total={total} answered={answered} streak={streak} results={results} />
 
       {quiz.single_choice_questions.map((q, i) => {
         const key = questionKey("single", i);
@@ -182,7 +165,9 @@ export function QuizView({
             text={q.question}
             verdict={finished ? verdicts[key] : undefined}
             explanation={
-              finished ? `${t("quiz.expected")} ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}` : undefined
+              finished
+                ? `${t("quiz.expected")} ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}`
+                : undefined
             }
           >
             <Textarea
@@ -196,14 +181,10 @@ export function QuizView({
         );
       })}
 
-      {!finished ? (
+      {!finished && total > 0 && (
         <Button type="submit" data-testid="submit-quiz" disabled={answered === 0}>
           {t("quiz.finish")}
         </Button>
-      ) : (
-        <p className="num text-sm" data-testid="quiz-score">
-          {t("quiz.score", { correct: results.correct, answered: results.answered })}
-        </p>
       )}
     </form>
   );

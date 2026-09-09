@@ -3,6 +3,7 @@
 import { MessageCircle, Send, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { Prose } from "@/components/prose";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
@@ -98,8 +99,8 @@ function Bubble({ turn, streaming }: { turn: ChatTurn; streaming?: boolean }) {
   const mine = turn.role === "user";
   return (
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
-      <div className={cn("max-w-[85%] rounded-lg px-3 py-2 leading-relaxed whitespace-pre-wrap", mine ? "bg-primary text-primary-foreground" : "bg-muted")} aria-busy={streaming}>
-        {turn.content}
+      <div className={cn("max-w-[85%] rounded-lg px-3 py-2 leading-relaxed", mine ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-muted")} aria-busy={streaming}>
+        {mine ? turn.content : <Prose text={turn.content} />}
       </div>
     </div>
   );

@@ -37,8 +37,23 @@ export function seedArchive() {
               structure: { title: "Working with Pandas DataFrames", overview: "From creating and inspecting DataFrames to grouping a real sales dataset.", content: "", summary: "Inspect first, then filter, then group." },
               markdown: sample.learning_document,
             },
-            quiz: { single_choice_questions: [], multiple_choice_questions: [], true_false_questions: [], short_answer_questions: [] },
-            quiz_results: { answered: 3, correct: 2, wrong_questions: [], verdicts: {}, submittedAt: now - 2 * 86_400_000 + 30 * 60_000 },
+            quiz: {
+              single_choice_questions: [
+                { question: "Which method previews the first rows of a DataFrame?", options: ["df.head()", "df.tail()", "df.first()", "df.top()"], correct_option: 0, explanation: "head() shows the top rows." },
+                { question: "Which call returns column types and non-null counts?", options: ["df.info()", "df.describe()", "df.shape", "df.columns"], correct_option: 0, explanation: "info() is the structural summary." },
+                { question: "Which expression computes the mean sales per region?", options: ["df.groupby('region')['sales'].mean()", "df['sales'].mean('region')", "df.mean().groupby('region')", "df.region.sales.mean()"], correct_option: 0, explanation: "Group first, then aggregate the column." },
+              ],
+              multiple_choice_questions: [],
+              true_false_questions: [{ question: "iloc selects by label.", correct_answer: false, explanation: "iloc is positional; loc is by label." }],
+              short_answer_questions: [],
+            },
+            quiz_results: {
+              answered: 3,
+              correct: 2,
+              wrong_questions: [{ question: "Which expression computes the mean sales per region?", expected_answer: "df.groupby('region')['sales'].mean()" }],
+              verdicts: { "single:0": "correct", "single:1": "correct", "single:2": "incorrect", "tf:0": "unanswered" },
+              submittedAt: now - 2 * 86_400_000 + 30 * 60_000,
+            },
           },
         },
         mastery_history: [

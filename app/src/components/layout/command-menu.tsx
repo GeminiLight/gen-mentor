@@ -9,6 +9,7 @@ import {
   Moon,
   Plus,
   Route,
+  Search,
   Sun,
   TrendingUp,
   UserRound,
@@ -31,7 +32,7 @@ import { LANGS, useLangStore, useT } from "@/lib/i18n";
 import { useArchive, useActiveGoal } from "@/lib/store";
 
 /** ⌘K / Ctrl+K. Jumps to pages, sessions and goals; the only global keyboard surface. */
-export function CommandMenu() {
+export function CommandMenu({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
@@ -58,16 +59,22 @@ export function CommandMenu() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="hidden text-muted-foreground md:inline-flex"
-        onClick={() => setOpen(true)}
-        aria-label={t("command.open")}
-      >
-        {t("common.search")}
-        <kbd className="ml-1 rounded border bg-muted px-1 font-mono text-xs">⌘K</kbd>
-      </Button>
+      {compact ? (
+        <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("command.open")}>
+          <Search aria-hidden />
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground"
+          onClick={() => setOpen(true)}
+          aria-label={t("command.open")}
+        >
+          {t("common.search")}
+          <kbd className="ml-1 rounded border bg-muted px-1 font-mono text-xs">⌘K</kbd>
+        </Button>
+      )}
       <CommandDialog
         open={open}
         onOpenChange={setOpen}

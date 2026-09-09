@@ -152,6 +152,7 @@ export const zh: Dict = {
     selectAll: "选出所有正确项，然后确认",
     confirm: "确认",
     finish: "交卷",
+    none: "这个会话没有测验题。重新生成会话可以得到一组新题。",
     score: "答了 {answered} 题，对 {correct} 题",
     correct: "正确",
     incorrect: "错误",

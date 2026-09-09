@@ -69,6 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {t("common.appName")}
           </Link>
           <div className="flex items-center">
+            <CommandMenu compact />
             {goal && <TutorSheet goal={goal} />}
             <LangToggle />
             <ThemeToggle />

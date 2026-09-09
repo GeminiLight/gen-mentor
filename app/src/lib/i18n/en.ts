@@ -150,6 +150,7 @@ export const en = {
     selectAll: "select all that apply, then confirm",
     confirm: "Confirm",
     finish: "Finish quiz",
+    none: "This session has no quiz questions. Regenerate the session to get a new set.",
     score: "{correct} of {answered} answered correctly",
     correct: "Correct",
     incorrect: "Incorrect",
