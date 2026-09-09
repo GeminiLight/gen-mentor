@@ -23,7 +23,7 @@ export function HealthBadge() {
   return (
     <ModelSettings
       trigger={
-        <button type="button" data-testid="health-badge" className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted">
+        <button type="button" data-testid="health-badge" className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted">
           <span className={`size-1.5 rounded-full ${tone}`} aria-hidden />
           {label}
         </button>

@@ -20,7 +20,7 @@ export function HomeView() {
   return (
     <main className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
-        <Logo width={168} />
+        <Logo width={168} className="h-auto w-28 sm:w-42" />
         <div className="flex items-center gap-2">
           <HealthBadge />
           <LangToggle />
