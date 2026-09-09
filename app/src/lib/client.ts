@@ -32,8 +32,21 @@ export interface Health {
   ok: boolean;
   provider: "openai" | "anthropic";
   serverKey: boolean;
+  /** Which credentials this request would use. */
+  source: "server" | "byok";
   mode: "live" | "record" | "replay";
   models: { fast: string; smart: string };
+}
+
+/** Learner-supplied credentials ride along as one header; see lib/llm/config.ts. */
+function llmHeaders(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem("genmentor.llm.v1");
+    const byok = raw ? (JSON.parse(raw) as { state?: { byok?: unknown } }).state?.byok : null;
+    return byok ? { "x-genmentor-llm": JSON.stringify(byok) } : {};
+  } catch {
+    return {};
+  }
 }
 
 export class ApiError extends Error {
@@ -57,7 +70,7 @@ async function readError(res: Response): Promise<never> {
 }
 
 async function post<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", ...llmHeaders() }, body: JSON.stringify(body), signal });
   if (!res.ok) return readError(res);
   return (await res.json()) as T;
 }
@@ -67,7 +80,7 @@ async function post<T>(url: string, body: unknown, signal?: AbortSignal): Promis
  * Resolves with the `@@final` payload when the route sends one, else the full text.
  */
 async function postStream<T>(url: string, body: unknown, onDelta?: (text: string) => void, signal?: AbortSignal): Promise<{ raw: string; final: T | null }> {
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", ...llmHeaders() }, body: JSON.stringify(body), signal });
   if (!res.ok || !res.body) return readError(res);
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -91,9 +104,15 @@ type In<S extends z.ZodType> = z.input<S>;
 
 export const api = {
   health: async (): Promise<Health> => {
-    const res = await fetch("/api/health", { cache: "no-store" });
+    const res = await fetch("/api/health", { cache: "no-store", headers: llmHeaders() });
     if (!res.ok) return readError(res);
     return (await res.json()) as Health;
+  },
+  /** Live round trip with the given credentials; returns the model's reply and latency. */
+  testLLM: async (byok: unknown): Promise<{ ok: true; reply: string; ms: number; model: string }> => {
+    const res = await fetch("/api/health", { method: "POST", headers: { "Content-Type": "application/json", "x-genmentor-llm": JSON.stringify(byok) } });
+    if (!res.ok) return readError(res);
+    return (await res.json()) as { ok: true; reply: string; ms: number; model: string };
   },
   refineGoal: (body: In<typeof RefineGoalRequest>) => post<RefinedGoal>("/api/refine-goal", body),
   identifySkillGap: (body: In<typeof IdentifySkillGapRequest>) => post<SkillGaps & SkillRequirements>("/api/identify-skill-gap", body),

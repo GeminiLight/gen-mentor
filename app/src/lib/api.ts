@@ -1,7 +1,7 @@
 /** Shared plumbing for route handlers: body validation, error shaping, text streaming. */
 import { NextResponse } from "next/server";
 import type { z } from "zod";
-import { toHttpError } from "./llm";
+import { llmForRequest, toHttpError, withLLM } from "./llm";
 
 export function fail(e: unknown) {
   const { status, message } = toHttpError(e);
@@ -25,6 +25,11 @@ export async function parseBody<S extends z.ZodType>(req: Request, schema: S): P
 }
 
 export const isResponse = (v: unknown): v is NextResponse => v instanceof Response;
+
+/** Run a route's work under the LLM the request selected (the learner's own key, or the server's). */
+export function withRequestLLM<T>(req: Request, fn: () => Promise<T>): Promise<T> {
+  return withLLM(llmForRequest(req).llm, fn);
+}
 
 /**
  * Run a streaming task and return its deltas as plain text. With `final`, the resolved

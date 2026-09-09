@@ -79,3 +79,10 @@ OKLCH 定义，明暗各一套，`.dark` class 切换，默认跟随系统。
 组件里只写 `t("scope.key")`，不写字面文案；日期与数字用 `useT()` 返回的 `fmtDate` / `fmtNum`
 按当前语言格式化。首次访问按 `navigator.language` 判断，之后随设备持久化，`<html lang>` 同步。
 智能体生成的内容（目标、路径、文档、导师回复）跟随学习者自己输入的语言，不由这层翻译。
+
+## 标识
+
+`resources/logo.svg` 是从原 PNG 复刻的矢量版：环与叶片按测得的几何重绘，字标从位图描摹为路径，
+渐变色取自采样。`resources/logo-mark.svg` 只有圆环标记，同一份复制到 `app/public/` 并作为
+`app/src/app/icon.svg` 站点图标。界面里标记出现在侧栏、手机顶栏和首页；字标只在首页和 README 用，
+产品内部仍以文字 "GenMentor" 为名。标识色是品牌固有色，不进入设计 token，因此放在静态文件里而不是组件中。

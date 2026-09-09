@@ -11,7 +11,8 @@
 
 | 方法 | 路径 | agent | 档位 | 返回 | maxDuration |
 |---|---|---|---|---|---|
-| GET | `/api/health` | 无 | 无 | `{ ok, provider, serverKey, mode, models }`，不含凭证 | 默认 |
+| GET | `/api/health` | 无 | 无 | `{ ok, provider, serverKey, source, mode, models }`，不含凭证；带 `x-genmentor-llm` 头时反映学习者的配置 | 默认 |
+| POST | `/api/health` | 无 | fast | 用 `x-genmentor-llm` 头里的凭证做一次 ping，返回 `{ ok, reply, ms, model }` | 60 |
 | POST | `/api/refine-goal` | Goal Refiner | fast | `{ refined_goal }` | 60 |
 | POST | `/api/identify-skill-gap` | Skill Mapper 加 Skill Gap Identifier | smart | `{ skill_gaps, skill_requirements }`；传入 `skill_requirements` 可跳过 mapper | 120 |
 | POST | `/api/profile` | Adaptive Learner Profiler | fast | `{ learner_profile }`；`mode: init` 或 `update` | 120 |
@@ -27,6 +28,10 @@
 Performance Evaluator 不在这份实现里。当前仓没有这个 agent 的 prompt（只有 KiddleMentor 有），
 而 profiler 的 update 任务本身接收 `quiz_performance` 并据此更新认知状态，这就是论文里评估反馈进
 入学习者模型的路径。
+
+## 请求头
+
+`x-genmentor-llm`：JSON，`{ provider, apiKey, baseUrl?, fastModel?, smartModel?, disableThinking? }`。任何 POST 路由都接受，缺省用服务端配置。
 
 ## 流式协议
 

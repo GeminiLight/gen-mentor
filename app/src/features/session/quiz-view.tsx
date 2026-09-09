@@ -7,7 +7,6 @@ import type { DocumentQuiz } from "@/lib/schemas";
 import { useT } from "@/lib/i18n";
 import { emptySelections, judge, questionKey, resolveOption, type Selections } from "@/lib/quiz";
 import type { QuizResults } from "@/lib/store/types";
-import { cn } from "@/lib/utils";
 import { Option, Question } from "./quiz-question";
 import { QuizStatus } from "./quiz-status";
 

@@ -1,5 +1,5 @@
 import { schedulePath } from "@/lib/agents/path";
-import { isResponse, parseBody, taskStream } from "@/lib/api";
+import { isResponse, parseBody, taskStream, withRequestLLM } from "@/lib/api";
 import { SchedulePathRequest } from "@/lib/schemas";
 
 export const maxDuration = 180;
@@ -8,5 +8,5 @@ export const maxDuration = 180;
 export async function POST(req: Request) {
   const body = await parseBody(req, SchedulePathRequest);
   if (isResponse(body)) return body;
-  return taskStream((onDelta) => schedulePath(body, onDelta), { final: true });
+  return taskStream((onDelta) => withRequestLLM(req, () => schedulePath(body, onDelta)), { final: true });
 }

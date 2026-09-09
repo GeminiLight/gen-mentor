@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 344 344" role="img" aria-label="GenMentor">
+  <defs>
+    <linearGradient id="disc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9166FF"/><stop offset="1" stop-color="#1F66FF"/></linearGradient>
+    <linearGradient id="leafgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00CC99"/><stop offset="1" stop-color="#0BBFA6"/></linearGradient>
+    <linearGradient id="word" x1="422" y1="0" x2="1957" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9867FF"/><stop offset="0.38" stop-color="#8183FB"/><stop offset="0.77" stop-color="#3AA9F2"/><stop offset="1" stop-color="#0DB0F1"/></linearGradient>
+  </defs>
+  <g transform="translate(172 172)">
+    <circle r="138.3" fill="none" stroke="#6EF5CA" stroke-width="34.6"/>
+    <circle r="94" fill="url(#disc)"/>
+    <path d="M0 -14 H59 V14 H0 Z" fill="#fff"/>
+    <path d="M 28.9 -34.5 A 45 45 0 1 0 44.3 7.8" fill="none" stroke="#fff" stroke-width="28.5"/>
+    <g fill="url(#leafgrad)">
+      <path id="petal" d="M0 -75 C 26 -95 26 -152 0 -172 C -26 -152 -26 -95 0 -75 Z"/>
+      <use href="#petal" transform="rotate(90)"/><use href="#petal" transform="rotate(180)"/><use href="#petal" transform="rotate(270)"/>
+    </g>
+  </g>
+</svg>

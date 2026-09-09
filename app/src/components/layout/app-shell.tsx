@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { LangToggle } from "@/components/lang-toggle";
+import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ModelSettings } from "@/features/settings/model-settings";
 import { TutorSheet } from "@/features/tutor/tutor-sheet";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
@@ -27,8 +29,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         {t("common.skipToContent")}
       </a>
       <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col border-r bg-sidebar px-3 py-4 md:flex">
-        <Link href="/" className="px-2 text-sm font-semibold tracking-tight">
-          {t("common.appName")}
+        <Link href="/" className="px-2 text-sm" aria-label={t("common.appName")}>
+          <Brand />
         </Link>
         <nav className="mt-8 flex flex-col gap-0.5" aria-label="Primary">
           {items.map(({ href, label, icon: Icon }) => (
@@ -51,6 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center justify-between">
             {goal ? <TutorSheet goal={goal} /> : <span />}
             <div className="flex items-center">
+              <ModelSettings />
               <LangToggle />
               <ThemeToggle />
             </div>
@@ -60,12 +63,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-12 items-center justify-between border-b px-4 md:hidden">
-          <Link href="/" className="text-sm font-semibold tracking-tight">
-            {t("common.appName")}
+          <Link href="/" className="text-sm" aria-label={t("common.appName")}>
+            <Brand />
           </Link>
           <div className="flex items-center">
             <CommandMenu compact />
             {goal && <TutorSheet goal={goal} />}
+            <ModelSettings />
             <LangToggle />
             <ThemeToggle />
           </div>

@@ -43,6 +43,11 @@ const serverLLM: LLM = { chatText, chatStream };
 /** Shape-compatible replacement for the `@/lib/llm` module. */
 export const fakeLLMModule = () => ({
   serverLLM,
+  currentLLM: () => serverLLM,
+  withLLM: <T,>(_llm: LLM, fn: () => T) => fn(),
+  llmForRequest: () => ({ llm: serverLLM, source: "server" as const }),
+  byokFromRequest: () => null,
+  createLLMForConfig: () => serverLLM,
   chatText,
   chatStream,
   extractJSON,

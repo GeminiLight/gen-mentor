@@ -50,6 +50,14 @@ profile、路径、按 `goalId:index` 键的会话状态（知识点、草稿、
 `parsePartialJSON` 边收边渲染。完成会话时把 `quiz_performance` 并进 `learner_interactions`
 调 profile update，标记 `if_learned`，记一条掌握度点。
 
+## 自带密钥（BYOK）
+
+学习者可以在设置里填自己的供应商、地址、密钥和模型（`features/settings/model-settings.tsx`），
+保存在 localStorage（`genmentor.llm.v1`），由 `lib/client.ts` 以 `x-genmentor-llm` 请求头随每次调用发送。
+服务端 `lib/llm/config.ts#byokFromRequest` 用 zod 校验后为该请求构造一个 LLM（`createLLM`），
+路由用 `withRequestLLM` 把它放进 AsyncLocalStorage，agent 通过 `currentLLM()` 取用，服务端不落盘。
+`POST /api/health` 用给定凭证做一次最小调用以便"测试"。BYOK 请求始终 live，不参与 record / replay。
+
 ## LLM 调用链
 
 route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组装 prompt →

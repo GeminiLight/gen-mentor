@@ -3,6 +3,7 @@
 import { ArrowRight, Compass, Route, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { LangToggle } from "@/components/lang-toggle";
+import { Logo } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useT, type Key } from "@/lib/i18n";
 import { ContinueLink } from "./continue-link";
@@ -19,7 +20,7 @@ export function HomeView() {
   return (
     <main className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
-        <span className="font-semibold tracking-tight">{t("common.appName")}</span>
+        <Logo width={168} />
         <div className="flex items-center gap-2">
           <HealthBadge />
           <LangToggle />

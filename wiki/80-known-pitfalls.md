@@ -108,3 +108,9 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 现象：首页大标题退化成 16px。
 原因：`@theme` 里 `--text-*: initial` 之后 `text-4xl` 不存在，Tailwind 不报错，只是不生成。
 解法：只用 xs 到 2xl 六级；截图评审时留意标题层级。
+
+## SVG 里 `<use>` 引用的 id 与渐变 id 撞名
+
+现象：四片叶子只画出一片。
+原因：`<path id="leaf">` 与 `<linearGradient id="leaf">` 同名，`href="#leaf"` 解析到渐变。
+解法：图形元素与 paint 元素分别命名。

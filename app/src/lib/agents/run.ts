@@ -3,7 +3,7 @@
  * schema violation one corrective re-ask that shows the model exactly what failed.
  */
 import type { z } from "zod";
-import { extractJSON, jsonCall, LLMError, serverLLM, type ChatOpts, type Tier } from "@/lib/llm";
+import { currentLLM, extractJSON, jsonCall, LLMError, type ChatOpts, type Tier } from "@/lib/llm";
 import { fill, type PromptValue } from "@/lib/prompts/format";
 
 export interface AgentCall {
@@ -25,7 +25,7 @@ export async function runJSON<S extends z.ZodType>(call: AgentCall, schema: S): 
   if (parsed.success) return parsed.data;
 
   const issues = parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("\n");
-  const retry = await serverLLM.chatText({
+  const retry = await currentLLM().chatText({
     ...base,
     messages: [
       { role: "user", content: user },
@@ -49,7 +49,7 @@ export function streamJSON<S extends z.ZodType>(call: AgentCall, schema: S, onDe
   const user = fill(call.task, call.vars);
   const opts: ChatOpts = { tier: call.tier, system: call.system, messages: [{ role: "user", content: user }], maxTokens: call.maxTokens ?? DEFAULT_JSON_TOKENS };
   return (async (): Promise<z.output<S>> => {
-    const run = serverLLM.chatStream(opts);
+    const run = currentLLM().chatStream(opts);
     for await (const d of run.deltas) onDelta?.(d);
     const text = run.text();
     let problem: string;
@@ -62,7 +62,7 @@ export function streamJSON<S extends z.ZodType>(call: AgentCall, schema: S, onDe
       problem = e.message;
     }
     // The stream is already on the wire; the corrective re-ask is a plain call whose result becomes @@final.
-    const retry = await serverLLM.chatText({
+    const retry = await currentLLM().chatText({
       ...opts,
       messages: [
         { role: "user", content: user },
@@ -78,7 +78,7 @@ export function streamJSON<S extends z.ZodType>(call: AgentCall, schema: S, onDe
 
 /** Plain text streaming for conversational agents. */
 export async function streamText(call: Omit<AgentCall, "vars" | "task"> & { messages: ChatOpts["messages"] }, onDelta?: (d: string) => void) {
-  const run = serverLLM.chatStream({ tier: call.tier, system: call.system, messages: call.messages, maxTokens: call.maxTokens ?? 4000 });
+  const run = currentLLM().chatStream({ tier: call.tier, system: call.system, messages: call.messages, maxTokens: call.maxTokens ?? 4000 });
   for await (const d of run.deltas) onDelta?.(d);
   return run.text();
 }

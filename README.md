@@ -1,6 +1,6 @@
 <div align="center">
   <p align="center">
-    <img src="resources/logo.png" alt="GenMentor Logo" width="300"/>
+    <img src="resources/logo.svg" alt="GenMentor" width="360"/>
   </p>
   <p><b>LLM-powered & Goal-oriented Tutoring System</b></p>
   <p>
@@ -66,6 +66,9 @@ cp app/.env.example app/.env.local
 # set LLM_API_KEY and LLM_BASE_URL (or OPENAI_API_KEY / ANTHROPIC_API_KEY)
 make dev                          # http://localhost:3000
 ```
+
+Learners can also bring their own key from the app (the key icon in the sidebar): it stays in
+their browser and is sent with each request, so a public deployment can run without a server key.
 
 `LLM_FAST_MODEL` and `LLM_SMART_MODEL` split the work between a cheap model (tutor, quizzes,
 goal refinement) and a stronger one (skill gap, scheduling, content). Defaults and the other
