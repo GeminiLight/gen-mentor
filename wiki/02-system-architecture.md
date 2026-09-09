@@ -12,6 +12,7 @@
 | 校验 | zod 4，全部 route 入参必须过 zod |
 | LLM | `openai` 与 `@anthropic-ai/sdk` 官方 SDK，不用 langchain |
 | 动效 | `motion/react` |
+| 语言 | `lib/i18n`：en / zh 词典，zustand 持久化的语言选择，`useT()` |
 | 测试 | vitest（单元）、Playwright 加 axe（E2E 与可访问性） |
 | 包管理 | pnpm 11 |
 

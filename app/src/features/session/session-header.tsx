@@ -1,15 +1,19 @@
+"use client";
+
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { SessionItem } from "@/lib/schemas";
+import { useT } from "@/lib/i18n";
 
 export function SessionHeader({ session }: { session: SessionItem }) {
+  const { t } = useT();
   return (
     <div>
       <Button variant="ghost" size="sm" asChild className="-ml-2 text-muted-foreground">
         <Link href="/learning-path">
-          <ArrowLeft aria-hidden /> Path
+          <ArrowLeft aria-hidden /> {t("session.path")}
         </Link>
       </Button>
       <p className="eyebrow mt-4">{session.id}</p>
@@ -21,7 +25,7 @@ export function SessionHeader({ session }: { session: SessionItem }) {
             {s}
           </Badge>
         ))}
-        {session.if_learned && <Badge className="bg-success-soft text-success">Learned</Badge>}
+        {session.if_learned && <Badge className="bg-success-soft text-success">{t("common.learned")}</Badge>}
       </div>
     </div>
   );

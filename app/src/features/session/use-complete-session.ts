@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/client";
+import { useT } from "@/lib/i18n";
 import { quizPerformance } from "@/lib/quiz";
 import type { SessionItem } from "@/lib/schemas";
 import { useArchive, type Goal } from "@/lib/store";
@@ -16,6 +17,7 @@ import { masteryRate, sessionUid } from "@/lib/store/derive";
 export function useCompleteSession(goal: Goal | null, session: SessionItem | undefined, index: number) {
   const { updateGoal, patchSession, recordMastery } = useArchive();
   const router = useRouter();
+  const { t } = useT();
   const [completing, setCompleting] = useState(false);
 
   const complete = async () => {
@@ -38,12 +40,12 @@ export function useCompleteSession(goal: Goal | null, session: SessionItem | und
       }));
       patchSession(uid, { completed_at: Date.now() });
       recordMastery(goal.id, masteryRate(learner_profile), learner_profile.cognitive_status.overall_progress);
-      toast.success("Session completed", {
-        description: `Profile updated. Overall progress ${learner_profile.cognitive_status.overall_progress}%.`,
+      toast.success(t("session.completed"), {
+        description: t("session.completedBody", { n: learner_profile.cognitive_status.overall_progress }),
       });
       router.push("/learning-path");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not update your profile");
+      toast.error(e instanceof Error ? e.message : t("session.completeFailed"));
     } finally {
       setCompleting(false);
     }

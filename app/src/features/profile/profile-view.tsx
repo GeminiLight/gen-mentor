@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
+import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { masteryRate } from "@/lib/store/derive";
 import { ArchivePanel } from "./archive-panel";
@@ -21,11 +22,12 @@ export function ProfileView() {
   const { hydrated, updateGoal, recordMastery } = useArchive();
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const { t } = useT();
   if (!hydrated) return <Skeleton className="h-64 rounded-xl" data-loading="" />;
   if (!goal) {
     return (
       <div className="space-y-6">
-        <EmptyState title="No active goal" body="The learner profile is built during onboarding." action={<Button asChild><Link href="/onboarding">Start with a goal</Link></Button>} />
+        <EmptyState title={t("common.noActiveGoal")} body={t("profile.emptyBody")} action={<Button asChild><Link href="/onboarding">{t("common.startWithGoal")}</Link></Button>} />
         <ArchivePanel />
       </div>
     );
@@ -39,9 +41,9 @@ export function ProfileView() {
       updateGoal(goal.id, { learner_profile });
       recordMastery(goal.id, masteryRate(learner_profile), learner_profile.cognitive_status.overall_progress);
       setNote("");
-      toast.success("Profile updated");
+      toast.success(t("profile.updated"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Update failed");
+      toast.error(e instanceof Error ? e.message : t("profile.updateFailed"));
     } finally {
       setBusy(false);
     }
@@ -49,43 +51,43 @@ export function ProfileView() {
 
   return (
     <>
-      <PageHeader eyebrow="Learner profile" title="How GenMentor sees you" description="Rebuilt by the profiler each time you complete a session. Tell it what it is missing." />
+      <PageHeader eyebrow={t("profile.eyebrow")} title={t("profile.title")} description={t("profile.lede")} />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Background</CardTitle>
+            <CardTitle>{t("profile.background")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-relaxed">
             <p>{p.learner_information}</p>
             <div>
-              <p className="eyebrow">Goal</p>
+              <p className="eyebrow">{t("profile.goal")}</p>
               <p className="mt-1">{p.learning_goal}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Cognitive status</CardTitle>
-            <CardDescription>Overall progress {p.cognitive_status.overall_progress}%</CardDescription>
+            <CardTitle>{t("profile.cognitive")}</CardTitle>
+            <CardDescription>{t("profile.overall", { n: p.cognitive_status.overall_progress })}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div>
-              <p className="eyebrow">Mastered</p>
+              <p className="eyebrow">{t("profile.mastered")}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {p.cognitive_status.mastered_skills.length === 0 && <span className="text-muted-foreground">None yet</span>}
+                {p.cognitive_status.mastered_skills.length === 0 && <span className="text-muted-foreground">{t("profile.noneYet")}</span>}
                 {p.cognitive_status.mastered_skills.map((s) => (
                   <Badge key={s.name} className="bg-success-soft text-success">
-                    {s.name} · {s.proficiency_level}
+                    {s.name} · {t(`levels.${s.proficiency_level}`)}
                   </Badge>
                 ))}
               </div>
             </div>
             <div>
-              <p className="eyebrow">In progress</p>
+              <p className="eyebrow">{t("profile.inProgress")}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {p.cognitive_status.in_progress_skills.map((s) => (
                   <Badge key={s.name} variant="outline">
-                    {s.name} · {s.current_proficiency_level} → {s.required_proficiency_level}
+                    {s.name} · {t(`levels.${s.current_proficiency_level}`)} → {t(`levels.${s.required_proficiency_level}`)}
                   </Badge>
                 ))}
               </div>
@@ -94,15 +96,15 @@ export function ProfileView() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Learning preferences</CardTitle>
+            <CardTitle>{t("profile.preferences")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm leading-relaxed">
             <p>
-              <span className="text-muted-foreground">Content style · </span>
+              <span className="text-muted-foreground">{t("profile.contentStyle")} · </span>
               {p.learning_preferences.content_style}
             </p>
             <p>
-              <span className="text-muted-foreground">Activity type · </span>
+              <span className="text-muted-foreground">{t("profile.activityType")} · </span>
               {p.learning_preferences.activity_type}
             </p>
             {p.learning_preferences.additional_notes && <p className="text-muted-foreground">{p.learning_preferences.additional_notes}</p>}
@@ -110,7 +112,7 @@ export function ProfileView() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Behavioral patterns</CardTitle>
+            <CardTitle>{t("profile.behavior")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm leading-relaxed">
             <p>{p.behavioral_patterns.system_usage_frequency}</p>
@@ -120,16 +122,16 @@ export function ProfileView() {
         </Card>
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Tell the profiler something</CardTitle>
-            <CardDescription>New experience, a preference it got wrong, time you can commit. The whole profile is rebuilt with it.</CardDescription>
+            <CardTitle>{t("profile.tellTitle")}</CardTitle>
+            <CardDescription>{t("profile.tellLede")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Label htmlFor="note" className="sr-only">
-              Additional information
+              {t("profile.tellLabel")}
             </Label>
-            <Textarea id="note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} disabled={busy} placeholder="I finished a SQL course last month and prefer short sessions on weekday evenings." />
+            <Textarea id="note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} disabled={busy} placeholder={t("profile.tellPlaceholder")} />
             <Button onClick={() => void update()} disabled={busy || note.trim().length < 8}>
-              {busy ? "Updating…" : "Update profile"}
+              {busy ? t("profile.updating") : t("profile.update")}
             </Button>
           </CardContent>
         </Card>

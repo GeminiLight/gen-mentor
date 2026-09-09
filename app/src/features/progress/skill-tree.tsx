@@ -3,10 +3,11 @@
 import { useState } from "react";
 import type { SessionItem } from "@/lib/schemas";
 import type { Goal } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import { skillLevels } from "@/lib/store/derive";
 import { cn } from "@/lib/utils";
 
-const LEVELS = ["unlearned", "beginner", "intermediate", "advanced"];
+const LEVELS = ["unlearned", "beginner", "intermediate", "advanced"] as const;
 const FILL = ["fill-level-0", "fill-level-1", "fill-level-2", "fill-level-3"];
 const COL = 168;
 const ROW = 92;
@@ -20,6 +21,7 @@ const SESSION_R = 9;
 export function SkillTree({ goal }: { goal: Goal }) {
   const skills = skillLevels(goal.learner_profile);
   const [focus, setFocus] = useState<string | null>(null);
+  const { t } = useT();
   const cols = Math.max(skills.length, 1);
   const width = cols * COL;
   const sessionsOf = (name: string) => goal.learning_path.map((s, i) => ({ s, i })).filter(({ s }) => s.desired_outcome_when_completed.some((o) => o.name === name));
@@ -27,16 +29,16 @@ export function SkillTree({ goal }: { goal: Goal }) {
   const height = ROW * 2 + maxSessions * (SESSION_R * 2 + 10) + 24;
   const x = (i: number) => COL * i + COL / 2;
 
-  if (skills.length === 0) return <p className="text-sm text-muted-foreground">No skills in the profile yet.</p>;
+  if (skills.length === 0) return <p className="text-sm text-muted-foreground">{t("progress.noSkills")}</p>;
 
   return (
     <div className="overflow-x-auto" data-testid="skill-tree">
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto block min-w-full" role="img" aria-label={`Skill tree with ${skills.length} skills and ${goal.learning_path.length} sessions`}>
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto block min-w-full" role="img" aria-label={t("progress.treeAria", { skills: skills.length, sessions: goal.learning_path.length })}>
         {/* goal */}
         <g>
           <rect x={width / 2 - 60} y={12} width={120} height={28} rx={14} className="fill-foreground" />
           <text x={width / 2} y={26} dominantBaseline="central" textAnchor="middle" className="fill-background text-xs font-medium">
-            Goal
+            {t("progress.goal")}
           </text>
         </g>
         {skills.map((k, i) => {
@@ -55,7 +57,7 @@ export function SkillTree({ goal }: { goal: Goal }) {
                 {k.name.length > 22 ? `${k.name.slice(0, 21)}…` : k.name}
               </text>
               <text x={cx} y={cy + 50} textAnchor="middle" className="fill-muted-foreground text-xs">
-                {LEVELS[k.currentRank]} → {LEVELS[k.requiredRank]}
+                {t(`levels.${LEVELS[k.currentRank]}`)} → {t(`levels.${LEVELS[k.requiredRank]}`)}
               </text>
               {sessions.map(({ s, i: si }, j) => (
                 <SessionNode key={si} session={s} index={si} cx={cx} cy={cy + 74 + j * (SESSION_R * 2 + 10)} />

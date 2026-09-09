@@ -18,6 +18,7 @@ import { PipelinePanel, type PipelineView } from "./pipeline-panel";
 import { QuizView } from "./quiz-view";
 import { SessionHeader } from "./session-header";
 import { useCompleteSession } from "./use-complete-session";
+import { useT } from "@/lib/i18n";
 
 const idle = (): PipelineView => ({
   status: Object.fromEntries(STAGES.map((s) => [s, "pending"])) as Record<Stage, StageStatus>,
@@ -27,6 +28,7 @@ const idle = (): PipelineView => ({
 export function SessionView({ index }: { index: number }) {
   const goal = useActiveGoal();
   const { hydrated, patchSession, openSession, submitQuiz } = useArchive();
+  const { t } = useT();
   const [view, setView] = useState<PipelineView>(idle);
   const [running, setRunning] = useState(false);
   const started = useRef<string | null>(null);
@@ -76,7 +78,7 @@ export function SessionView({ index }: { index: number }) {
           },
         );
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Content generation failed";
+        const msg = e instanceof Error ? e.message : t("session.generationFailed");
         setView((cur) => ({
           ...cur,
           error: msg,
@@ -88,7 +90,7 @@ export function SessionView({ index }: { index: number }) {
         setRunning(false);
       }
     },
-    [goal, session, uid, state, patchSession],
+    [goal, session, uid, state, patchSession, t],
   );
 
   // First visit: record the open and kick off whatever stage is missing.
@@ -107,11 +109,11 @@ export function SessionView({ index }: { index: number }) {
   if (!goal || !session || !uid) {
     return (
       <EmptyState
-        title="Session not found"
-        body="This session is not on the active goal's path."
+        title={t("session.notFoundTitle")}
+        body={t("session.notFoundBody")}
         action={
           <Button asChild>
-            <Link href="/learning-path">Back to the path</Link>
+            <Link href="/learning-path">{t("session.backToPath")}</Link>
           </Button>
         }
       />
@@ -148,14 +150,14 @@ export function SessionView({ index }: { index: number }) {
             <Tabs defaultValue="read">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <TabsList>
-                  <TabsTrigger value="read">Read</TabsTrigger>
+                  <TabsTrigger value="read">{t("session.read")}</TabsTrigger>
                   <TabsTrigger value="quiz" data-testid="tab-quiz">
-                    Quiz{state?.quiz_results ? ` · ${state.quiz_results.correct}/${state.quiz_results.answered}` : ""}
+                    {t("session.quiz")}{state?.quiz_results ? ` · ${state.quiz_results.correct}/${state.quiz_results.answered}` : ""}
                   </TabsTrigger>
                 </TabsList>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" onClick={() => void start(true)} disabled={completing}>
-                    <RefreshCw aria-hidden /> Regenerate
+                    <RefreshCw aria-hidden /> {t("session.regenerate")}
                   </Button>
                   {!session.if_learned && (
                     <Button
@@ -164,7 +166,7 @@ export function SessionView({ index }: { index: number }) {
                       disabled={completing}
                       data-testid="complete-session"
                     >
-                      <CheckCircle2 aria-hidden /> {completing ? "Updating profile…" : "Complete session"}
+                      <CheckCircle2 aria-hidden /> {completing ? t("session.completing") : t("session.complete")}
                     </Button>
                   )}
                 </div>

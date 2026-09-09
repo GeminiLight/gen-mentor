@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { cn } from "@/lib/utils";
-import { useActiveGoal, useArchive } from "@/lib/store";
 import { TutorSheet } from "@/features/tutor/tutor-sheet";
+import { useT } from "@/lib/i18n";
+import { useActiveGoal, useArchive } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { CommandMenu } from "./command-menu";
 import { NAV } from "./nav";
 
@@ -15,17 +17,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const goal = useActiveGoal();
   const hydrated = useArchive((s) => s.hydrated);
+  const { t } = useT();
   const items = NAV.filter((n) => !n.needsGoal || goal);
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`) || (href === "/learning-path" && pathname.startsWith("/session/"));
 
   return (
     <div className="flex min-h-full flex-1">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:ring-3 focus:ring-ring/50">
-        Skip to content
+        {t("common.skipToContent")}
       </a>
       <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col border-r bg-sidebar px-3 py-4 md:flex">
         <Link href="/" className="px-2 text-sm font-semibold tracking-tight">
-          GenMentor
+          {t("common.appName")}
         </Link>
         {goal && (
           <p className="mt-4 line-clamp-3 px-2 text-xs leading-relaxed text-muted-foreground" title={goal.learning_goal}>
@@ -44,15 +47,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             >
               <Icon className="size-4" aria-hidden />
-              {label}
+              {t(label)}
             </Link>
           ))}
         </nav>
         <div className="mt-auto space-y-2 px-1">
           <CommandMenu />
           <div className="flex items-center justify-between">
-            {goal && <TutorSheet goal={goal} />}
-            <ThemeToggle />
+            {goal ? <TutorSheet goal={goal} /> : <span />}
+            <div className="flex items-center">
+              <LangToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </aside>
@@ -60,10 +66,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-12 items-center justify-between border-b px-4 md:hidden">
           <Link href="/" className="text-sm font-semibold tracking-tight">
-            GenMentor
+            {t("common.appName")}
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center">
             {goal && <TutorSheet goal={goal} />}
+            <LangToggle />
             <ThemeToggle />
           </div>
         </header>
@@ -79,7 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs text-muted-foreground", isActive(href) && "text-foreground")}
             >
               <Icon className="size-5" aria-hidden />
-              {label}
+              {t(label)}
             </Link>
           ))}
         </nav>

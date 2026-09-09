@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { sessionMinutes, sessionUid } from "@/lib/store/derive";
 
@@ -15,8 +16,9 @@ import { sessionMinutes, sessionUid } from "@/lib/store/derive";
 export function LibraryView() {
   const goal = useActiveGoal();
   const hydrated = useArchive((s) => s.hydrated);
+  const { t } = useT();
   if (!hydrated) return <Skeleton className="h-64 rounded-xl" data-loading="" />;
-  if (!goal) return <EmptyState title="No active goal" body="The library fills with documents as you open sessions." action={<Button asChild><Link href="/goals">Go to goals</Link></Button>} />;
+  if (!goal) return <EmptyState title={t("common.noActiveGoal")} body={t("library.emptyGoalBody")} action={<Button asChild><Link href="/goals">{t("common.goToGoals")}</Link></Button>} />;
 
   const docs = goal.learning_path
     .map((s, i) => ({ session: s, index: i, state: goal.sessions[sessionUid(goal.id, i)] }))
@@ -24,9 +26,9 @@ export function LibraryView() {
 
   return (
     <>
-      <PageHeader eyebrow="Library" title="Everything written for you" description="Documents stay here after you finish a session, with the quiz result and the sources they drew on." />
+      <PageHeader eyebrow={t("library.eyebrow")} title={t("library.title")} description={t("library.lede")} />
       {docs.length === 0 ? (
-        <EmptyState title="Nothing generated yet" body="Open a session on your path and its document will appear here." action={<Button asChild><Link href="/learning-path">Open the path</Link></Button>} />
+        <EmptyState title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {docs.map(({ session, index, state }) => (
@@ -35,20 +37,18 @@ export function LibraryView() {
                 <CardHeader>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <BookOpen className="size-3.5" aria-hidden /> {session.id}
-                    {session.if_learned && <Badge className="ml-auto bg-success-soft text-success">Learned</Badge>}
+                    {session.if_learned && <Badge className="ml-auto bg-success-soft text-success">{t("common.learned")}</Badge>}
                   </div>
                   <CardTitle className="leading-snug">{state!.document!.structure.title}</CardTitle>
                   <CardDescription className="line-clamp-3">{state!.document!.structure.overview}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                  <span className="num">{state!.knowledge_points?.length ?? 0} points</span>
-                  <span className="num">{state!.knowledge_drafts?.reduce((a, d) => a + d.sources.length, 0) ?? 0} sources</span>
+                  <span className="num">{t("library.points", { n: state!.knowledge_points?.length ?? 0 })}</span>
+                  <span className="num">{t("library.sources", { n: state!.knowledge_drafts?.reduce((a, d) => a + d.sources.length, 0) ?? 0 })}</span>
                   {state!.quiz_results && (
-                    <span className="num">
-                      quiz {state!.quiz_results.correct}/{state!.quiz_results.answered}
-                    </span>
+                    <span className="num">{t("library.quiz", { correct: state!.quiz_results.correct, answered: state!.quiz_results.answered })}</span>
                   )}
-                  {sessionMinutes(state) > 0 && <span className="num">{sessionMinutes(state)} min</span>}
+                  {sessionMinutes(state) > 0 && <span className="num">{t("common.minutes", { n: sessionMinutes(state) })}</span>}
                 </CardContent>
               </Card>
             </Link>

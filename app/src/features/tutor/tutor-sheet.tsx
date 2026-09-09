@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
+import { useT } from "@/lib/i18n";
 import type { ChatTurn } from "@/lib/schemas";
 import { useArchive, type Goal } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 /** The AI tutor, always one tap away. Replies stream in; history is kept per goal on the device. */
 export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) {
   const { appendTutor, clearTutor } = useArchive();
+  const { t } = useT();
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -31,7 +33,7 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
       });
       appendTutor(goal.id, [{ role: "user", content }, { role: "assistant", content: raw.trim() }]);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "The tutor did not answer");
+      toast.error(e instanceof Error ? e.message : t("tutor.failed"));
       setDraft(content);
     } finally {
       setPending(null);
@@ -41,17 +43,17 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Open AI tutor">
+        <Button variant="ghost" size="icon" aria-label={t("tutor.open")}>
           <MessageCircle aria-hidden />
         </Button>
       </SheetTrigger>
       <SheetContent className="flex w-full flex-col sm:max-w-(--w-dialog)">
         <SheetHeader>
-          <SheetTitle>AI tutor</SheetTitle>
-          <SheetDescription>Ask about anything on your path. Answers are grounded in your profile{context ? " and the document you are reading" : ""}.</SheetDescription>
+          <SheetTitle>{t("tutor.title")}</SheetTitle>
+          <SheetDescription>{t("tutor.lede", { context: context ? t("tutor.ledeContext") : "" })}</SheetDescription>
         </SheetHeader>
         <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
-          {goal.tutor.length === 0 && pending === null && <p className="text-muted-foreground">No messages yet. Try “What should I focus on this week?”</p>}
+          {goal.tutor.length === 0 && pending === null && <p className="text-muted-foreground">{t("tutor.empty")}</p>}
           {goal.tutor.map((m, i) => (
             <Bubble key={i} turn={m} />
           ))}
@@ -74,15 +76,15 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
               }
             }}
             rows={2}
-            placeholder="Ask the tutor…"
-            aria-label="Message to the tutor"
+            placeholder={t("tutor.placeholder")}
+            aria-label={t("tutor.messageLabel")}
             className="min-h-0 resize-none"
           />
-          <Button type="submit" size="icon" aria-label="Send" disabled={pending !== null || !draft.trim()}>
+          <Button type="submit" size="icon" aria-label={t("tutor.send")} disabled={pending !== null || !draft.trim()}>
             <Send aria-hidden />
           </Button>
           {goal.tutor.length > 0 && (
-            <Button type="button" variant="ghost" size="icon" aria-label="Clear conversation" onClick={() => clearTutor(goal.id)}>
+            <Button type="button" variant="ghost" size="icon" aria-label={t("tutor.clear")} onClick={() => clearTutor(goal.id)}>
               <Trash2 aria-hidden />
             </Button>
           )}

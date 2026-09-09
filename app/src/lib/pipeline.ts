@@ -5,17 +5,18 @@
  * restarts (the Python frontend did the same with content_pipeline_state).
  */
 import { api } from "@/lib/client";
+import type { Key } from "@/lib/i18n";
 import { parsePartialJSON } from "@/lib/llm/partial-json";
 import type { KnowledgeDraft, KnowledgePoint, LearnerProfile, SessionItem } from "@/lib/schemas";
 import type { SessionState } from "@/lib/store/types";
 
 export type Stage = "knowledge_points" | "knowledge_drafts" | "document" | "quiz";
 export const STAGES: Stage[] = ["knowledge_points", "knowledge_drafts", "document", "quiz"];
-export const STAGE_LABELS: Record<Stage, { running: string; done: string }> = {
-  knowledge_points: { running: "Exploring the knowledge points this session needs", done: "Knowledge points" },
-  knowledge_drafts: { running: "Drafting each knowledge point", done: "Drafts" },
-  document: { running: "Integrating the drafts into one document", done: "Document" },
-  quiz: { running: "Writing quiz questions from the document", done: "Quiz" },
+export const STAGE_LABELS: Record<Stage, { running: Key; done: Key }> = {
+  knowledge_points: { running: "session.stageExploreRun", done: "session.stageExploreDone" },
+  knowledge_drafts: { running: "session.stageDraftRun", done: "session.stageDraftDone" },
+  document: { running: "session.stageDocRun", done: "session.stageDocDone" },
+  quiz: { running: "session.stageQuizRun", done: "session.stageQuizDone" },
 };
 
 export interface PipelineInput {

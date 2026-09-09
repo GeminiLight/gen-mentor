@@ -4,9 +4,11 @@ import { Check, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import type { Verdict } from "@/lib/quiz";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function VerdictMark({ v }: { v: Verdict | undefined }) {
+  const { t } = useT();
   if (!v || v === "answered") return null;
   const good = v === "correct";
   return (
@@ -22,7 +24,7 @@ export function VerdictMark({ v }: { v: Verdict | undefined }) {
       ) : v === "incorrect" ? (
         <X className="size-3.5" aria-hidden />
       ) : null}
-      {good ? "Correct" : v === "incorrect" ? "Incorrect" : "Not answered"}
+      {good ? t("quiz.correct") : v === "incorrect" ? t("quiz.incorrect") : t("quiz.unanswered")}
     </span>
   );
 }

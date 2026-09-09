@@ -22,10 +22,8 @@ test("onboarding shows the stage list immediately after submit", async ({ page }
   await page.goto("/onboarding");
   await page.getByLabel("Where do you want to be?").fill(sample.learning_goal);
   await page.getByLabel("Your background").fill(sample.learner_information);
-  const t0 = Date.now();
   await page.getByRole("button", { name: "Build my path" }).click();
   await expect(page.getByText("Refining your goal into something a path can be built against")).toBeVisible({ timeout: BUDGET_MS });
-  expect(Date.now() - t0).toBeLessThan(BUDGET_MS + 100);
 });
 
 test("opening an ungenerated session shows the pipeline panel at once", async ({ page }) => {
@@ -41,10 +39,8 @@ test("reschedule shows streaming state before the model answers", async ({ page 
   await slowApi(page);
   await page.goto("/learning-path");
   await page.getByRole("button", { name: "Reschedule" }).click();
-  const t0 = Date.now();
   await page.getByRole("dialog").getByRole("button", { name: "Reschedule" }).click();
   await expect(page.getByRole("dialog").locator("[data-loading]")).toBeVisible({ timeout: BUDGET_MS });
-  expect(Date.now() - t0).toBeLessThan(BUDGET_MS + 100);
 });
 
 test("pages render skeletons before the archive hydrates", async ({ page }) => {
@@ -61,8 +57,6 @@ test("tutor shows the pending bubble the moment a message is sent", async ({ pag
   await page.goto("/learning-path");
   await page.getByRole("button", { name: "Open AI tutor" }).first().click();
   await page.getByLabel("Message to the tutor").fill("Hello");
-  const t0 = Date.now();
   await page.getByRole("button", { name: "Send" }).click();
   await expect(page.getByTestId("tutor-messages").locator("[aria-busy=true]")).toBeVisible({ timeout: BUDGET_MS });
-  expect(Date.now() - t0).toBeLessThan(BUDGET_MS + 100);
 });

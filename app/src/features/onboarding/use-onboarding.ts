@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { api } from "@/lib/client";
+import { useT, type Key } from "@/lib/i18n";
 import { parsePartialJSON } from "@/lib/llm/partial-json";
 import type { LearningPath } from "@/lib/schemas";
 import { useArchive } from "@/lib/store";
@@ -10,11 +11,11 @@ import { masteryRate } from "@/lib/store/derive";
 import type { StageStatus } from "@/components/stage-list";
 
 export type Step = "refine" | "gap" | "profile" | "path";
-export const STEPS: { key: Step; label: string }[] = [
-  { key: "refine", label: "Refining your goal into something a path can be built against" },
-  { key: "gap", label: "Mapping the skills the goal needs and comparing them with your background" },
-  { key: "profile", label: "Building your learner profile" },
-  { key: "path", label: "Scheduling the first learning path" },
+export const STEPS: { key: Step; label: Key }[] = [
+  { key: "refine", label: "onboarding.stepRefine" },
+  { key: "gap", label: "onboarding.stepGap" },
+  { key: "profile", label: "onboarding.stepProfile" },
+  { key: "path", label: "onboarding.stepPath" },
 ];
 
 export interface Preview {
@@ -27,6 +28,7 @@ export interface Preview {
 export function useOnboarding() {
   const router = useRouter();
   const addGoal = useArchive((s) => s.addGoal);
+  const { t } = useT();
   const [status, setStatus] = useState<Record<Step, StageStatus>>({ refine: "pending", gap: "pending", profile: "pending", path: "pending" });
   const [preview, setPreview] = useState<Preview>({});
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function useOnboarding() {
           const partial = parsePartialJSON<LearningPath>(t);
           if (partial) setPreview((p) => ({ ...p, path: partial }));
         });
-        if (!final) throw new Error("The scheduler did not return a path");
+        if (!final) throw new Error(t("onboarding.schedulerNoPath"));
         mark("path", "done");
 
         const id = `g_${Date.now().toString(36)}`;
@@ -82,10 +84,10 @@ export function useOnboarding() {
         router.push("/learning-path");
       } catch (e) {
         mark(step, "error");
-        setError(e instanceof Error ? e.message : "Something went wrong");
+        setError(e instanceof Error ? e.message : t("onboarding.genericError"));
       }
     },
-    [addGoal, router],
+    [addGoal, router, t],
   );
 
   return { run, status, preview, error, running };

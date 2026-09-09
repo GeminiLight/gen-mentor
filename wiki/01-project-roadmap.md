@@ -100,3 +100,13 @@
 | 删除 `frontend/`、`backend/`、旧启动脚本与旧 CI | 仓库根 | done |
 | 论文实现标签 `paper-python-v1`（7a22a54） | git tag | done |
 | README 重写 | `README.md` | done |
+
+## 后续：UI/UX 打磨与中英文
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 中英文词典、语言切换、`<html lang>` 同步 | `app/src/lib/i18n/`、`components/lang-toggle.tsx` | done |
+| 全部页面与组件改用 `t()` | `app/src/features/*`、`components/layout/*` | done |
+| 阅读页目录（滚动高亮）与路径页统计 | `features/session/document-toc.tsx`、`features/path/path-view.tsx` | done |
+| 修复：⌘K 面板缺 cmdk 根节点崩溃；首页标题引用了不存在的字号 | `command-menu.tsx`、`home-view.tsx` | done |
+| e2e：两种语言无键泄漏、切换持久化、浏览器语言默认 | `e2e/specs/i18n.spec.ts` | done |

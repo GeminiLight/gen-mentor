@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { DocumentQuiz } from "@/lib/schemas";
+import { useT } from "@/lib/i18n";
 import { emptySelections, judge, questionKey, resolveOption, type Selections } from "@/lib/quiz";
 import type { QuizResults } from "@/lib/store/types";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function QuizView({
 }) {
   const [sel, setSel] = useState<Selections>(() => emptySelections(quiz));
   const [order, setOrder] = useState<string[]>([]);
+  const { t } = useT();
   const finished = !!results;
   // Live verdicts for what has been answered so far; the stored results win once finished.
   const live = useMemo(() => judge(quiz, sel), [quiz, sel]);
@@ -64,7 +66,7 @@ export function QuizView({
         aria-live="polite"
       >
         <span className="num text-muted-foreground">
-          {answered} / {total} answered
+          {t("quiz.answered", { n: answered, total })}
         </span>
         <span
           className={cn(
@@ -74,7 +76,7 @@ export function QuizView({
           data-testid="streak"
         >
           <Flame className={cn("size-4", streak >= 2 && "fill-current")} aria-hidden />
-          {streak >= 2 ? `${streak} in a row` : "streak"}
+          {streak >= 2 ? t("quiz.inARow", { n: streak }) : t("quiz.streak")}
         </span>
       </div>
 
@@ -109,7 +111,7 @@ export function QuizView({
             key={key}
             n={++n}
             text={q.question}
-            hint="select all that apply, then confirm"
+            hint={t("quiz.selectAll")}
             verdict={locked ? verdicts[key] : undefined}
             explanation={q.explanation}
           >
@@ -141,7 +143,7 @@ export function QuizView({
                 disabled={(sel.multiple[i]?.length ?? 0) === 0}
                 onClick={() => setOrder((o) => (o.includes(key) ? o : [...o, key]))}
               >
-                Confirm
+                {t("quiz.confirm")}
               </Button>
             )}
           </Question>
@@ -163,7 +165,7 @@ export function QuizView({
                   correct={val === q.correct_answer}
                   onChange={() => answer(key, { ...sel, tf: sel.tf.map((x, j) => (j === i ? val : x)) })}
                 >
-                  {val ? "True" : "False"}
+                  {val ? t("quiz.true") : t("quiz.false")}
                 </Option>
               ))}
             </div>
@@ -180,7 +182,7 @@ export function QuizView({
             text={q.question}
             verdict={finished ? verdicts[key] : undefined}
             explanation={
-              finished ? `Expected: ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}` : undefined
+              finished ? `${t("quiz.expected")} ${q.expected_answer}${q.explanation ? ` — ${q.explanation}` : ""}` : undefined
             }
           >
             <Textarea
@@ -188,7 +190,7 @@ export function QuizView({
               value={sel.short[i] ?? ""}
               disabled={finished}
               onChange={(e) => setSel({ ...sel, short: sel.short.map((x, j) => (j === i ? e.target.value : x)) })}
-              aria-label={`Answer to question ${n}`}
+              aria-label={t("quiz.answerTo", { n })}
             />
           </Question>
         );
@@ -196,11 +198,11 @@ export function QuizView({
 
       {!finished ? (
         <Button type="submit" data-testid="submit-quiz" disabled={answered === 0}>
-          Finish quiz
+          {t("quiz.finish")}
         </Button>
       ) : (
         <p className="num text-sm" data-testid="quiz-score">
-          <span className="font-medium">{results.correct}</span> of {results.answered} answered correctly
+          {t("quiz.score", { correct: results.correct, answered: results.answered })}
         </p>
       )}
     </form>

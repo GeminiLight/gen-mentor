@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 const LEVEL_STROKE = ["stroke-level-0", "stroke-level-1", "stroke-level-2", "stroke-level-3"];
 
@@ -39,11 +42,12 @@ export function MasteryRing({ current, required, size = 64, label, children }: {
 
 /** Overall progress as a single arc; the number is the profile's own `overall_progress`. */
 export function ProgressRing({ value, size = 120 }: { value: number; size?: number }) {
+  const { t } = useT();
   const r = (size - 12) / 2;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`Overall progress ${pct}%`} className="shrink-0">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={t("progress.overallAria", { n: pct })} className="shrink-0">
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={8} className="stroke-muted" />
       <circle
         cx={size / 2}

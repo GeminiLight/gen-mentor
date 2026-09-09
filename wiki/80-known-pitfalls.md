@@ -96,3 +96,15 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 原因：fixture 哈希覆盖 system 与 user 全文。
 解法：改 prompt 后清空 `e2e/fixtures/llm` 并在 record 模式重跑 `agents.spec` 与三条 LLM 旅程，约 25 分钟。
 教训：prompt 改动要成批做，评测与重录一次完成。
+
+## shadcn 的 `CommandDialog` 不含 cmdk 根节点
+
+现象：打开命令面板整页崩，`Cannot read properties of undefined (reading 'subscribe')`。
+原因：radix-nova 版的 `CommandDialog` 只包 Dialog，`CommandInput` / `CommandItem` 直接放进去拿不到 cmdk store。
+解法：在 `CommandDialog` 里自己套一层 `<Command>`。
+
+## 收窄字号阶梯后旧 class 静默失效
+
+现象：首页大标题退化成 16px。
+原因：`@theme` 里 `--text-*: initial` 之后 `text-4xl` 不存在，Tailwind 不报错，只是不生成。
+解法：只用 xs 到 2xl 六级；截图评审时留意标题层级。
