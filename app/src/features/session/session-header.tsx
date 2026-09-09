@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import type { SessionItem } from "@/lib/schemas";
 import { useT } from "@/lib/i18n";
 
-export function SessionHeader({ session }: { session: SessionItem }) {
+export function SessionHeader({ session, readingMinutes }: { session: SessionItem; readingMinutes?: number }) {
   const { t } = useT();
   return (
     <div>
@@ -16,7 +16,10 @@ export function SessionHeader({ session }: { session: SessionItem }) {
           <ArrowLeft aria-hidden /> {t("session.path")}
         </Link>
       </Button>
-      <p className="eyebrow mt-4">{session.id}</p>
+      <p className="eyebrow mt-4">
+        {session.id}
+        {readingMinutes ? <span className="num ml-3 normal-case tracking-normal">{t("session.readingTime", { n: readingMinutes })}</span> : null}
+      </p>
       <h1 className="mt-1 text-xl font-semibold tracking-tight">{session.title}</h1>
       <p className="mt-2 max-w-(--w-measure) text-sm leading-relaxed text-muted-foreground">{session.abstract}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">

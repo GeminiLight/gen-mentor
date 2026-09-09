@@ -32,7 +32,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Link href="/" className="px-2 text-sm" aria-label={t("common.appName")}>
           <Brand />
         </Link>
-        <nav className="mt-8 flex flex-col gap-0.5" aria-label="Primary">
+        {goal && (
+          <Link href="/goals" className="mt-4 block truncate rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground" title={goal.learning_goal}>
+            {goal.learning_goal}
+          </Link>
+        )}
+        <nav className="mt-6 flex flex-col gap-0.5" aria-label="Primary">
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}

@@ -20,6 +20,11 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const next = goal.learning_path.find((s) => !s.if_learned) ?? goal.learning_path[0];
+  const suggestions = [
+    t("tutor.suggestFocus"),
+    ...(next ? [t("tutor.suggestExplain", { title: next.title }), t("tutor.suggestQuiz", { title: next.title })] : []),
+  ];
 
   const send = async () => {
     const content = draft.trim();
@@ -28,11 +33,17 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
     setDraft("");
     setPending("");
     try {
-      const { raw } = await api.tutor({ messages: history, learner_profile: goal.learner_profile, external_resources: context }, (t) => {
-        setPending(t);
-        listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
-      });
-      appendTutor(goal.id, [{ role: "user", content }, { role: "assistant", content: raw.trim() }]);
+      const { raw } = await api.tutor(
+        { messages: history, learner_profile: goal.learner_profile, external_resources: context },
+        (t) => {
+          setPending(t);
+          listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+        },
+      );
+      appendTutor(goal.id, [
+        { role: "user", content },
+        { role: "assistant", content: raw.trim() },
+      ]);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("tutor.failed"));
       setDraft(content);
@@ -54,7 +65,23 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
           <SheetDescription>{t("tutor.lede", { context: context ? t("tutor.ledeContext") : "" })}</SheetDescription>
         </SheetHeader>
         <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
-          {goal.tutor.length === 0 && pending === null && <p className="text-muted-foreground">{t("tutor.empty")}</p>}
+          {goal.tutor.length === 0 && pending === null && (
+            <div className="space-y-3">
+              <p className="text-muted-foreground">{t("tutor.empty")}</p>
+              <div className="flex flex-wrap gap-2">
+                {suggestions.map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    className="rounded-full border px-3 py-1.5 text-left text-xs transition-colors hover:bg-muted"
+                    onClick={() => setDraft(q)}
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {goal.tutor.map((m, i) => (
             <Bubble key={i} turn={m} />
           ))}
@@ -85,7 +112,13 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
             <Send aria-hidden />
           </Button>
           {goal.tutor.length > 0 && (
-            <Button type="button" variant="ghost" size="icon" aria-label={t("tutor.clear")} onClick={() => clearTutor(goal.id)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("tutor.clear")}
+              onClick={() => clearTutor(goal.id)}
+            >
               <Trash2 aria-hidden />
             </Button>
           )}
@@ -99,7 +132,13 @@ function Bubble({ turn, streaming }: { turn: ChatTurn; streaming?: boolean }) {
   const mine = turn.role === "user";
   return (
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
-      <div className={cn("max-w-[85%] rounded-lg px-3 py-2 leading-relaxed", mine ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-muted")} aria-busy={streaming}>
+      <div
+        className={cn(
+          "max-w-[85%] rounded-lg px-3 py-2 leading-relaxed",
+          mine ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-muted",
+        )}
+        aria-busy={streaming}
+      >
         {mine ? turn.content : <Prose text={turn.content} />}
       </div>
     </div>

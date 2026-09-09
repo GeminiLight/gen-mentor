@@ -44,6 +44,7 @@ export function ProgressView() {
 
       <Section title={t("progress.treeTitle")}>
         <SkillTree goal={goal} />
+        <p className="mt-3 text-xs text-muted-foreground">{t("progress.legend")}</p>
       </Section>
 
       <Section title={t("progress.ringsTitle")}>

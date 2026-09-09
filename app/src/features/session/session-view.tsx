@@ -2,7 +2,7 @@
 
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
@@ -33,12 +33,17 @@ export function SessionView({ index }: { index: number }) {
   const { t } = useT();
   const [view, setView] = useState<PipelineView>(idle);
   const [running, setRunning] = useState(false);
+  const [tab, setTab] = useState("read");
   const started = useRef<string | null>(null);
 
   const session = goal?.learning_path[index];
   const { complete, completing } = useCompleteSession(goal, session, index);
   const uid = goal ? sessionUid(goal.id, index) : null;
   const state: SessionState | undefined = goal && uid ? goal.sessions[uid] : undefined;
+  const readingMinutes = useMemo(() => {
+    const md = state?.document?.markdown;
+    return md ? Math.max(1, Math.round(md.split(/\s+/).length / 200)) : undefined;
+  }, [state?.document?.markdown]);
 
   const start = useCallback(
     async (fresh = false) => {
@@ -128,7 +133,7 @@ export function SessionView({ index }: { index: number }) {
 
   return (
     <div className="space-y-8">
-      <SessionHeader session={session} />
+      <SessionHeader session={session} readingMinutes={readingMinutes} />
 
       <AnimatePresence mode="wait" initial={false}>
         {!doc || !quiz || running ? (
@@ -149,7 +154,7 @@ export function SessionView({ index }: { index: number }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
           >
-            <Tabs defaultValue="read">
+            <Tabs value={tab} onValueChange={setTab}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <TabsList>
                   <TabsTrigger value="read">{t("session.read")}</TabsTrigger>
@@ -175,6 +180,22 @@ export function SessionView({ index }: { index: number }) {
               <TabsContent value="read" className="pt-6">
                 <ReadingProgress />
                 <DocumentView markdown={doc.markdown} sources={sources} />
+                <div
+                  className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t pt-6 lg:max-w-(--w-measure)"
+                  data-testid="reading-end"
+                >
+                  <p className="text-sm text-muted-foreground">{t("session.finishedReading")}</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setTab("quiz")}>
+                      {t("session.quiz")}
+                    </Button>
+                    {!session.if_learned && (
+                      <Button size="sm" onClick={() => void complete()} disabled={completing}>
+                        <CheckCircle2 aria-hidden /> {completing ? t("session.completing") : t("session.complete")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </TabsContent>
               <TabsContent value="quiz" className="pt-6">
                 <QuizView

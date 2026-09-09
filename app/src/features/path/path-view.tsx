@@ -4,6 +4,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
@@ -26,6 +27,7 @@ export function PathView() {
   return (
     <>
       <PageHeader eyebrow={t("path.eyebrow")} title={goal.learning_goal} description={meta} actions={<RescheduleDialog goal={goal} />} />
+      <Progress value={(learned / Math.max(1, goal.learning_path.length)) * 100} className="mb-2 h-1" aria-label={meta} />
       <ol className="divide-y" data-testid="path-stats">
         {goal.learning_path.map((s, i) => (
           <SessionRow key={s.id + i} session={s} index={i} isNext={i === nextIndex} minutes={sessionMinutes(goal.sessions[sessionUid(goal.id, i)])} />
