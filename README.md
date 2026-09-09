@@ -99,14 +99,15 @@ browser, checks accessibility in both themes and screenshots every page in three
 ## Reproducing the paper
 
 The Python implementation used for the paper (FastAPI backend, Streamlit frontend, LangChain
-agents) is preserved at git tag **`paper-python-v1`**:
+agents) lives on the **`v0.1-demo`** branch, also tagged `v0.1.0` and `paper-python-v1`:
 
 ```bash
-git checkout paper-python-v1
+git checkout v0.1-demo
 ```
 
-Its README describes how to run it. The current application keeps the same nine agents and the
-same prompts (see `prompts-baseline`), rewritten in TypeScript.
+Its README describes how to run it. That branch is frozen as the demo version; all further work
+happens on `main`, which keeps the same nine agents and the same prompts (see `prompts-baseline`),
+rewritten in TypeScript.
 
 ## Citation
 
