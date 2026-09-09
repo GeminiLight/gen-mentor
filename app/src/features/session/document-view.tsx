@@ -27,8 +27,9 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
     return n ? `${base}-${n}` : base;
   };
   return (
-    <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_var(--w-toc)]">
-      <details className="rounded-lg border bg-muted/30 px-4 py-3 xl:hidden">
+    <div className="@container">
+    <div className="grid min-w-0 gap-8 @3xl:grid-cols-[minmax(0,1fr)_var(--w-toc)]">
+      <details className="rounded-lg border bg-muted/30 px-4 py-3 @3xl:hidden">
         <summary className="cursor-pointer text-sm font-medium">{t("session.contents")}</summary>
         <div className="pt-4"><DocumentToc items={toc} /></div>
       </details>
@@ -108,11 +109,12 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
           </aside>
         )}
       </article>
-      <aside className="hidden xl:block">
+      <aside className="hidden @3xl:block">
         <div className="sticky top-8">
           <DocumentToc items={toc} />
         </div>
       </aside>
+    </div>
     </div>
   );
 }

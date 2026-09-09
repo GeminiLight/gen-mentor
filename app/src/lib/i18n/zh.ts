@@ -1,3 +1,4 @@
+import { review } from "./zh-review";
 import { polish } from "./zh-polish";
 import type { Dict } from "./en";
 import { command, settings } from "./zh-shell";
@@ -245,6 +246,8 @@ export const zh: Dict = {
     deletedAll: "已删除全部数据",
   },
   tutor: {
+    pin: "固定在侧边",
+    unpin: "取消固定 · 随点随用",
     open: "导师",
     title: "导师",
     lede: "了解你的目标和画像{context}。",
@@ -263,4 +266,5 @@ export const zh: Dict = {
   settings,
   command,
   polish,
+  review,
 };

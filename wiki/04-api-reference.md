@@ -29,6 +29,10 @@ Performance Evaluator 不在这份实现里。当前仓没有这个 agent 的 pr
 而 profiler 的 update 任务本身接收 `quiz_performance` 并据此更新认知状态，这就是论文里评估反馈进
 入学习者模型的路径。
 
+## 创建路径的课程数
+
+`POST /api/schedule-path` 的 `task: "create"` 下，`session_count: 0` 或省略表示 Adaptive，模型根据目标、技能差距和偏好选择 1–10 课；指定正整数时沿用固定课数规则。创建目标表单默认 Adaptive，草稿保留用户手动选择。重排路径的 `-1` 语义保持不变。
+
 ## 请求头
 
 `x-genmentor-llm`：JSON，`{ provider, apiKey, baseUrl?, fastModel?, smartModel?, disableThinking? }`。任何 POST 路由都接受，缺省用服务端配置。

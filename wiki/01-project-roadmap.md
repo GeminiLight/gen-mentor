@@ -142,9 +142,20 @@
 | 创建目标的表单与阶段 checkpoint 持久化 | `lib/store/onboarding-draft.ts` | done |
 | 重排后课程内容重绑定、已完成课程保护 | `lib/store/reconcile-path.ts` | done |
 | 深校验档案、替换确认、导入前备份 | `lib/schemas/archive.ts`、`features/profile/archive-panel.tsx` | done |
-| 导师组合输入保护、清空确认、提问即时显示、滚动跟随控制 | `features/tutor/` | done |
+| 导师组合输入保护、清空确认、提问即时显示、滚动跟随控制、固定/临时模式 | `features/tutor/` | done |
 | 文库正文搜索、模型配置如实提示、进度估计标识 | `features/library/`、`features/settings/`、`features/progress/` | done |
 | 12 条针对审计缺陷的回归测试 | `e2e/specs/polish-{quiz,recovery,layout}.spec.ts` | done |
 
 本轮没有改 prompt、图表结构或 SDK 调用，也没有完成全部 30 项审计建议。
 稳定课程 URL、完成事实与画像更新解耦、技能证据详情与跨目标文库继续保留在 backlog。
+
+## 创建目标：确认与修订
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 技能确认、当前/目标水平滑块、3 分钟计时与延时 | `features/onboarding/starting-point-review.tsx`、`review-controls.tsx` | done |
+| 目标修订后重跑后续阶段、旧请求隔离与确认草稿恢复 | `features/onboarding/use-onboarding.ts`、`lib/store/onboarding-draft.ts` | done |
+| 默认 Adaptive、无历史目标隐藏 Goals | `features/onboarding/goal-form.tsx`、`onboarding-page.tsx` | done |
+
+验证包含手动确认、计时自动继续、编辑暂停与恢复、水平持久化、晚到请求、失败重试，
+以及手机和桌面的明暗主题截图与 axe 检查。

@@ -24,10 +24,12 @@ export interface GoalFormValues {
  * with focus moved there; a disabled button that never says why is the thing this avoids.
  */
 export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: (v: GoalFormValues) => void }) {
-  const { goal, info, count, patch } = useOnboardingDraft();
+  const { goal, info, count: savedCount, patch } = useOnboardingDraft();
+  const count = savedCount || "0";
   const setGoal = (goal: string) => patch({ goal });
   const setInfo = (info: string) => patch({ info });
-  const setCount = (count: string) => patch({ count });
+  // Ignore the native select’s empty synchronization event during draft hydration.
+  const setCount = (count: string) => { if (count) patch({ count }); };
   const [parsing, setParsing] = useState(false);
   const [touched, setTouched] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -126,6 +128,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="0">{t("polish.adaptiveCount")}</SelectItem>
               {[3, 4, 5, 6, 8, 10].map((n) => (
                 <SelectItem key={n} value={String(n)}>
                   {t("onboarding.countOption", { n })}
@@ -138,7 +141,8 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           {t("onboarding.submit")}
         </Button>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{goal || info ? t("polish.savedDraft") : t("polish.countHelp")}</p>
+      <p className="text-xs leading-relaxed text-muted-foreground">{t(count === "0" ? "polish.adaptiveCountHelp" : "polish.countHelp")}</p>
+      {(goal || info) && <p className="text-xs text-muted-foreground">{t("polish.savedDraft")}</p>}
     </form>
   );
 }

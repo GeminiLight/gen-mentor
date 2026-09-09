@@ -1,3 +1,4 @@
+import { review } from "./en-review";
 import { polish } from "./en-polish";
 /** English UI copy. Short, plain, no explanations of the machinery. `zh.ts` mirrors every key. */
 import { command, settings } from "./en-shell";
@@ -244,6 +245,8 @@ export const en = {
     deletedAll: "All data deleted",
   },
   tutor: {
+    pin: "Pin to side",
+    unpin: "Unpin · open on demand",
     open: "Tutor",
     title: "Tutor",
     lede: "Knows your goal and profile{context}.",
@@ -262,6 +265,7 @@ export const en = {
   settings,
   command,
   polish,
+  review,
 } as const;
 
 export type Dict = { [K in keyof typeof en]: { [P in keyof (typeof en)[K]]: string } };

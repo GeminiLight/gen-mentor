@@ -53,6 +53,12 @@ describe("agents: path scheduler", () => {
     expect(lastUserMessage()).toContain("**Desired Session Count**: 5");
     expect(requests[0].tier).toBe("smart");
   });
+  it.each([0, undefined])("lets the scheduler choose the count for Adaptive (%s)", async (session_count) => {
+    reset(path);
+    await schedulePath({ task: "create", learner_profile: profile, session_count });
+    expect(lastUserMessage()).toContain("**Desired Session Count**: Adaptive: choose 1-10 sessions");
+    expect(lastUserMessage()).toContain("no fixed count is requested");
+  });
   it("uses the reschedule task with -1 as the default session count", async () => {
     reset(path);
     await schedulePath({ task: "reschedule", learner_profile: profile, learning_path: path.learning_path });

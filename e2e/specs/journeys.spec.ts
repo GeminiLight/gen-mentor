@@ -11,13 +11,16 @@ test.describe.configure({ timeout: 900_000 });
 const archiveOf = (page: Page) => page.evaluate((k) => JSON.parse(window.localStorage.getItem(k) ?? "null"), STORAGE_KEY);
 
 test.describe("onboarding → path", () => {
-  test("builds a goal from a typed goal and background", async ({ page }) => {
+  test("builds a goal from a typed goal and background with a fixed session count", async ({ page }) => {
     await page.goto("/onboarding");
     await page.getByLabel("Goal", { exact: true }).fill(sample.learning_goal);
     await page.getByLabel("Background", { exact: true }).fill(sample.learner_information);
+    await page.getByLabel("Sessions", { exact: true }).click();
+    await page.getByRole("option", { name: "5 sessions", exact: true }).click();
     await page.getByRole("button", { name: "Build my path" }).click();
     await expect(page.getByText("Finding the skill gap")).toBeVisible({ timeout: 300_000 });
     await expect(page.getByText("Skill gap", { exact: true })).toBeVisible({ timeout: 300_000 });
+    await page.getByRole("button", { name: "Confirm and continue", exact: true }).click();
     await page.waitForURL("**/learning-path", { timeout: 600_000 });
     const rows = page.getByTestId("session-row");
     await expect(rows.first()).toBeVisible();

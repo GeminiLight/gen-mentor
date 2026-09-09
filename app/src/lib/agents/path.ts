@@ -2,6 +2,7 @@
 import type { PromptValue } from "@/lib/prompts/format";
 import {
   pathSchedulerCreateTask,
+  pathSchedulerCount,
   pathSchedulerRefineTask,
   pathSchedulerRescheduleTask,
   pathSchedulerSystem,
@@ -19,7 +20,7 @@ export function schedulePath(req: PathRequest, onDelta?: (d: string) => void) {
   switch (req.task) {
     case "create":
       return streamJSON(
-        { ...base, task: pathSchedulerCreateTask, vars: { learner_profile: req.learner_profile, session_count: req.session_count ?? 0 } },
+        { ...base, task: pathSchedulerCreateTask, vars: { learner_profile: req.learner_profile, session_count: pathSchedulerCount(req.session_count) } },
         LearningPath,
         onDelta,
       );
