@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
+import { parsePartialJSON } from "@/lib/llm/partial-json";
+import type { LearningPath } from "@/lib/schemas";
 import { useArchive, type Goal } from "@/lib/store";
 
 /** Task C of the scheduler: learned sessions are kept verbatim, the rest is regenerated. */
@@ -18,15 +20,19 @@ export function RescheduleDialog({ goal }: { goal: Goal }) {
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [busy, setBusy] = useState(false);
-  const [preview, setPreview] = useState("");
+  const [preview, setPreview] = useState<Partial<LearningPath> | null>(null);
 
   const run = async () => {
     setBusy(true);
-    setPreview("");
+    setPreview(null);
     try {
       const { final } = await api.schedulePath(
         { task: "reschedule", learner_profile: goal.learner_profile, learning_path: goal.learning_path, session_count: -1, other_feedback: feedback.trim() },
-        (t) => setPreview(t.slice(-240)),
+        // The new path arrives as JSON; show the session titles as they take shape, not the raw text.
+        (text) => {
+          const partial = parsePartialJSON<LearningPath>(text);
+          if (partial) setPreview(partial);
+        },
       );
       if (!final) throw new Error(t("onboarding.schedulerNoPath"));
       updateGoal(goal.id, { learning_path: final.learning_path });
@@ -38,6 +44,8 @@ export function RescheduleDialog({ goal }: { goal: Goal }) {
       setBusy(false);
     }
   };
+
+  const titles = preview?.learning_path?.map((s) => s?.title).filter((x): x is string => !!x) ?? [];
 
   return (
     <Dialog open={open} onOpenChange={(o) => !busy && setOpen(o)}>
@@ -56,9 +64,20 @@ export function RescheduleDialog({ goal }: { goal: Goal }) {
           <Textarea id="feedback" rows={3} value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder={t("path.feedbackPlaceholder")} disabled={busy} />
         </div>
         {busy && (
-          <pre className="max-h-24 overflow-hidden rounded-md bg-muted p-3 font-mono text-xs text-muted-foreground" aria-live="polite" data-loading="">
-            {preview || t("path.scheduling")}
-          </pre>
+          <div className="max-h-40 overflow-hidden rounded-md bg-muted p-3 text-sm" aria-live="polite" data-loading="">
+            {titles.length === 0 ? (
+              <p className="text-muted-foreground">{t("path.scheduling")}</p>
+            ) : (
+              <ol className="space-y-1">
+                {titles.map((title, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="num w-5 shrink-0 text-muted-foreground">{i + 1}</span>
+                    <span className="truncate">{title}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
         )}
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>

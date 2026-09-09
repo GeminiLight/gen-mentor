@@ -1,70 +1,134 @@
 "use client";
 
-import { MessageCircle, Send, Trash2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { MessageCircle, Send, Square, Trash2 } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Prose } from "@/components/prose";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
-import type { ChatTurn } from "@/lib/schemas";
+import type { ChatTurn, SessionItem } from "@/lib/schemas";
 import { useArchive, type Goal } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-/** The AI tutor, always one tap away. Replies stream in; history is kept per goal on the device. */
-export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) {
+/**
+ * The AI tutor, always one tap away. Replies stream in; history is kept per goal on the device.
+ * On a session page the document is handed over as context and the suggestions name that session.
+ */
+export function TutorSheet({
+  goal,
+  session,
+  context,
+  variant = "icon",
+}: {
+  goal: Goal;
+  /** The session the learner is looking at, if any; otherwise the next one on the path. */
+  session?: SessionItem;
+  /** Grounding text for the tutor, e.g. the open document's markdown. */
+  context?: string;
+  /** `rail` is a labeled row for the desktop navigation; `icon` a bare button for tight bars. */
+  variant?: "icon" | "rail";
+}) {
   const { appendTutor, clearTutor } = useArchive();
   const { t } = useT();
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const next = goal.learning_path.find((s) => !s.if_learned) ?? goal.learning_path[0];
+  const abort = useRef<AbortController | null>(null);
+  // The sheet mounts its list on open; a stable callback ref lands the learner on the latest turn.
+  const attachList = useCallback((el: HTMLDivElement | null) => {
+    listRef.current = el;
+    el?.scrollTo({ top: el.scrollHeight });
+  }, []);
+  const focus = session ?? goal.learning_path.find((s) => !s.if_learned) ?? goal.learning_path[0];
   const suggestions = [
     t("tutor.suggestFocus"),
-    ...(next ? [t("tutor.suggestExplain", { title: next.title }), t("tutor.suggestQuiz", { title: next.title })] : []),
+    ...(focus ? [t("tutor.suggestExplain", { title: focus.title }), t("tutor.suggestQuiz", { title: focus.title })] : []),
   ];
 
   const send = async () => {
     const content = draft.trim();
     if (!content || pending !== null) return;
     const history: ChatTurn[] = [...goal.tutor, { role: "user", content }];
+    const ctrl = new AbortController();
+    abort.current = ctrl;
+    let partial = "";
     setDraft("");
     setPending("");
     try {
       const { raw } = await api.tutor(
         { messages: history, learner_profile: goal.learner_profile, external_resources: context },
-        (t) => {
-          setPending(t);
+        (text) => {
+          partial = text;
+          setPending(text);
           listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
         },
+        ctrl.signal,
       );
       appendTutor(goal.id, [
         { role: "user", content },
         { role: "assistant", content: raw.trim() },
       ]);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("tutor.failed"));
-      setDraft(content);
+      // Stopped by the learner: keep what has arrived, or hand the question back if nothing did.
+      if (ctrl.signal.aborted) {
+        if (partial.trim()) appendTutor(goal.id, [{ role: "user", content }, { role: "assistant", content: partial.trim() }]);
+        else setDraft(content);
+      } else {
+        toast.error(e instanceof Error ? e.message : t("tutor.failed"));
+        setDraft(content);
+      }
     } finally {
+      abort.current = null;
       setPending(null);
     }
   };
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t("tutor.open")}>
-          <MessageCircle aria-hidden />
-        </Button>
-      </SheetTrigger>
+      {variant === "rail" ? (
+        <SheetTrigger asChild>
+          <button
+            type="button"
+            className="flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+          >
+            <MessageCircle className="size-4" aria-hidden />
+            {t("tutor.open")}
+          </button>
+        </SheetTrigger>
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label={t("tutor.open")}>
+                <MessageCircle aria-hidden />
+              </Button>
+            </SheetTrigger>
+          </TooltipTrigger>
+          <TooltipContent>{t("tutor.open")}</TooltipContent>
+        </Tooltip>
+      )}
       <SheetContent className="flex w-full flex-col sm:max-w-(--w-dialog)">
-        <SheetHeader>
+        <SheetHeader className="pr-20">
           <SheetTitle>{t("tutor.title")}</SheetTitle>
           <SheetDescription>{t("tutor.lede", { context: context ? t("tutor.ledeContext") : "" })}</SheetDescription>
         </SheetHeader>
-        <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
+        {goal.tutor.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="absolute top-3 right-12 text-muted-foreground"
+            aria-label={t("tutor.clear")}
+            onClick={() => clearTutor(goal.id)}
+          >
+            <Trash2 aria-hidden />
+          </Button>
+        )}
+        <div ref={attachList} role="log" className="flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
           {goal.tutor.length === 0 && pending === null && (
             <div className="space-y-3">
               <p className="text-muted-foreground">{t("tutor.empty")}</p>
@@ -108,18 +172,26 @@ export function TutorSheet({ goal, context }: { goal: Goal; context?: string }) 
             aria-label={t("tutor.messageLabel")}
             className="min-h-0 resize-none"
           />
-          <Button type="submit" size="icon" aria-label={t("tutor.send")} disabled={pending !== null || !draft.trim()}>
-            <Send aria-hidden />
-          </Button>
-          {goal.tutor.length > 0 && (
+          {pending !== null ? (
+            // Distinct keys so React does not turn this node into the submit button mid-click: the abort
+            // settles in a microtask, before the browser runs the click's default action on the same element.
             <Button
+              key="stop"
               type="button"
-              variant="ghost"
               size="icon"
-              aria-label={t("tutor.clear")}
-              onClick={() => clearTutor(goal.id)}
+              variant="outline"
+              aria-label={t("tutor.stop")}
+              data-testid="tutor-stop"
+              onClick={(e) => {
+                e.preventDefault();
+                abort.current?.abort();
+              }}
             >
-              <Trash2 aria-hidden />
+              <Square className="fill-current" aria-hidden />
+            </Button>
+          ) : (
+            <Button key="send" type="submit" size="icon" aria-label={t("tutor.send")} disabled={!draft.trim()}>
+              <Send aria-hidden />
             </Button>
           )}
         </form>

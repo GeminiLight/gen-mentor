@@ -3,18 +3,19 @@
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { useT } from "@/lib/i18n";
 import { useArchive, type Goal } from "@/lib/store";
-import { learnedCount, masteryRate } from "@/lib/store/derive";
+import { learnedCount } from "@/lib/store/derive";
 import { cn } from "@/lib/utils";
 
 export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
   const { setActiveGoal, removeGoal } = useArchive();
   const { t, fmtDate } = useT();
   const learned = learnedCount(goal);
-  const mastery = Math.round(masteryRate(goal.learner_profile) * 100);
+  const { mastered_skills, in_progress_skills } = goal.learner_profile.cognitive_status;
+  const skills = mastered_skills.length + in_progress_skills.length;
   return (
     <div data-testid="goal-card" data-active={active || undefined} className={cn("flex flex-col rounded-xl border bg-card p-5", active && "border-brand/60")}>
       <div className="flex items-start justify-between gap-3">
@@ -34,6 +35,9 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
               <DialogDescription>{t("goals.deleteBody")}</DialogDescription>
             </DialogHeader>
             <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="ghost">{t("common.cancel")}</Button>
+              </DialogClose>
               <Button variant="destructive" onClick={() => removeGoal(goal.id)}>
                 {t("common.delete")}
               </Button>
@@ -46,7 +50,7 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })}</span>
           <span className="num">
-            {t("goals.skillsMastered")} {mastery}%
+            {t("goals.skillsMastered")} {mastered_skills.length} / {skills}
           </span>
         </div>
         <Progress value={(learned / Math.max(1, goal.learning_path.length)) * 100} aria-label={t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })} />

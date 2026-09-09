@@ -52,3 +52,28 @@ export function totalMinutes(goal: Goal): number {
 }
 
 export const quizAccuracy = (r: { answered: number; correct: number } | undefined) => (r && r.answered ? r.correct / r.answered : null);
+
+export interface ActivitySummary {
+  /** Distinct local calendar days with any open or completion. */
+  activeDays: number;
+  opened: number;
+  completed: number;
+  /** Mean sitting minutes over completed sessions, or null before the first completion. */
+  avgMinutes: number | null;
+  lastActive: number | null;
+}
+
+/** What the archive actually records about how the learner works; the profile page shows this, not a guess. */
+export function activitySummary(goal: Goal): ActivitySummary {
+  const states = Object.values(goal.sessions);
+  const stamps = states.flatMap((s) => [...s.opened_at, ...(s.completed_at ? [s.completed_at] : [])]);
+  const completed = states.filter((s) => s.completed_at);
+  const minutes = completed.map(sessionMinutes).filter((m) => m > 0);
+  return {
+    activeDays: new Set(stamps.map((ts) => new Date(ts).toDateString())).size,
+    opened: states.filter((s) => s.opened_at.length > 0).length,
+    completed: completed.length,
+    avgMinutes: minutes.length ? Math.round(minutes.reduce((a, b) => a + b, 0) / minutes.length) : null,
+    lastActive: stamps.length ? Math.max(...stamps) : null,
+  };
+}

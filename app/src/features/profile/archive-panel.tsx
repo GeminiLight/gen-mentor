@@ -1,17 +1,18 @@
 "use client";
 
-import { Download, Upload } from "lucide-react";
+import { Download, Trash2, Upload } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useArchive } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { archiveFileName, archiveToBlob, parseArchive } from "@/lib/store/archive";
 
-/** The archive is the learner's property: one JSON file out, the same file back in. */
+/** The archive is the learner's property: one JSON file out, the same file back in, and a way to wipe it. */
 export function ArchivePanel() {
-  const { exportArchive, importArchive, goals } = useArchive();
+  const { exportArchive, importArchive, reset, goals } = useArchive();
   const fileRef = useRef<HTMLInputElement>(null);
   const { t } = useT();
 
@@ -52,6 +53,37 @@ export function ArchivePanel() {
         <Button variant="outline" onClick={() => fileRef.current?.click()}>
           <Upload aria-hidden /> {t("profile.import")}
         </Button>
+        {goals.length > 0 && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" className="ml-auto text-muted-foreground hover:text-destructive" data-testid="delete-all">
+                <Trash2 aria-hidden /> {t("profile.deleteAll")}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t("profile.deleteAllTitle")}</DialogTitle>
+                <DialogDescription>{t("profile.deleteAllBody")}</DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="ghost">{t("common.cancel")}</Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      reset();
+                      toast.success(t("profile.deletedAll"));
+                    }}
+                  >
+                    {t("common.delete")}
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </CardContent>
     </Card>
   );

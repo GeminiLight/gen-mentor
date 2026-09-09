@@ -41,7 +41,7 @@ export function useCompleteSession(goal: Goal | null, session: SessionItem | und
       patchSession(uid, { completed_at: Date.now() });
       recordMastery(goal.id, masteryRate(learner_profile), learner_profile.cognitive_status.overall_progress);
       toast.success(t("session.completed"), {
-        description: t("session.completedBody", { n: learner_profile.cognitive_status.overall_progress }),
+        description: t("session.completedBody", { from: goal.learner_profile.cognitive_status.overall_progress, to: learner_profile.cognitive_status.overall_progress }),
       });
       router.push("/learning-path");
     } catch (e) {

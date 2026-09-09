@@ -27,7 +27,6 @@ export function OnboardingPage() {
       </header>
       <div className="mb-10 max-w-(--w-measure)">
         <h1 className="text-xl font-semibold tracking-tight">{t("onboarding.title")}</h1>
-        {t("onboarding.lede") && <p className="mt-2 text-sm text-muted-foreground">{t("onboarding.lede")}</p>}
       </div>
       <OnboardingFlow />
     </main>

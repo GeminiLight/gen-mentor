@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -16,12 +16,17 @@ import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { masteryRate } from "@/lib/store/derive";
 import { ArchivePanel } from "./archive-panel";
+import { HabitsCard } from "./habits-card";
 
 export function ProfileView() {
   const goal = useActiveGoal();
   const { hydrated, updateGoal, recordMastery } = useArchive();
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
+  const noteOk = note.trim().length >= 8;
+  const noteInvalid = touched && !noteOk;
   const { t } = useT();
   if (!hydrated) return <Skeleton className="h-64 rounded-xl" data-loading="" />;
   if (!goal) {
@@ -35,12 +40,18 @@ export function ProfileView() {
   const p = goal.learner_profile;
 
   const update = async () => {
+    if (!noteOk) {
+      setTouched(true);
+      noteRef.current?.focus();
+      return;
+    }
     setBusy(true);
     try {
       const { learner_profile } = await api.profile({ mode: "update", learner_profile: p, learner_interactions: { additional_information: note.trim() }, learner_information: goal.learner_information });
       updateGoal(goal.id, { learner_profile });
       recordMastery(goal.id, masteryRate(learner_profile), learner_profile.cognitive_status.overall_progress);
       setNote("");
+      setTouched(false);
       toast.success(t("profile.updated"));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("profile.updateFailed"));
@@ -110,16 +121,7 @@ export function ProfileView() {
             {p.learning_preferences.additional_notes && <p className="text-muted-foreground">{p.learning_preferences.additional_notes}</p>}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("profile.behavior")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm leading-relaxed">
-            <p>{p.behavioral_patterns.system_usage_frequency}</p>
-            <p>{p.behavioral_patterns.session_duration_engagement}</p>
-            {p.behavioral_patterns.motivational_triggers && <p className="text-muted-foreground">{p.behavioral_patterns.motivational_triggers}</p>}
-          </CardContent>
-        </Card>
+        <HabitsCard goal={goal} />
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>{t("profile.tellTitle")}</CardTitle>
@@ -129,8 +131,23 @@ export function ProfileView() {
             <Label htmlFor="note" className="sr-only">
               {t("profile.tellLabel")}
             </Label>
-            <Textarea id="note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} disabled={busy} placeholder={t("profile.tellPlaceholder")} />
-            <Button onClick={() => void update()} disabled={busy || note.trim().length < 8}>
+            <Textarea
+              ref={noteRef}
+              id="note"
+              rows={3}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              disabled={busy}
+              placeholder={t("profile.tellPlaceholder")}
+              aria-invalid={noteInvalid || undefined}
+              aria-describedby={noteInvalid ? "note-error" : undefined}
+            />
+            {noteInvalid && (
+              <p id="note-error" className="text-xs text-destructive" role="alert">
+                {t("profile.tellRequired")}
+              </p>
+            )}
+            <Button onClick={() => void update()} disabled={busy}>
               {busy ? t("profile.updating") : t("profile.update")}
             </Button>
           </CardContent>

@@ -44,7 +44,9 @@ export function LibraryView() {
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <span className="num">{t("library.points", { n: state!.knowledge_points?.length ?? 0 })}</span>
-                  <span className="num">{t("library.sources", { n: state!.knowledge_drafts?.reduce((a, d) => a + d.sources.length, 0) ?? 0 })}</span>
+                  {(state!.knowledge_drafts?.some((d) => d.sources.length > 0) ?? false) && (
+                    <span className="num">{t("library.sources", { n: state!.knowledge_drafts!.reduce((a, d) => a + d.sources.length, 0) })}</span>
+                  )}
                   {state!.quiz_results && (
                     <span className="num">{t("library.quiz", { correct: state!.quiz_results.correct, answered: state!.quiz_results.answered })}</span>
                   )}

@@ -7,7 +7,8 @@ import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useT, type Key } from "@/lib/i18n";
-import { useArchive } from "@/lib/store";
+import { useActiveGoal, useArchive } from "@/lib/store";
+import { learnedCount } from "@/lib/store/derive";
 import { HealthBadge } from "./health-badge";
 
 const steps: { icon: typeof Compass; title: Key; body: Key }[] = [
@@ -16,11 +17,13 @@ const steps: { icon: typeof Compass; title: Key; body: Key }[] = [
   { icon: Sparkles, title: "home.step3Title", body: "home.step3Body" },
 ];
 
-/** Returning learners get their path as the primary action; newcomers get the goal form. */
+/** Returning learners see their goal and the next session before the fold; newcomers get the goal form. */
 export function HomeView() {
   const { t } = useT();
   const { goals, hydrated } = useArchive();
-  const returning = hydrated && goals.length > 0;
+  const goal = useActiveGoal();
+  const returning = hydrated && goals.length > 0 && goal;
+  const next = goal?.learning_path.find((s) => !s.if_learned);
   return (
     <main className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
@@ -58,6 +61,18 @@ export function HomeView() {
             </>
           )}
         </div>
+        {returning && (
+          <div className="mt-5 max-w-xl text-sm text-muted-foreground" data-testid="home-resume">
+            <p className="truncate" title={goal.learning_goal}>
+              {goal.learning_goal}
+            </p>
+            <p className="mt-0.5 truncate">
+              <span className="num">{t("path.lede", { n: learnedCount(goal), total: goal.learning_path.length })}</span>
+              <span aria-hidden> · </span>
+              {next ? t("home.nextUp", { title: next.title }) : t("home.allDone")}
+            </p>
+          </div>
+        )}
 
         <ol className="mt-20 grid gap-x-10 gap-y-8 border-t pt-8 sm:grid-cols-3">
           {steps.map(({ icon: Icon, title, body }, i) => (

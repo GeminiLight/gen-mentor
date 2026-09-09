@@ -110,3 +110,23 @@
 | 阅读页目录（滚动高亮）与路径页统计 | `features/session/document-toc.tsx`、`features/path/path-view.tsx` | done |
 | 修复：⌘K 面板缺 cmdk 根节点崩溃；首页标题引用了不存在的字号 | `command-menu.tsx`、`home-view.tsx` | done |
 | e2e：两种语言无键泄漏、切换持久化、浏览器语言默认 | `e2e/specs/i18n.spec.ts` | done |
+
+## 后续：产品体验审计（2026-09-09）
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 路径行整行可点（手机端此前只有下一课有可见入口） | `features/path/session-row.tsx` | done |
+| 内容流水线失败可从断点重试；onboarding 失败保留输入并从失败步骤续跑 | `features/session/pipeline-panel.tsx`、`features/onboarding/use-onboarding.ts` | done |
+| 导师读取当前会话文档，建议按当前课命名；桌面栏改为带文字的入口 | `components/layout/app-shell.tsx`、`features/tutor/tutor-sheet.tsx` | done |
+| 阶段列表显示运行秒数；重排对话框显示解析出的课名而非原始 JSON | `components/stage-list.tsx`、`features/path/reschedule-dialog.tsx` | done |
+| 首页给回访者显示目标与下一课；测验交卷后就地提供「标记完成」 | `features/system/home-view.tsx`、`features/session/session-reader.tsx` | done |
+| 用时按"坐下"累加，跨天间隔不计；阅读时长与字数按 CJK 字符计 | `lib/store/derive.ts`、`lib/utils.ts` | done |
+| 图标按钮加 tooltip；删除目标对话框加取消；文库隐藏 0 来源；技能树手机端居中 | `components/*-toggle.tsx`、`features/goals/goal-card.tsx`、`features/library/`、`features/progress/skill-tree.tsx` | done |
+| 文案：不再宣称"数据不离开设备"（输入会发给模型）；「随时间」改为「已掌握技能占比」；删除 28 个未使用的词典键 | `lib/i18n/{en,zh}.ts` | done |
+| 画像「习惯」改为档案派生的真实活动（活跃天数、打开与完成数、每课用时、最近活跃） | `lib/store/derive.ts`、`features/profile/habits-card.tsx` | done |
+| 未做测验就「标记完成」时先问一次；已完成的课在读完和交卷处给「下一课」 | `features/session/session-reader.tsx` | done |
+| onboarding 提交按钮始终可点，空字段在提交时就地提示并聚焦；路径生成后 toast 到达 | `features/onboarding/goal-form.tsx`、`use-onboarding.ts` | done |
+| 路径全部完成的收尾状态；路径页骨架按真实形状 | `features/path/path-view.tsx` | done |
+| 导师回复可中途停止并保留已到内容；打开抽屉落在最新一轮 | `features/tutor/tutor-sheet.tsx` | done |
+| 「删除全部数据」带确认；完成 toast 显示进度前后值；词典拆出 `*-shell.ts` 以守住 300 行预算 | `features/profile/archive-panel.tsx`、`lib/i18n/` | done |
+| 画像「补充一点」同样改为就地校验；会话页浏览器标签显示课名 | `features/profile/profile-view.tsx`、`features/session/session-view.tsx` | done |

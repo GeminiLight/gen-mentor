@@ -122,3 +122,21 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 解法：`vercel api -X PATCH` 不带 teamId 会静默失败，用 REST 直接改：
 `curl -X PATCH https://api.vercel.com/v9/projects/<id>?teamId=<team> -d '{"rootDirectory":"app"}'`，然后 `vercel redeploy` 验证。
 教训：CLI 部署绿不代表 Git 部署绿，两条路径都要各验一次。
+
+## `make verify-ui` 不设置 LLM 模式，默认 live
+
+现象：verify-ui 跑到 onboarding 旅程时 5 分钟超时，`/tmp/gm/app.log` 里全是 `[api] 429 速率限制`。
+原因：`verify-ui.sh` 直接 `pnpm start`，`GENMENTOR_LLM_MODE` 只在 shell 环境里，没有的话 `llmMode()` 回落到 live，
+真去打网关，被限流后旅程等不到路径。
+解法：`GENMENTOR_LLM_MODE=replay make verify-ui`。是否让脚本默认 replay 属于改闸门，需要所有者确认。
+教训：闸门红了先看 app.log 有没有 429，再看是不是自己的改动。
+
+## 「停止」按钮点一下反而重新发送
+
+现象：导师抽屉里点「停止」，请求确实被 abort，但紧接着又发出一次同样的请求。
+原因：停止按钮和发送按钮是同一位置的条件渲染，React 复用了同一个 `<button>` 节点。click 监听器里
+`abort()` 之后，fetch 的拒绝在微任务里落地，React 同步把节点改成 `type="submit"`；浏览器随后才执行
+这次点击的默认行为，看到的已经是提交按钮，于是提交了表单。
+解法：两个按钮给不同的 `key` 让 React 重新挂载，停止按钮的 onClick 里 `preventDefault()`。
+教训：条件渲染切换"同类型不同语义"的元素时给 key；异步状态切换发生在同一次点击的默认行为之前。
+

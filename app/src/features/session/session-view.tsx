@@ -1,24 +1,20 @@
 "use client";
 
-import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { nextStage, runPipeline, STAGES, type Stage } from "@/lib/pipeline";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { sessionUid } from "@/lib/store/derive";
-import type { QuizResults, SessionState } from "@/lib/store/types";
+import type { SessionState } from "@/lib/store/types";
 import type { StageStatus } from "@/components/stage-list";
-import { DocumentView } from "./document-view";
+import { readingMinutes } from "@/lib/utils";
 import { PipelinePanel, type PipelineView } from "./pipeline-panel";
-import { QuizView } from "./quiz-view";
-import { ReadingProgress } from "./reading-progress";
-import { RegenerateButton } from "./regenerate-button";
 import { SessionHeader } from "./session-header";
+import { SessionReader } from "./session-reader";
 import { useCompleteSession } from "./use-complete-session";
 import { useT } from "@/lib/i18n";
 
@@ -40,10 +36,7 @@ export function SessionView({ index }: { index: number }) {
   const { complete, completing } = useCompleteSession(goal, session, index);
   const uid = goal ? sessionUid(goal.id, index) : null;
   const state: SessionState | undefined = goal && uid ? goal.sessions[uid] : undefined;
-  const readingMinutes = useMemo(() => {
-    const md = state?.document?.markdown;
-    return md ? Math.max(1, Math.round(md.split(/\s+/).length / 200)) : undefined;
-  }, [state?.document?.markdown]);
+  const minutes = state?.document?.markdown ? readingMinutes(state.document.markdown) : undefined;
 
   const start = useCallback(
     async (fresh = false) => {
@@ -100,6 +93,11 @@ export function SessionView({ index }: { index: number }) {
     [goal, session, uid, state, patchSession, t],
   );
 
+  // The tab and history entry carry the session's own title, not a generic "Session".
+  useEffect(() => {
+    if (session) document.title = `${session.title} · ${t("common.appName")}`;
+  }, [session, t]);
+
   // First visit: record the open and kick off whatever stage is missing.
   useEffect(() => {
     if (!hydrated || !goal || !uid || started.current === uid) return;
@@ -129,83 +127,33 @@ export function SessionView({ index }: { index: number }) {
 
   const doc = state?.document;
   const quiz = state?.quiz;
-  const sources = state?.knowledge_drafts?.flatMap((d) => d.sources) ?? [];
 
   return (
     <div className="space-y-8">
-      <SessionHeader session={session} readingMinutes={readingMinutes} />
+      <SessionHeader session={session} readingMinutes={minutes} />
 
       <AnimatePresence mode="wait" initial={false}>
         {!doc || !quiz || running ? (
-          <motion.div
-            key="pipeline"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-          >
-            <PipelinePanel view={view} />
+          <motion.div key="pipeline" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            {/* A retry resumes from the last checkpoint; only the stages that never finished run again. */}
+            <PipelinePanel view={view} onRetry={running ? undefined : () => void start()} />
           </motion.div>
         ) : (
-          <motion.div
-            key="reader"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
-          >
-            <Tabs value={tab} onValueChange={setTab}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <TabsList>
-                  <TabsTrigger value="read">{t("session.read")}</TabsTrigger>
-                  <TabsTrigger value="quiz" data-testid="tab-quiz">
-                    {t("session.quiz")}
-                    {state?.quiz_results ? ` · ${state.quiz_results.correct}/${state.quiz_results.answered}` : ""}
-                  </TabsTrigger>
-                </TabsList>
-                <div className="flex items-center gap-2">
-                  <RegenerateButton disabled={completing} onConfirm={() => void start(true)} />
-                  {!session.if_learned && (
-                    <Button
-                      size="sm"
-                      onClick={() => void complete()}
-                      disabled={completing}
-                      data-testid="complete-session"
-                    >
-                      <CheckCircle2 aria-hidden /> {completing ? t("session.completing") : t("session.complete")}
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <TabsContent value="read" className="pt-6">
-                <ReadingProgress />
-                <DocumentView markdown={doc.markdown} sources={sources} />
-                <div
-                  className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t pt-6 lg:max-w-(--w-measure)"
-                  data-testid="reading-end"
-                >
-                  <p className="text-sm text-muted-foreground">{t("session.finishedReading")}</p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setTab("quiz")}>
-                      {t("session.quiz")}
-                    </Button>
-                    {!session.if_learned && (
-                      <Button size="sm" onClick={() => void complete()} disabled={completing}>
-                        <CheckCircle2 aria-hidden /> {completing ? t("session.completing") : t("session.complete")}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="quiz" className="pt-6">
-                <QuizView
-                  key={state?.quiz_results?.submittedAt ?? "fresh"}
-                  quiz={quiz}
-                  results={state?.quiz_results}
-                  onSubmit={(r: QuizResults) => submitQuiz(uid, r)}
-                />
-              </TabsContent>
-            </Tabs>
+          <motion.div key="reader" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}>
+            <SessionReader
+              session={session}
+              next={goal.learning_path[index + 1] ? { index: index + 1, title: goal.learning_path[index + 1].title } : undefined}
+              markdown={doc.markdown}
+              sources={state?.knowledge_drafts?.flatMap((d) => d.sources) ?? []}
+              quiz={quiz}
+              results={state?.quiz_results}
+              tab={tab}
+              onTab={setTab}
+              completing={completing}
+              onComplete={() => void complete()}
+              onRegenerate={() => void start(true)}
+              onSubmitQuiz={(r) => submitQuiz(uid, r)}
+            />
           </motion.div>
         )}
       </AnimatePresence>

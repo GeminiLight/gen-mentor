@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SessionItem } from "@/lib/schemas";
 import type { Goal } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -22,6 +22,12 @@ export function SkillTree({ goal }: { goal: Goal }) {
   const skills = skillLevels(goal.learner_profile);
   const [focus, setFocus] = useState<string | null>(null);
   const { t } = useT();
+  const scroller = useRef<HTMLDivElement>(null);
+  // On a phone the tree is wider than the screen; open it centred on the goal, not on the left edge.
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+  }, [skills.length]);
   const cols = Math.max(skills.length, 1);
   const width = cols * COL;
   const sessionsOf = (name: string) => goal.learning_path.map((s, i) => ({ s, i })).filter(({ s }) => s.desired_outcome_when_completed.some((o) => o.name === name));
@@ -32,7 +38,7 @@ export function SkillTree({ goal }: { goal: Goal }) {
   if (skills.length === 0) return <p className="text-sm text-muted-foreground">{t("progress.noSkills")}</p>;
 
   return (
-    <div className="overflow-x-auto" data-testid="skill-tree">
+    <div ref={scroller} className="overflow-x-auto" data-testid="skill-tree">
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto block min-w-full" role="img" aria-label={t("progress.treeAria", { skills: skills.length, sessions: goal.learning_path.length })}>
         {/* goal */}
         <g>

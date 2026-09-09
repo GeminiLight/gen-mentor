@@ -28,6 +28,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { LANGS, useLangStore, useT } from "@/lib/i18n";
 import { useArchive, useActiveGoal } from "@/lib/store";
 
@@ -60,20 +61,25 @@ export function CommandMenu({ compact = false }: { compact?: boolean }) {
   return (
     <>
       {compact ? (
-        <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("command.open")}>
-          <Search aria-hidden />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("command.open")}>
+              <Search aria-hidden />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t("command.open")}</TooltipContent>
+        </Tooltip>
       ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground"
+        <button
+          type="button"
+          className="flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
           onClick={() => setOpen(true)}
           aria-label={t("command.open")}
         >
+          <Search className="size-4" aria-hidden />
           {t("common.search")}
-          <kbd className="ml-1 rounded border bg-muted px-1 font-mono text-xs">⌘K</kbd>
-        </Button>
+          <kbd className="ml-auto rounded border bg-muted px-1 font-mono text-xs">⌘K</kbd>
+        </button>
       )}
       <CommandDialog
         open={open}

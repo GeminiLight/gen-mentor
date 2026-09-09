@@ -11,6 +11,7 @@ import { NoKeyBanner } from "@/features/settings/no-key-banner";
 import { TutorSheet } from "@/features/tutor/tutor-sheet";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
+import { sessionUid } from "@/lib/store/derive";
 import { cn } from "@/lib/utils";
 import { CommandMenu } from "./command-menu";
 import { NAV } from "./nav";
@@ -23,6 +24,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useT();
   const items = NAV.filter((n) => !n.needsGoal || goal);
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`) || (href === "/learning-path" && pathname.startsWith("/session/"));
+
+  // On a session page the tutor reads the open document and its suggestions name that session.
+  const sessionIndex = /^\/session\/(\d+)/.exec(pathname)?.[1];
+  const session = goal && sessionIndex !== undefined ? goal.learning_path[Number(sessionIndex)] : undefined;
+  const context = goal && sessionIndex !== undefined ? goal.sessions[sessionUid(goal.id, Number(sessionIndex))]?.document?.markdown : undefined;
+  const tutor = (variant: "icon" | "rail") => (goal ? <TutorSheet goal={goal} session={session} context={context} variant={variant} /> : null);
 
   return (
     <div className="flex min-h-full flex-1">
@@ -54,15 +61,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="mt-auto space-y-2 px-1">
+        <div className="mt-auto flex flex-col gap-0.5">
+          {tutor("rail")}
           <CommandMenu />
-          <div className="flex items-center justify-between">
-            {goal ? <TutorSheet goal={goal} /> : <span />}
-            <div className="flex items-center">
-              <ModelSettings />
-              <LangToggle />
-              <ThemeToggle />
-            </div>
+          <div className="mt-2 flex items-center gap-0.5 border-t pt-3">
+            <ModelSettings />
+            <LangToggle />
+            <ThemeToggle />
           </div>
         </div>
       </aside>
@@ -75,7 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <div className="flex items-center">
             <CommandMenu compact />
-            {goal && <TutorSheet goal={goal} />}
+            {tutor("icon")}
             <ModelSettings />
             <LangToggle />
             <ThemeToggle />

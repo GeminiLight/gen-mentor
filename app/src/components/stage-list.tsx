@@ -2,7 +2,7 @@
 
 import { Check, CircleDashed } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -71,16 +71,14 @@ export function StageList({
   );
 }
 
-/** Seconds since `key` became the running stage; resets when the running stage changes. */
+/** Seconds since `key` became the running stage; a new key reads as zero until its first tick. */
 function useElapsed(key: string | null): number {
-  const [seconds, setSeconds] = useState(0);
-  const startedAt = useRef<number>(0);
+  const [tick, setTick] = useState<{ key: string | null; seconds: number }>({ key: null, seconds: 0 });
   useEffect(() => {
     if (key === null) return;
-    startedAt.current = Date.now();
-    setSeconds(0);
-    const id = window.setInterval(() => setSeconds(Math.floor((Date.now() - startedAt.current) / 1000)), 1000);
+    const startedAt = Date.now();
+    const id = window.setInterval(() => setTick({ key, seconds: Math.floor((Date.now() - startedAt) / 1000) }), 1000);
     return () => window.clearInterval(id);
   }, [key]);
-  return key === null ? 0 : seconds;
+  return tick.key === key ? tick.seconds : 0;
 }

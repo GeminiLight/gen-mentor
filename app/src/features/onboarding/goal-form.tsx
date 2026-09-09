@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
+import { countWords } from "@/lib/utils";
 
 export interface GoalFormValues {
   learning_goal: string;
@@ -17,16 +18,25 @@ export interface GoalFormValues {
   session_count: number;
 }
 
+/**
+ * The submit button is always live. An empty field is pointed out on submit, next to the field,
+ * with focus moved there; a disabled button that never says why is the thing this avoids.
+ */
 export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: (v: GoalFormValues) => void }) {
   const [goal, setGoal] = useState("");
   const [info, setInfo] = useState("");
   const [count, setCount] = useState("5");
   const [parsing, setParsing] = useState(false);
+  const [touched, setTouched] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const goalRef = useRef<HTMLInputElement>(null);
+  const infoRef = useRef<HTMLTextAreaElement>(null);
   const { t } = useT();
-  // Short answers are allowed: the agents infer from whatever is there. The hint below nudges, never blocks.
+  // Short answers are allowed: the agents infer from whatever is there.
   const goalOk = goal.trim().length >= 3;
   const infoOk = info.trim().length >= 3;
+  const goalInvalid = touched && !goalOk;
+  const infoInvalid = touched && !infoOk;
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
@@ -46,15 +56,36 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
   return (
     <form
       className="space-y-6"
+      noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        if (goalOk && infoOk) onSubmit({ learning_goal: goal.trim(), learner_information: info.trim(), session_count: Number(count) });
+        if (!goalOk || !infoOk) {
+          setTouched(true);
+          (goalOk ? infoRef : goalRef).current?.focus();
+          return;
+        }
+        onSubmit({ learning_goal: goal.trim(), learner_information: info.trim(), session_count: Number(count) });
       }}
     >
       <div className="space-y-2">
         <Label htmlFor="goal">{t("onboarding.goalLabel")}</Label>
-        <Input id="goal" name="learning_goal" value={goal} onChange={(e) => setGoal(e.target.value)} disabled={disabled} placeholder={t("onboarding.goalPlaceholder")} autoFocus />
-        {t("onboarding.goalHint") && <p className="text-xs text-muted-foreground">{t("onboarding.goalHint")}</p>}
+        <Input
+          ref={goalRef}
+          id="goal"
+          name="learning_goal"
+          value={goal}
+          onChange={(e) => setGoal(e.target.value)}
+          disabled={disabled}
+          placeholder={t("onboarding.goalPlaceholder")}
+          aria-invalid={goalInvalid || undefined}
+          aria-describedby={goalInvalid ? "goal-error" : undefined}
+          autoFocus
+        />
+        {goalInvalid && (
+          <p id="goal-error" className="text-xs text-destructive" role="alert">
+            {t("onboarding.goalRequired")}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -67,6 +98,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           </Button>
         </div>
         <Textarea
+          ref={infoRef}
           id="info"
           name="learner_information"
           value={info}
@@ -74,8 +106,12 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           disabled={disabled}
           rows={7}
           placeholder={t("onboarding.infoPlaceholder")}
+          aria-invalid={infoInvalid || undefined}
+          aria-describedby="info-hint"
         />
-        <p className="text-xs text-muted-foreground">{info.trim().length < 40 ? t("onboarding.infoHintShort") : t("onboarding.infoWords", { n: info.trim().split(/\s+/).length })}</p>
+        <p id="info-hint" className={infoInvalid ? "text-xs text-destructive" : "text-xs text-muted-foreground"} role={infoInvalid ? "alert" : undefined}>
+          {infoInvalid ? t("onboarding.infoRequired") : info.trim().length < 40 ? t("onboarding.infoHintShort") : t("onboarding.infoWords", { n: countWords(info) })}
+        </p>
       </div>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -94,7 +130,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
             </SelectContent>
           </Select>
         </div>
-        <Button type="submit" size="lg" disabled={disabled || !goalOk || !infoOk}>
+        <Button type="submit" size="lg" disabled={disabled}>
           {t("onboarding.submit")}
         </Button>
       </div>

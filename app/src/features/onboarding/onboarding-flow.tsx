@@ -8,10 +8,10 @@ import { GoalForm, type GoalFormValues } from "./goal-form";
 import { STEPS, useOnboarding } from "./use-onboarding";
 
 export function OnboardingFlow() {
-  const { run, status, preview, error, running } = useOnboarding();
+  const { run, retry, status, preview, error, running } = useOnboarding();
   const { t } = useT();
   const started = Object.values(status).some((s) => s !== "pending");
-  const submit = (v: GoalFormValues) => void run(v.learning_goal, v.learner_information, v.session_count);
+  const submit = (v: GoalFormValues) => void run(v);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -69,9 +69,12 @@ export function OnboardingFlow() {
               <div role="alert" className="rounded-lg border border-destructive/40 bg-destructive-soft p-4 text-sm">
                 <p className="font-medium text-destructive">{t("onboarding.failedTitle")}</p>
                 <p className="mt-1 text-muted-foreground">{error}</p>
-                <Button variant="outline" size="sm" className="mt-3" onClick={() => window.location.reload()}>
-                  {t("onboarding.startOver")}
-                </Button>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <Button variant="outline" size="sm" onClick={retry} data-testid="onboarding-retry">
+                    {t("common.tryAgain")}
+                  </Button>
+                  <span className="text-xs text-muted-foreground">{t("onboarding.retryHint")}</span>
+                </div>
               </div>
             )}
           </>

@@ -2,6 +2,7 @@
 
 import { StageList, type StageStatus } from "@/components/stage-list";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
 import type { KnowledgeDraft, KnowledgePoint } from "@/lib/schemas";
 import { STAGES, STAGE_LABELS, type Stage } from "@/lib/pipeline";
@@ -21,8 +22,8 @@ const KT_DOT: Record<KnowledgePoint["type"], string> = {
   strategic: "bg-kt-strategic",
 };
 
-/** What the agents are doing right now, with whatever has streamed in so far. */
-export function PipelinePanel({ view }: { view: PipelineView }) {
+/** What the agents are doing right now, with whatever has streamed in so far. On failure, a way to resume. */
+export function PipelinePanel({ view, onRetry }: { view: PipelineView; onRetry?: () => void }) {
   const { t } = useT();
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" data-loading="">
@@ -39,12 +40,18 @@ export function PipelinePanel({ view }: { view: PipelineView }) {
           }))}
         />
         {view.error && (
-          <p
-            role="alert"
-            className="rounded-md border border-destructive/40 bg-destructive-soft p-3 text-sm text-destructive"
-          >
-            {view.error}
-          </p>
+          <div role="alert" className="rounded-md border border-destructive/40 bg-destructive-soft p-3 text-sm">
+            <p className="font-medium text-destructive">{t("session.generationFailed")}</p>
+            <p className="mt-1 text-muted-foreground">{view.error}</p>
+            {onRetry && (
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <Button variant="outline" size="sm" onClick={onRetry} data-testid="pipeline-retry">
+                  {t("common.tryAgain")}
+                </Button>
+                <span className="text-xs text-muted-foreground">{t("session.retryHint")}</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
