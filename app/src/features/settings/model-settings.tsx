@@ -14,7 +14,7 @@ import { useT } from "@/lib/i18n";
 import { ByokHeaders, type Byok } from "@/lib/llm/config";
 import { maskKey, useLLMSettings } from "@/lib/store/llm-settings";
 
-const empty: Byok = { provider: "openai", apiKey: "", baseUrl: undefined, fastModel: undefined, smartModel: undefined, disableThinking: false };
+const empty: Byok = { provider: "openai", apiKey: "", baseUrl: undefined, fastModel: "gpt-4.1-mini", smartModel: "gpt-4.1", disableThinking: false };
 
 /** Bring your own key: provider, endpoint, key and models, tested live before saving. */
 export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
@@ -24,7 +24,7 @@ export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
   const [form, setForm] = useState<Byok>(byok ?? empty);
   const [testing, setTesting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-  const set = (patch: Partial<Byok>) => setForm((f) => ({ ...f, ...patch }));
+  const set = (patch: Partial<Byok>) => { setResult(null); setForm((f) => ({ ...f, ...patch })); };
   const parsed = ByokHeaders.safeParse({ ...form, baseUrl: form.baseUrl || undefined, fastModel: form.fastModel || undefined, smartModel: form.smartModel || undefined });
 
   const test = async () => {
@@ -43,7 +43,7 @@ export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
   const save = () => {
     if (!parsed.success) return;
     setByok(parsed.data);
-    toast.success(t("settings.saved"));
+    toast.success(t("settings.saved"), { description: t("polish.modelUnverified") });
     setOpen(false);
   };
   const clear = () => {
@@ -87,7 +87,7 @@ export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
         <div className="grid gap-4">
           <div className="grid gap-1.5">
             <Label htmlFor="llm-provider">{t("settings.provider")}</Label>
-            <Select value={form.provider} onValueChange={(v) => set({ provider: v as Byok["provider"] })}>
+            <Select value={form.provider} onValueChange={(v) => set({ provider: v as Byok["provider"], baseUrl: undefined, fastModel: v === "openai" ? "gpt-4.1-mini" : "claude-sonnet-5", smartModel: v === "openai" ? "gpt-4.1" : "claude-opus-5" })}>
               <SelectTrigger id="llm-provider" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -108,14 +108,15 @@ export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <Label htmlFor="llm-fast">{t("settings.fastModel")}</Label>
-              <Input id="llm-fast" value={form.fastModel ?? ""} onChange={(e) => set({ fastModel: e.target.value })} placeholder={form.provider === "openai" ? "gpt-4.1-mini" : "claude-sonnet-5"} />
+              <Input id="llm-fast" value={form.fastModel ?? ""} onChange={(e) => set({ fastModel: e.target.value })} placeholder={form.provider === "openai" ? "glm-5.3-flash" : "claude-sonnet-5"} />
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="llm-smart">{t("settings.smartModel")}</Label>
-              <Input id="llm-smart" value={form.smartModel ?? ""} onChange={(e) => set({ smartModel: e.target.value })} placeholder={form.provider === "openai" ? "gpt-4.1" : "claude-opus-5"} />
+              <Input id="llm-smart" value={form.smartModel ?? ""} onChange={(e) => set({ smartModel: e.target.value })} placeholder={form.fastModel || (form.provider === "openai" ? "glm-5.3-flash" : "claude-opus-5")} />
             </div>
           </div>
           <p className="text-xs text-muted-foreground">{t("settings.privacy")}</p>
+          {!parsed.success && form.apiKey && <p role="alert" className="text-xs text-destructive">{t("polish.modelFields")}</p>}
           {result && (
             <p className="rounded-md bg-muted px-3 py-2 text-xs" role="status" data-testid="llm-test-result">
               {result}

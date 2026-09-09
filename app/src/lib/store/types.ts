@@ -18,7 +18,14 @@ export interface QuizResults {
   submittedAt: number;
 }
 
+export interface QuizDraft {
+  selections: Selections;
+  order: string[];
+}
+
 export interface SessionState {
+  quiz_draft?: QuizDraft;
+  reading_anchor?: string;
   knowledge_points?: KnowledgePoint[];
   knowledge_drafts?: KnowledgeDraft[];
   document?: { structure: DocumentStructure; markdown: string };

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export function PageHeader({ eyebrow, title, description, actions }: { eyebrow?: string; title: string; description?: string; actions?: ReactNode }) {
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1 basis-64">
         {eyebrow && <p className="eyebrow mb-1">{eyebrow}</p>}
         <h1 className="text-lg font-semibold tracking-tight text-balance sm:text-xl">{title}</h1>
         {description && <p className="mt-1.5 max-w-(--w-measure) text-sm text-muted-foreground">{description}</p>}

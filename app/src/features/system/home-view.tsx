@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useT, type Key } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
-import { learnedCount } from "@/lib/store/derive";
+import { LearningDesk } from "./learning-desk";
 import { HealthBadge } from "./health-badge";
 
 const steps: { icon: typeof Compass; title: Key; body: Key }[] = [
@@ -23,10 +23,9 @@ export function HomeView() {
   const { goals, hydrated } = useArchive();
   const goal = useActiveGoal();
   const returning = hydrated && goals.length > 0 && goal;
-  const next = goal?.learning_path.find((s) => !s.if_learned);
   return (
     <main className="flex flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
+      <header className="mx-auto flex w-full max-w-(--w-content) items-center justify-between px-6 py-5">
         <Logo width={168} className="h-auto w-28 sm:w-42" />
         <div className="flex items-center gap-2">
           <HealthBadge />
@@ -35,45 +34,14 @@ export function HomeView() {
         </div>
       </header>
 
-      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-16">
+      {returning ? <LearningDesk goal={goal} /> : (
+      <section className="mx-auto flex w-full max-w-(--w-content) flex-1 flex-col justify-center px-6 py-16">
         <h1 className="max-w-2xl text-xl font-semibold leading-tight tracking-tight sm:text-2xl">{t("home.title")}</h1>
         <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">{t("home.lede")}</p>
         <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3" data-hydrated={hydrated ? "" : undefined}>
-          {returning ? (
-            <>
-              <Button size="lg" asChild>
-                <Link href="/learning-path" data-testid="continue-link">
-                  {t("home.continue")} <ArrowRight data-icon="inline-end" aria-hidden />
-                </Link>
-              </Button>
-              <Button size="lg" variant="ghost" asChild>
-                <Link href="/onboarding">{t("home.newGoal")}</Link>
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button size="lg" asChild>
-                <Link href="/onboarding">
-                  {t("home.cta")} <ArrowRight data-icon="inline-end" aria-hidden />
-                </Link>
-              </Button>
-              <span className="text-sm text-muted-foreground">{t("home.noAccount")}</span>
-            </>
-          )}
+          <Button size="lg" asChild className="h-11 px-5"><Link href="/onboarding">{t("home.cta")} <ArrowRight aria-hidden /></Link></Button>
+          <span className="text-sm text-muted-foreground">{t("home.noAccount")}</span>
         </div>
-        {returning && (
-          <div className="mt-5 max-w-xl text-sm text-muted-foreground" data-testid="home-resume">
-            <p className="truncate" title={goal.learning_goal}>
-              {goal.learning_goal}
-            </p>
-            <p className="mt-0.5 truncate">
-              <span className="num">{t("path.lede", { n: learnedCount(goal), total: goal.learning_path.length })}</span>
-              <span aria-hidden> · </span>
-              {next ? t("home.nextUp", { title: next.title }) : t("home.allDone")}
-            </p>
-          </div>
-        )}
-
         <ol className="mt-20 grid gap-x-10 gap-y-8 border-t pt-8 sm:grid-cols-3">
           {steps.map(({ icon: Icon, title, body }, i) => (
             <li key={title}>
@@ -88,7 +56,9 @@ export function HomeView() {
         </ol>
       </section>
 
-      <footer className="mx-auto flex w-full max-w-5xl items-center gap-5 px-6 py-6 text-xs text-muted-foreground">
+      )}
+
+      <footer className="mx-auto flex w-full max-w-(--w-content) items-center gap-5 px-6 py-6 text-xs text-muted-foreground">
         <span>WWW 2025</span>
         <a href="https://arxiv.org/pdf/2501.15749" target="_blank" rel="noreferrer" className="hover:text-foreground">
           {t("home.paper")}

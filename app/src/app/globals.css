@@ -175,6 +175,7 @@
 
   /* Widths: every fixed width in the app is one of these */
   --w-rail: 15rem; /* desktop navigation rail */
+  --w-toc: 13rem;
   --w-col: 30rem; /* single reading column on phones */
   --w-content: 70rem; /* page content max */
   --w-measure: 68ch; /* prose line length */
@@ -297,5 +298,13 @@
   .reading {
     max-width: var(--w-measure);
     line-height: 1.7;
+  }
+}
+
+/* Touch controls retain the desktop density while leaving room for a thumb. */
+@media (pointer: coarse) {
+  [data-slot="button"], [data-slot="select-trigger"], [data-slot="tabs-trigger"] {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
   }
 }

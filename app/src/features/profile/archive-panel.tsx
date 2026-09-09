@@ -1,11 +1,12 @@
 "use client";
 
 import { Download, Trash2, Upload } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import type { Archive } from "@/lib/store/types";
 import { useArchive } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { archiveFileName, archiveToBlob, parseArchive } from "@/lib/store/archive";
@@ -13,6 +14,7 @@ import { archiveFileName, archiveToBlob, parseArchive } from "@/lib/store/archiv
 /** The archive is the learner's property: one JSON file out, the same file back in, and a way to wipe it. */
 export function ArchivePanel() {
   const { exportArchive, importArchive, reset, goals } = useArchive();
+  const [pending, setPending] = useState<Archive | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { t } = useT();
 
@@ -30,10 +32,10 @@ export function ArchivePanel() {
     if (!file) return;
     try {
       const archive = parseArchive(await file.text());
-      importArchive(archive);
-      toast.success(t("profile.imported", { n: archive.goals.length }));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("profile.importFailed"));
+      if (goals.length > 0) setPending(archive);
+      else { importArchive(archive); toast.success(t("profile.imported", { n: archive.goals.length })); }
+    } catch {
+      toast.error(t("polish.importInvalid"));
     } finally {
       if (fileRef.current) fileRef.current.value = "";
     }
@@ -84,6 +86,24 @@ export function ArchivePanel() {
             </DialogContent>
           </Dialog>
         )}
+        <Dialog open={!!pending} onOpenChange={(open) => !open && setPending(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("polish.importTitle")}</DialogTitle>
+              <DialogDescription>{t("polish.importBody", { incoming: pending?.goals.length ?? 0, current: goals.length })}</DialogDescription>
+            </DialogHeader>
+            <Button variant="outline" onClick={download}><Download aria-hidden />{t("polish.importBackup")}</Button>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setPending(null)}>{t("common.cancel")}</Button>
+              <Button variant="destructive" onClick={() => {
+                if (!pending) return;
+                importArchive(pending);
+                toast.success(t("profile.imported", { n: pending.goals.length }));
+                setPending(null);
+              }}>{t("polish.importReplace")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

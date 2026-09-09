@@ -1,6 +1,7 @@
 /** Pure derivations over the store. Everything the UI shows as "progress" comes from here. */
+import { scoredCount } from "@/lib/quiz";
 import { LEVEL_ORDER, type LearnerProfile } from "@/lib/schemas";
-import type { Goal, SessionState, SessionUid } from "./types";
+import type { Goal, QuizResults, SessionState, SessionUid } from "./types";
 
 export const sessionUid = (goalId: string, index: number): SessionUid => `${goalId}:${index}`;
 
@@ -51,7 +52,7 @@ export function totalMinutes(goal: Goal): number {
   return Object.values(goal.sessions).reduce((acc, s) => acc + sessionMinutes(s), 0);
 }
 
-export const quizAccuracy = (r: { answered: number; correct: number } | undefined) => (r && r.answered ? r.correct / r.answered : null);
+export const quizAccuracy = (r: QuizResults | undefined) => (r && scoredCount(r) ? r.correct / scoredCount(r) : null);
 
 export interface ActivitySummary {
   /** Distinct local calendar days with any open or completion. */

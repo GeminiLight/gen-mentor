@@ -4,6 +4,7 @@
  */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { useOnboardingDraft } from "./onboarding-draft";
 import type { ChatTurn } from "@/lib/schemas";
 import type { Archive, Goal, QuizResults, SessionState, SessionUid } from "./types";
 
@@ -60,7 +61,7 @@ export const useArchive = create<State & Actions>()(
           return { sessions: { ...g.sessions, [uid]: { ...current, ...(typeof patch === "function" ? patch(current) : patch) } } };
         }),
       openSession: (uid) => get().patchSession(uid, (s) => ({ opened_at: [...s.opened_at, Date.now()] })),
-      submitQuiz: (uid, results) => get().patchSession(uid, { quiz_results: results }),
+      submitQuiz: (uid, results) => get().patchSession(uid, { quiz_results: results, quiz_draft: undefined }),
 
       recordMastery: (goalId, rate, overall_progress) =>
         get().updateGoal(goalId, (g) => ({ mastery_history: [...g.mastery_history, { ts: Date.now(), rate, overall_progress }] })),
@@ -69,7 +70,7 @@ export const useArchive = create<State & Actions>()(
 
       exportArchive: () => ({ version: 1, exported_at: Date.now(), active_goal_id: get().active_goal_id, goals: get().goals }),
       importArchive: (archive) => set({ goals: archive.goals, active_goal_id: archive.active_goal_id ?? archive.goals[0]?.id ?? null }),
-      reset: () => set({ goals: [], active_goal_id: null }),
+      reset: () => { set({ goals: [], active_goal_id: null }); useOnboardingDraft.getState().clear(); },
       setHydrated: () => set({ hydrated: true }),
     }),
     {

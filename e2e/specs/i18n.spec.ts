@@ -6,7 +6,7 @@ import { seed } from "./seed";
  * across reloads, set <html lang>, and never leak a dictionary key.
  */
 const PAGES = ["/", "/goals", "/learning-path", "/library", "/progress", "/profile", "/session/0", "/onboarding"];
-const KEY_LEAK = /\b(common|nav|home|onboarding|goals|path|session|quiz|library|progress|profile|tutor|command|health|levels)\.[a-zA-Z]+\b/;
+const KEY_LEAK = /\b(common|nav|home|onboarding|goals|path|session|quiz|library|progress|profile|tutor|command|health|levels|polish)\.[a-zA-Z]+\b/;
 
 test("defaults to the browser language", async ({ browser }) => {
   const zh = await browser.newContext({ locale: "zh-CN" });
@@ -26,9 +26,9 @@ test("switching to Chinese translates every page and persists", async ({ page })
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
 
   const expected: Record<string, RegExp> = {
-    "/": /朝着目标学/,
+    "/": /从上次停下的地方，继续/,
     "/goals": /^目标$/,
-    "/learning-path": /Transition into/, // the goal text is the learner's own words
+    "/learning-path": /^学习路径$/,
     "/library": /^文库$/,
     "/progress": /^进度$/,
     "/profile": /^画像$/,
@@ -43,7 +43,8 @@ test("switching to Chinese translates every page and persists", async ({ page })
     await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   }
   await page.goto("/learning-path");
-  await expect(page.getByText("学习路径")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "学习路径" })).toBeVisible();
+  await expect(page.locator("main")).toContainText("Transition into");
   await expect(page.getByRole("link", { name: /开始/ }).first()).toBeVisible();
 });
 

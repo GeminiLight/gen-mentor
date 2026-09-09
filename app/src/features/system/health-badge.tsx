@@ -17,7 +17,7 @@ export function HealthBadge() {
 
   const ready = health !== null && health !== "error" && (health.serverKey || !!byok);
   const label =
-    health === null ? t("health.checking") : health === "error" ? t("health.unreachable") : ready ? t("health.ready", { mode: health.mode }) : t("health.noKey");
+    health === null ? t("health.checking") : health === "error" ? t("health.unreachable") : ready ? t("polish.modelConfigured") : t("health.noKey");
   const tone = health === null ? "bg-muted-foreground/40" : ready ? "bg-primary" : "bg-destructive";
 
   return (

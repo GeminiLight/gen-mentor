@@ -10,7 +10,7 @@ test("health reports mode and models without leaking a credential", async ({ req
   expect(JSON.stringify(body)).not.toMatch(/sk-|Bearer|API_KEY/i);
 });
 
-test("home shows the live model status", async ({ page }) => {
+test("home identifies configuration without claiming a verified model connection", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByTestId("health-badge")).toContainText(/Model ready|No model key/);
+  await expect(page.getByTestId("health-badge")).toContainText(/Model configured|No model key/);
 });

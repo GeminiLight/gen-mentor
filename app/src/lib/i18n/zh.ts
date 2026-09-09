@@ -1,3 +1,4 @@
+import { polish } from "./zh-polish";
 import type { Dict } from "./en";
 import { command, settings } from "./zh-shell";
 
@@ -103,7 +104,7 @@ export const zh: Dict = {
     review: "回顾",
     reschedule: "重排",
     rescheduleTitle: "重排路径？",
-    rescheduleBody: "已完成的课保留，其余按当前画像重排。",
+    rescheduleBody: "已完成的课保留。未完成的课会按当前画像调整；内容变化的课程会重新准备教材和测验。",
     feedbackLabel: "有什么想调整的？",
     feedbackPlaceholder: "课短一些、多练 SQL、跳过基础…",
     scheduling: "规划中…",
@@ -261,4 +262,5 @@ export const zh: Dict = {
   },
   settings,
   command,
+  polish,
 };

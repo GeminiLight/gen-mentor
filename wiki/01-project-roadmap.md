@@ -130,3 +130,21 @@
 | 导师回复可中途停止并保留已到内容；打开抽屉落在最新一轮 | `features/tutor/tutor-sheet.tsx` | done |
 | 「删除全部数据」带确认；完成 toast 显示进度前后值；词典拆出 `*-shell.ts` 以守住 300 行预算 | `features/profile/archive-panel.tsx`、`lib/i18n/` | done |
 | 画像「补充一点」同样改为就地校验；会话页浏览器标签显示课名 | `features/profile/profile-view.tsx`、`features/session/session-view.tsx` | done |
+
+## 后续：学习体验精修（2026-09-09）
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 回访学习书桌、当前课优先的路径页面、主次动作与移动操作区 | `features/system/learning-desk.tsx`、`features/path/current-session.tsx`、`components/layout/app-shell.tsx` | done |
+| 阅读布局、移动目录、章节恢复、单篇下载、长课名处理 | `features/session/document-view.tsx`、`reading-bookmark.tsx`、`reading-tools.tsx` | done |
+| 多选确认、测验草稿、简答待自评、漏答提交确认和覆盖率 | `features/session/quiz-view.tsx`、`use-quiz-draft.ts`、`lib/quiz.ts` | done |
+| 出题独立恢复，已完成教材不被出题失败阻塞 | `features/session/session-view.tsx` | done |
+| 创建目标的表单与阶段 checkpoint 持久化 | `lib/store/onboarding-draft.ts` | done |
+| 重排后课程内容重绑定、已完成课程保护 | `lib/store/reconcile-path.ts` | done |
+| 深校验档案、替换确认、导入前备份 | `lib/schemas/archive.ts`、`features/profile/archive-panel.tsx` | done |
+| 导师组合输入保护、清空确认、提问即时显示、滚动跟随控制 | `features/tutor/` | done |
+| 文库正文搜索、模型配置如实提示、进度估计标识 | `features/library/`、`features/settings/`、`features/progress/` | done |
+| 12 条针对审计缺陷的回归测试 | `e2e/specs/polish-{quiz,recovery,layout}.spec.ts` | done |
+
+本轮没有改 prompt、图表结构或 SDK 调用，也没有完成全部 30 项审计建议。
+稳定课程 URL、完成事实与画像更新解耦、技能证据详情与跨目标文库继续保留在 backlog。

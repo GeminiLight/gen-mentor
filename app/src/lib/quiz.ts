@@ -74,13 +74,18 @@ export function judge(quiz: DocumentQuiz, sel: Selections): QuizResults {
   return r;
 }
 
+/** Only objective, graded answers belong in an accuracy denominator. */
+export function scoredCount(results: Pick<QuizResults, "verdicts">): number {
+  return Object.values(results.verdicts).filter((v) => v === "correct" || v === "incorrect").length;
+}
+
 /** The `quiz_performance` object merged into `learner_interactions` for the profiler. */
 export function quizPerformance(results: QuizResults, session_title: string) {
   return {
     session_title,
     total_answered: results.answered,
     total_correct: results.correct,
-    accuracy: results.answered ? Math.round((results.correct / results.answered) * 100) / 100 : 0,
+    accuracy: scoredCount(results) ? Math.round((results.correct / scoredCount(results)) * 100) / 100 : null,
     wrong_questions: results.wrong_questions,
   };
 }

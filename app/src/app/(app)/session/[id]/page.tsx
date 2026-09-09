@@ -8,5 +8,5 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const index = Number.parseInt(id, 10);
   if (!Number.isInteger(index) || index < 0) notFound();
-  return <SessionView index={index} />;
+  return <SessionView key={index} index={index} />;
 }
