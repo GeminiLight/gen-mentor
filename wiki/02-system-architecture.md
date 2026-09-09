@@ -86,7 +86,7 @@ route 收到请求 → `parseBody(schema)` 校验 → `lib/agents/<agent>` 组�
 | 方式 | 做法 |
 |---|---|
 | 本地 | `make install && make dev`，只需 `app/.env.local` 里一个 LLM key |
-| Vercel | 项目 `gen-mentor`（team geminilights-projects），生产别名 https://gen-mentor.vercel.app ，Root Directory `app`，GitHub `main` 推送自动部署。生产环境不配任何 LLM 变量，访客自带 key（顶部横幅引导）。预览部署开着 Vercel Authentication，生产别名公开 |
+| Vercel | 项目 `gen-mentor`（team geminilights-projects），主域名 https://genmentor.aurax.live （旧地址 https://gen-mentor.vercel.app 保留用于原浏览器档案访问） ，Root Directory `app`，GitHub `main` 推送自动部署。生产环境不配任何 LLM 变量，访客自带 key（顶部横幅引导）。预览部署开着 Vercel Authentication，生产别名公开 |
 | 容器 | `docker build -t genmentor app/`，`docker run -p 3000:3000 --env-file app/.env.local genmentor`；镜像用 `.next/standalone` 单进程 |
 
 `GENMENTOR_LLM_MODE=replay` 加 `e2e/fixtures/llm` 可以在没有 key 的机器上完整演示已录制的旅程。
@@ -118,3 +118,8 @@ correct / incorrect 两种 verdict 作分母，简答题显示待自评，无可
 AppShell 只挂载一个按目标 ID 隔离的导师会话，桌面和手机入口共享它。展示模式与展开状态
 由 `genmentor.tutor-panel.v1` 独立保存；刷新只恢复已固定且展开的面板。会话 hook 持有草稿、
 请求与流式文本，抽屉/固定侧栏仅改变展示容器。切换目标卸载旧会话并中止旧请求。
+
+主域名 DNS 由 Cloudflare 管理：`genmentor` CNAME 指向 Vercel 分配的
+`11e1c9bf0df68f4a.vercel-dns-017.com`，采用 DNS-only；2026-09-10 验证与 HTTPS 访问通过。
+学习档案和模型配置按浏览器 origin 隔离。切换域名时从旧站导出学习档案、在新站导入，
+模型凭证在新站重新配置，因此旧站暂不强制跳转。后续 main 部署继续绑定新主域名。

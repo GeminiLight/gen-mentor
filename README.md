@@ -4,7 +4,7 @@
   </p>
   <p><b>LLM-powered & Goal-oriented Tutoring System</b></p>
   <p>
-    <a href="https://gen-mentor.vercel.app">Live app</a> &nbsp;·&nbsp;
+    <a href="https://genmentor.aurax.live">Live app</a> &nbsp;·&nbsp;
     <a href="https://www.tianfuwang.tech/gen-mentor">Website</a> &nbsp;·&nbsp;
     <a href="https://arxiv.org/pdf/2501.15749">Paper</a> &nbsp;·&nbsp;
     <a href="https://youtu.be/vTdtGZop-Zc">Video</a>
@@ -82,7 +82,7 @@ No key at hand? `GENMENTOR_LLM_MODE=replay make dev` serves the recorded journey
 
 | Target | How |
 |---|---|
-| Vercel | The public instance at [gen-mentor.vercel.app](https://gen-mentor.vercel.app) ships without a server key: visitors add their own provider, key and models in **Model** settings. To run your own, import the repo with **Root Directory** `app` and optionally add the environment variables |
+| Vercel | The public instance at [genmentor.aurax.live](https://genmentor.aurax.live) ships without a server key: visitors add their own provider, key and models in **Model** settings. To run your own, import the repo with **Root Directory** `app` and optionally add the environment variables |
 | Container | `docker build -t genmentor app && docker run -p 3000:3000 --env-file app/.env.local genmentor` |
 
 ## Repository layout
