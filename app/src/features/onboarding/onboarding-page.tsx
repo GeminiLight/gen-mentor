@@ -5,13 +5,15 @@ import { LangToggle } from "@/components/lang-toggle";
 import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useT } from "@/lib/i18n";
+import { NoKeyBanner } from "@/features/settings/no-key-banner";
 import { OnboardingFlow } from "./onboarding-flow";
 
 export function OnboardingPage() {
   const { t } = useT();
   return (
     <main className="mx-auto w-full max-w-(--w-content) px-6 py-6">
-      <header className="mb-10 flex items-center justify-between">
+      <NoKeyBanner />
+      <header className="my-6 flex items-center justify-between">
         <Link href="/" className="text-sm" aria-label={t("common.appName")}>
           <Brand />
         </Link>

@@ -42,3 +42,16 @@ test("invalid credentials header is ignored, not trusted", async ({ page }) => {
   const res = await page.request.get("/api/health", { headers: { "x-genmentor-llm": "not json" } });
   expect((await res.json()).source).toBe("server");
 });
+
+test("without a server key the app asks for one before anything else", async ({ page }) => {
+  await seed(page);
+  await page.route("**/api/health", (route) =>
+    route.request().method() === "GET"
+      ? route.fulfill({ json: { ok: true, provider: "openai", serverKey: false, source: "server", mode: "live", models: { fast: "x", smart: "x" } } })
+      : route.continue(),
+  );
+  await page.goto("/learning-path");
+  await expect(page.getByTestId("no-key-banner")).toBeVisible();
+  await page.getByTestId("no-key-banner").getByRole("button").click();
+  await expect(page.getByLabel("API key")).toBeVisible();
+});

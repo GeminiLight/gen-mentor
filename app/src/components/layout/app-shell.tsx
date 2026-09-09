@@ -7,6 +7,7 @@ import { LangToggle } from "@/components/lang-toggle";
 import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ModelSettings } from "@/features/settings/model-settings";
+import { NoKeyBanner } from "@/features/settings/no-key-banner";
 import { TutorSheet } from "@/features/tutor/tutor-sheet";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
@@ -67,6 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <NoKeyBanner />
         <header className="flex h-12 items-center justify-between border-b px-4 md:hidden">
           <Link href="/" className="text-sm" aria-label={t("common.appName")}>
             <Brand />
