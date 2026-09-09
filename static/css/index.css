@@ -331,6 +331,39 @@ section {
   }
 }
 
+/* 1024–1215px: the bar is too narrow for five iconed items plus three
+   buttons. Use the full width, drop the menu icons and collapse the two
+   secondary buttons to icon-only (their aria-labels carry the name). */
+@media screen and (min-width: 1024px) and (max-width: 1215px) {
+  .site-nav > .container {
+    max-width: none;
+    padding: 0 0.5rem;
+  }
+
+  .site-nav .navbar-start .icon {
+    display: none;
+  }
+
+  .site-nav .navbar-start > .navbar-item {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  .site-nav .navbar-end .button.is-icon-compact {
+    width: 2.4rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .site-nav .navbar-end .button.is-icon-compact .icon {
+    margin: 0 !important;
+  }
+
+  .site-nav .navbar-end .button.is-icon-compact > span:not(.icon) {
+    display: none;
+  }
+}
+
 /* Theme toggle: round ghost control, shows the icon of the theme you would
    switch TO (moon on light, sun on dark). */
 .theme-toggle {
