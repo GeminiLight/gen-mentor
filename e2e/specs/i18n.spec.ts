@@ -12,7 +12,7 @@ test("defaults to the browser language", async ({ browser }) => {
   const zh = await browser.newContext({ locale: "zh-CN" });
   const page = await zh.newPage();
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("说出你想到达的位置，它来铺路。");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("朝着目标学。");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await zh.close();
 });
@@ -20,20 +20,20 @@ test("defaults to the browser language", async ({ browser }) => {
 test("switching to Chinese translates every page and persists", async ({ page }) => {
   await seed(page);
   await page.goto("/goals");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("What you are working toward");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Goals");
   await page.getByTestId("lang-toggle").first().click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("你正在朝什么努力");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("目标");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
 
   const expected: Record<string, RegExp> = {
-    "/": /说出你想到达的位置/,
-    "/goals": /你正在朝什么努力/,
+    "/": /朝着目标学/,
+    "/goals": /^目标$/,
     "/learning-path": /Transition into/, // the goal text is the learner's own words
-    "/library": /为你写下的一切/,
-    "/progress": /真正发生了什么变化/,
-    "/profile": /GenMentor 眼中的你/,
+    "/library": /^文库$/,
+    "/progress": /^进度$/,
+    "/profile": /^画像$/,
     "/session/0": /Python Fundamentals/, // session titles come from the model
-    "/onboarding": /说出你想到达的位置/,
+    "/onboarding": /你想到达哪里/,
   };
   for (const url of PAGES) {
     await page.goto(url);
@@ -44,7 +44,7 @@ test("switching to Chinese translates every page and persists", async ({ page })
   }
   await page.goto("/learning-path");
   await expect(page.getByText("学习路径")).toBeVisible();
-  await expect(page.getByRole("link", { name: /开始学习/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /开始/ }).first()).toBeVisible();
 });
 
 test("English pages leak no dictionary keys either", async ({ page }) => {

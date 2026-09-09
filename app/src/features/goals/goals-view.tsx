@@ -16,9 +16,7 @@ export function GoalsView() {
   return (
     <>
       <PageHeader
-        eyebrow={t("goals.eyebrow")}
         title={t("goals.title")}
-        description={t("goals.lede")}
         actions={
           <Button asChild>
             <Link href="/onboarding">

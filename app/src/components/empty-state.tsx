@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 
 export function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed p-10 text-center">
+    <div className="flex flex-col items-center py-20 text-center">
       <p className="font-medium">{title}</p>
-      <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{body}</p>
-      {action && <div className="mt-6 flex justify-center">{action}</div>}
+      <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">{body}</p>
+      {action && <div className="mt-5">{action}</div>}
     </div>
   );
 }

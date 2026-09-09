@@ -30,12 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Link href="/" className="px-2 text-sm font-semibold tracking-tight">
           {t("common.appName")}
         </Link>
-        {goal && (
-          <p className="mt-4 line-clamp-3 px-2 text-xs leading-relaxed text-muted-foreground" title={goal.learning_goal}>
-            {goal.learning_goal}
-          </p>
-        )}
-        <nav className="mt-6 flex flex-col gap-0.5" aria-label="Primary">
+        <nav className="mt-8 flex flex-col gap-0.5" aria-label="Primary">
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}

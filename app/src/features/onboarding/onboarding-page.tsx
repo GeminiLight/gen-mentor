@@ -23,9 +23,8 @@ export function OnboardingPage() {
         </div>
       </header>
       <div className="mb-10 max-w-(--w-measure)">
-        <p className="eyebrow">{t("onboarding.eyebrow")}</p>
-        <h1 className="mt-1 text-xl font-semibold tracking-tight">{t("onboarding.title")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("onboarding.lede")}</p>
+        <h1 className="text-xl font-semibold tracking-tight">{t("onboarding.title")}</h1>
+        {t("onboarding.lede") && <p className="mt-2 text-sm text-muted-foreground">{t("onboarding.lede")}</p>}
       </div>
       <OnboardingFlow />
     </main>

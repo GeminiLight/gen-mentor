@@ -13,16 +13,16 @@ const archiveOf = (page: Page) => page.evaluate((k) => JSON.parse(window.localSt
 test.describe("onboarding → path", () => {
   test("builds a goal from a typed goal and background", async ({ page }) => {
     await page.goto("/onboarding");
-    await page.getByLabel("Where do you want to be?").fill(sample.learning_goal);
-    await page.getByLabel("Your background").fill(sample.learner_information);
+    await page.getByLabel("Goal", { exact: true }).fill(sample.learning_goal);
+    await page.getByLabel("Background", { exact: true }).fill(sample.learner_information);
     await page.getByRole("button", { name: "Build my path" }).click();
-    await expect(page.getByText("Refined goal")).toBeVisible({ timeout: 300_000 });
+    await expect(page.getByText("Finding the skill gap")).toBeVisible({ timeout: 300_000 });
     await expect(page.getByText("Skill gap", { exact: true })).toBeVisible({ timeout: 300_000 });
     await page.waitForURL("**/learning-path", { timeout: 600_000 });
     const rows = page.getByTestId("session-row");
     await expect(rows.first()).toBeVisible();
     expect(await rows.count()).toBeGreaterThan(0);
-    await expect(page.getByText("Up next")).toBeVisible();
+    await expect(page.getByText("Next", { exact: true }).first()).toBeVisible();
     const archive = await archiveOf(page);
     expect(archive.state.goals).toHaveLength(1);
     expect(archive.state.goals[0].mastery_history).toHaveLength(1);
@@ -39,7 +39,7 @@ test.describe("with a seeded archive", () => {
     const card = page.getByTestId("goal-card");
     await expect(card).toHaveCount(1);
     await expect(card).toHaveAttribute("data-active", "true");
-    await card.getByRole("link", { name: "Open path" }).click();
+    await card.getByRole("link", { name: "Open", exact: true }).click();
     await page.waitForURL("**/learning-path");
   });
 
@@ -48,14 +48,14 @@ test.describe("with a seeded archive", () => {
     const rows = page.getByTestId("session-row");
     await expect(rows).toHaveCount(sample.learning_path.learning_path.length);
     await expect(rows.nth(0)).toHaveAttribute("data-learned", "true");
-    await expect(rows.nth(1).getByText("Up next")).toBeVisible();
+    await expect(rows.nth(1).getByText("Next", { exact: true })).toBeVisible();
   });
 
   test("session: a stored document renders without any agent call", async ({ page }) => {
     await page.goto("/session/0");
     await expect(page.getByRole("heading", { level: 1, name: sample.learning_path.learning_path[0].title })).toBeVisible();
     await expect(page.getByRole("article")).toContainText("Pandas");
-    await expect(page.getByText("Learned", { exact: true })).toBeVisible();
+    await expect(page.getByText("Done", { exact: true })).toBeVisible();
   });
 
   test("session: generating, reading, quizzing and completing the next session", async ({ page }) => {
@@ -93,7 +93,7 @@ test.describe("with a seeded archive", () => {
 
   test("tutor streams a reply and keeps it in the archive", async ({ page }) => {
     await page.goto("/learning-path");
-    await page.getByRole("button", { name: "Open AI tutor" }).first().click();
+    await page.getByRole("button", { name: "Tutor", exact: true }).first().click();
     await page.getByLabel("Message to the tutor").fill(sample.messages[0].content);
     await page.getByRole("button", { name: "Send" }).click();
     await expect(page.getByTestId("tutor-messages")).toContainText(/loc|iloc/, { timeout: 300_000 });
@@ -109,9 +109,9 @@ test.describe("with a seeded archive", () => {
     // An empty (not missing) archive, so the seed script does not re-seed on reload.
     await page.evaluate((k) => window.localStorage.setItem(k, JSON.stringify({ state: { goals: [], active_goal_id: null }, version: 0 })), STORAGE_KEY);
     await page.reload();
-    await expect(page.getByText("No active goal")).toBeVisible();
+    await expect(page.getByText("No goal yet")).toBeVisible();
     await page.getByTestId("import-archive").setInputFiles(path!);
-    await expect(page.getByText("How GenMentor sees you")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Profile" })).toBeVisible();
     const after = await archiveOf(page);
     expect(after.state.goals).toEqual(before.state.goals);
     expect(after.state.active_goal_id).toBe(before.state.active_goal_id);

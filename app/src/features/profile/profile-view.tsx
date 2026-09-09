@@ -51,7 +51,7 @@ export function ProfileView() {
 
   return (
     <>
-      <PageHeader eyebrow={t("profile.eyebrow")} title={t("profile.title")} description={t("profile.lede")} />
+      <PageHeader title={t("profile.title")} />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>

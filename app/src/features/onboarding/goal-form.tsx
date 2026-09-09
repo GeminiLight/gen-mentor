@@ -53,7 +53,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
       <div className="space-y-2">
         <Label htmlFor="goal">{t("onboarding.goalLabel")}</Label>
         <Input id="goal" name="learning_goal" value={goal} onChange={(e) => setGoal(e.target.value)} disabled={disabled} placeholder={t("onboarding.goalPlaceholder")} autoFocus />
-        <p className="text-xs text-muted-foreground">{t("onboarding.goalHint")}</p>
+        {t("onboarding.goalHint") && <p className="text-xs text-muted-foreground">{t("onboarding.goalHint")}</p>}
       </div>
 
       <div className="space-y-2">
@@ -74,9 +74,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           rows={7}
           placeholder={t("onboarding.infoPlaceholder")}
         />
-        <p className="text-xs text-muted-foreground">
-          {info.trim().length < 40 ? t("onboarding.infoHintShort") : t("onboarding.infoWords", { n: info.trim().split(/\s+/).length })}
-        </p>
+        {info.trim().length >= 40 && <p className="text-xs text-muted-foreground">{t("onboarding.infoWords", { n: info.trim().split(/\s+/).length })}</p>}
       </div>
 
       <div className="flex flex-wrap items-end justify-between gap-4">

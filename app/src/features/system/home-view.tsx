@@ -28,7 +28,7 @@ export function HomeView() {
       </header>
 
       <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-16">
-        <p className="text-sm font-medium text-muted-foreground">{t("home.eyebrow")}</p>
+        {t("home.eyebrow") && <p className="text-sm font-medium text-muted-foreground">{t("home.eyebrow")}</p>}
         <h1 className="mt-3 max-w-2xl text-xl font-semibold leading-tight tracking-tight sm:text-2xl">{t("home.title")}</h1>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">{t("home.lede")}</p>
         <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">

@@ -20,10 +20,10 @@ async function slowApi(page: import("@playwright/test").Page) {
 test("onboarding shows the stage list immediately after submit", async ({ page }) => {
   await slowApi(page);
   await page.goto("/onboarding");
-  await page.getByLabel("Where do you want to be?").fill(sample.learning_goal);
-  await page.getByLabel("Your background").fill(sample.learner_information);
+  await page.getByLabel("Goal", { exact: true }).fill(sample.learning_goal);
+  await page.getByLabel("Background", { exact: true }).fill(sample.learner_information);
   await page.getByRole("button", { name: "Build my path" }).click();
-  await expect(page.getByText("Refining your goal into something a path can be built against")).toBeVisible({ timeout: BUDGET_MS });
+  await expect(page.getByText("Refining your goal")).toBeVisible({ timeout: BUDGET_MS });
 });
 
 test("opening an ungenerated session shows the pipeline panel at once", async ({ page }) => {
@@ -31,15 +31,15 @@ test("opening an ungenerated session shows the pipeline panel at once", async ({
   await slowApi(page);
   await page.goto("/session/1");
   await expect(page.locator("[data-loading]").first()).toBeVisible({ timeout: BUDGET_MS + 300 });
-  await expect(page.getByText("Exploring the knowledge points this session needs")).toBeVisible({ timeout: BUDGET_MS });
+  await expect(page.getByText("Choosing knowledge points")).toBeVisible({ timeout: BUDGET_MS });
 });
 
 test("reschedule shows streaming state before the model answers", async ({ page }) => {
   await seed(page);
   await slowApi(page);
   await page.goto("/learning-path");
-  await page.getByRole("button", { name: "Reschedule" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Reschedule" }).click();
+  await page.getByRole("button", { name: "Replan" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Replan" }).click();
   await expect(page.getByRole("dialog").locator("[data-loading]")).toBeVisible({ timeout: BUDGET_MS });
 });
 
@@ -55,7 +55,7 @@ test("tutor shows the pending bubble the moment a message is sent", async ({ pag
   await seed(page);
   await slowApi(page);
   await page.goto("/learning-path");
-  await page.getByRole("button", { name: "Open AI tutor" }).first().click();
+  await page.getByRole("button", { name: "Tutor", exact: true }).first().click();
   await page.getByLabel("Message to the tutor").fill("Hello");
   await page.getByRole("button", { name: "Send" }).click();
   await expect(page.getByTestId("tutor-messages").locator("[aria-busy=true]")).toBeVisible({ timeout: BUDGET_MS });

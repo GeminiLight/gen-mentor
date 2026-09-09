@@ -9,7 +9,7 @@ import { seed, seedArchive, STORAGE_KEY } from "./seed";
 test("empty archive: rings, tree and footprint show empty states, no invented numbers", async ({ page }) => {
   await page.addInitScript((k) => window.localStorage.setItem(k, JSON.stringify({ state: { goals: [], active_goal_id: null }, version: 0 })), STORAGE_KEY);
   await page.goto("/progress");
-  await expect(page.getByText("No active goal")).toBeVisible();
+  await expect(page.getByText("No goal yet")).toBeVisible();
   await expect(page.getByTestId("skill-tree")).toHaveCount(0);
   await expect(page.getByTestId("mastery-line")).toHaveCount(0);
   await expect(page.locator("body")).not.toContainText(/\d+%/);
@@ -36,8 +36,9 @@ test("seeded archive: every gamified value traces back to the archive", async ({
   await expect(tree.locator('[data-testid="session-node"][data-learned="true"]')).toHaveCount(goal.learning_path[0].desired_outcome_when_completed.length);
 
   await expect(page.getByTestId("mastery-rings").getByRole("listitem")).toHaveCount(skills);
+  const label = (l: string) => (l === "unlearned" ? "not started" : l);
   for (const s of profile.cognitive_status.in_progress_skills) {
-    await expect(page.getByTestId("mastery-rings")).toContainText(`${s.current_proficiency_level} → ${s.required_proficiency_level}`);
+    await expect(page.getByTestId("mastery-rings")).toContainText(`${label(s.current_proficiency_level)} → ${label(s.required_proficiency_level)}`);
   }
   await expect(page.getByTestId("mastery-line")).toBeVisible();
   await expect(page.getByTestId("minutes-bars")).toBeVisible();
@@ -72,7 +73,7 @@ test("quiz: verdicts are instant and the streak counts consecutive correct answe
   await expect(third).toHaveAttribute("data-verdict", "incorrect");
   await expect(page.getByTestId("streak")).toContainText("streak");
   await page.getByTestId("submit-quiz").click();
-  await expect(page.getByTestId("quiz-score")).toHaveText(/2 of 3 answered correctly/);
+  await expect(page.getByTestId("quiz-score")).toContainText(/2 of 3 correct/);
 });
 
 const QUIZ = {

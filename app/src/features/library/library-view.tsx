@@ -26,7 +26,7 @@ export function LibraryView() {
 
   return (
     <>
-      <PageHeader eyebrow={t("library.eyebrow")} title={t("library.title")} description={t("library.lede")} />
+      <PageHeader title={t("library.title")} />
       {docs.length === 0 ? (
         <EmptyState title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
       ) : (

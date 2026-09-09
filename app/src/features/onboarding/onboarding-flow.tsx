@@ -19,7 +19,7 @@ export function OnboardingFlow() {
 
       <aside className="space-y-6 lg:border-l lg:pl-10" aria-label="Progress">
         {!started ? (
-          <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground lg:pt-1">
             <p className="font-medium text-foreground">{t("onboarding.whatNext")}</p>
             <ol className="mt-3 list-decimal space-y-1.5 pl-5">
               {STEPS.map((s) => (
