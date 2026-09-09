@@ -6,7 +6,7 @@ import { seed } from "./seed";
  * across reloads, set <html lang>, and never leak a dictionary key.
  */
 const PAGES = ["/", "/goals", "/learning-path", "/library", "/progress", "/profile", "/session/0", "/onboarding"];
-const KEY_LEAK = /\b(common|nav|home|onboarding|goals|path|session|quiz|library|progress|profile|tutor|command|health|levels|polish)\.[a-zA-Z]+\b/;
+const KEY_LEAK = /\b(common|nav|home|onboarding|goals|path|session|quiz|library|progress|profile|tutor|command|health|levels|polish|review)\.[a-zA-Z]+\b/;
 
 test("defaults to the browser language", async ({ browser }) => {
   const zh = await browser.newContext({ locale: "zh-CN" });

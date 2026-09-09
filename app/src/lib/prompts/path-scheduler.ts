@@ -88,3 +88,8 @@ Update the learning path based on the learner's updated profile, preserving all 
 * **Desired Session Count**: {session_count}
 * **Other Feedback**: {other_feedback}
 `;
+
+/** Zero (the onboarding Adaptive option) or an omitted count lets the scheduler choose. */
+export const pathSchedulerCount = (count?: number) => count === undefined || count === 0
+  ? "Adaptive: choose 1-10 sessions based on the learner’s goal, skill gaps, and preferences; no fixed count is requested."
+  : count;

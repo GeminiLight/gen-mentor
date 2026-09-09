@@ -9,6 +9,8 @@ import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ModelSettings } from "@/features/settings/model-settings";
 import { NoKeyBanner } from "@/features/settings/no-key-banner";
+import { TutorTrigger } from "@/features/tutor/tutor-trigger";
+import { useTutorPanel } from "@/features/tutor/use-tutor-panel";
 import { TutorSheet } from "@/features/tutor/tutor-sheet";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
@@ -30,7 +32,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const sessionIndex = /^\/session\/(\d+)/.exec(pathname)?.[1];
   const session = goal && sessionIndex !== undefined ? goal.learning_path[Number(sessionIndex)] : undefined;
   const context = goal && sessionIndex !== undefined ? goal.sessions[sessionUid(goal.id, Number(sessionIndex))]?.document?.markdown : undefined;
-  const tutor = (variant: "icon" | "rail") => (goal ? <TutorSheet goal={goal} session={session} context={context} variant={variant} /> : null);
+  const panel = useTutorPanel();
+  const tutor = (variant: "icon" | "rail") => (goal ? <TutorTrigger panel={panel} variant={variant} /> : null);
 
   return (
     <div className="flex min-h-full flex-1">
@@ -107,6 +110,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
       </div>
+      {goal && <TutorSheet key={goal.id} goal={goal} session={session} context={context} panel={panel} />}
     </div>
   );
 }

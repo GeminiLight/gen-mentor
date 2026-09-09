@@ -10,7 +10,7 @@ export function ClearConversation({ onClear, disabled }: { onClear: () => void; 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" variant="ghost" size="icon-sm" disabled={disabled} className="absolute top-3 right-12 text-muted-foreground" aria-label={t("tutor.clear")}><Trash2 aria-hidden /></Button>
+        <Button type="button" variant="ghost" size="icon-sm" disabled={disabled} className="text-muted-foreground" aria-label={t("tutor.clear")}><Trash2 aria-hidden /></Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>{t("polish.clearTutorTitle")}</DialogTitle><DialogDescription>{t("polish.clearTutorBody")}</DialogDescription></DialogHeader>

@@ -32,7 +32,7 @@ const knowledge = [
 ] as const;
 const sizes = ["text-xs", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl"] as const;
 const weights = ["font-normal", "font-medium", "font-semibold"] as const;
-const widths = ["--w-rail", "--w-col", "--w-content", "--w-measure", "--w-dialog"] as const;
+const widths = ["--w-rail", "--w-col", "--w-content", "--w-measure", "--w-dialog", "--w-tutor"] as const;
 const durations = ["--dur-fast", "--dur-base", "--dur-slow"] as const;
 
 function Swatches({ names }: { names: readonly (readonly [string, string])[] }) {

@@ -5,11 +5,13 @@ import { LangToggle } from "@/components/lang-toggle";
 import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useT } from "@/lib/i18n";
+import { useArchive } from "@/lib/store";
 import { NoKeyBanner } from "@/features/settings/no-key-banner";
 import { OnboardingFlow } from "./onboarding-flow";
 
 export function OnboardingPage() {
   const { t } = useT();
+  const hasGoals = useArchive((s) => s.hydrated && s.goals.length > 0);
   return (
     <main className="mx-auto w-full max-w-(--w-content) px-6 py-6">
       <NoKeyBanner />
@@ -18,18 +20,14 @@ export function OnboardingPage() {
           <Brand />
         </Link>
         <div className="flex items-center gap-1">
-          <Link href="/goals" className="mr-2 text-sm text-muted-foreground hover:text-foreground">
+          {hasGoals && <Link href="/goals" className="mr-2 text-sm text-muted-foreground hover:text-foreground">
             {t("onboarding.myGoals")}
-          </Link>
+          </Link>}
           <LangToggle />
           <ThemeToggle />
         </div>
       </header>
-      <div className="mb-10 max-w-(--w-measure)">
-        <p className="eyebrow mb-3">{t("polish.startSmall")}</p>
-        <h1 className="text-xl font-semibold tracking-tight">{t("onboarding.title")}</h1>
-      </div>
-      <div className="rounded-xl border bg-card p-5 sm:p-8"><OnboardingFlow /></div>
+      <OnboardingFlow />
     </main>
   );
 }
