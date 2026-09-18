@@ -6,7 +6,7 @@ import { seed } from "./seed";
  * across reloads, set <html lang>, and never leak a dictionary key.
  */
 const PAGES = ["/", "/goals", "/learning-path", "/library", "/progress", "/profile", "/session/0", "/onboarding"];
-const KEY_LEAK = /\b(common|nav|home|onboarding|goals|path|session|quiz|library|progress|profile|tutor|command|health|levels|polish|review)\.[a-zA-Z]+\b/;
+const KEY_LEAK = /\b(common|nav|home|onboarding|goals|path|session|quiz|library|progress|profile|tutor|command|health|levels|polish|review|navigation|journey|coach)\.[a-zA-Z]+\b/;
 
 test("defaults to the browser language", async ({ browser }) => {
   const zh = await browser.newContext({ locale: "zh-CN" });
@@ -26,11 +26,11 @@ test("switching to Chinese translates every page and persists", async ({ page })
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
 
   const expected: Record<string, RegExp> = {
-    "/": /从上次停下的地方，继续/,
+    "/": /为下一步学习，留一点空间/,
     "/goals": /^目标$/,
     "/learning-path": /^学习路径$/,
     "/library": /^文库$/,
-    "/progress": /^进度$/,
+    "/progress": /^看见有依据的学习进展$/,
     "/profile": /^画像$/,
     "/session/0": /Python Fundamentals/, // session titles come from the model
     "/onboarding": /你想到达哪里/,

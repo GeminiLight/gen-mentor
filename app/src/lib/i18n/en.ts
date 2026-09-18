@@ -1,3 +1,6 @@
+import { coach } from "./en-coach";
+import { journey } from "./en-journey";
+import { navigation } from "./en-navigation";
 import { review } from "./en-review";
 import { polish } from "./en-polish";
 /** English UI copy. Short, plain, no explanations of the machinery. `zh.ts` mirrors every key. */
@@ -184,7 +187,7 @@ export const en = {
   progress: {
     title: "Progress",
     emptyBody: "Set a goal and progress shows up here.",
-    overallAria: "Overall progress {n}%",
+    overallAria: "Target skill attainment {n}%",
     skillsMastered: "Skills",
     sessions: "Sessions",
     minutesReading: "{n} min",
@@ -266,6 +269,9 @@ export const en = {
   command,
   polish,
   review,
+  navigation,
+  journey,
+  coach,
 } as const;
 
 export type Dict = { [K in keyof typeof en]: { [P in keyof (typeof en)[K]]: string } };

@@ -1,5 +1,7 @@
 "use client";
 
+import { ReviewQueue } from "@/features/progress/review-queue";
+import { lessonState } from "@/features/path/lesson-state";
 import { ArrowRight, BookOpen, Check, Route } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,10 +16,11 @@ export function LearningDesk({ goal }: { goal: Goal }) {
   const next = goal.learning_path[index];
   const state = goal.sessions[sessionUid(goal.id, index)];
   const learned = learnedCount(goal);
+  const status = lessonState(false, state);
   return (
-    <section className="mx-auto w-full max-w-(--w-content) flex-1 px-6 py-12 sm:py-20" data-hydrated="" data-testid="home-resume">
-      <p className="eyebrow">{t("polish.workspace")}</p>
-      <h1 className="mt-3 text-xl font-semibold tracking-tight sm:text-2xl">{t("polish.welcome")}</h1>
+    <section className="mx-auto w-full max-w-(--w-content) flex-1 px-6 py-12 sm:py-12" data-hydrated="" data-testid="home-resume">
+      <p className="eyebrow">{t("coach.savedWork")}</p>
+      <h1 className="mt-3 text-xl font-semibold tracking-tight sm:text-2xl">{t("coach.deskTitle")}</h1>
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <div className="min-w-0 rounded-xl border bg-card p-6 sm:p-8">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -28,8 +31,8 @@ export function LearningDesk({ goal }: { goal: Goal }) {
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{next?.abstract ?? t("polish.completedPlanBody")}</p>
           {state?.reading_anchor && <p className="mt-5 text-xs text-muted-foreground">{t("polish.savedPlace")}</p>}
           <Button size="lg" asChild className="mt-8 h-11 px-5">
-            <Link href={next ? `/session/${index}` : "/progress"} data-testid="continue-link">
-              {next ? t("home.continue") : t("progress.title")} <ArrowRight aria-hidden />
+            <Link href={next ? `/session/${index}${status.quiz ? "#quiz" : ""}` : "/progress"} data-testid="continue-link">
+              {next ? t(status.action) : t("progress.title")} <ArrowRight aria-hidden />
             </Link>
           </Button>
         </div>
@@ -49,6 +52,7 @@ export function LearningDesk({ goal }: { goal: Goal }) {
           </div>
         </aside>
       </div>
+      <div className="mt-12 border-t pt-8"><ReviewQueue goal={goal} compact /></div>
     </section>
   );
 }

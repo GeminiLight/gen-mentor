@@ -30,7 +30,7 @@ export function resolveOption(options: string[], correct: number | string): numb
   if (s.length === 1 && letter !== -1 && letter < options.length) return letter;
   const byText = options.indexOf(s);
   if (byText !== -1) return byText;
-  const n = Number.parseInt(s, 10);
+  const n = /^\d+$/.test(s) ? Number(s) : Number.NaN;
   return Number.isInteger(n) && n >= 0 && n < options.length ? n : null;
 }
 
@@ -56,16 +56,18 @@ export function judge(quiz: DocumentQuiz, sel: Selections): QuizResults {
 
   quiz.single_choice_questions.forEach((q, i) => {
     const want = resolveOption(q.options, q.correct_option);
-    const got = sel.single[i];
+    const got = sel.single[i] ?? null;
     mark(questionKey("single", i), got !== null, want === null ? null : got === want, q.question, want === null ? String(q.correct_option) : q.options[want]);
   });
   quiz.multiple_choice_questions.forEach((q, i) => {
-    const want = q.correct_options.map((c) => resolveOption(q.options, c)).filter((x): x is number => x !== null).sort();
-    const got = [...(sel.multiple[i] ?? [])].sort();
-    mark(questionKey("multiple", i), got.length > 0, want.length === got.length && want.every((v, k) => v === got[k]), q.question, want.map((w) => q.options[w]).join(", "));
+    const resolved = q.correct_options.map((c) => resolveOption(q.options, c));
+    const valid = resolved.length > 0 && resolved.every((x) => x !== null);
+    const want = [...new Set(resolved.filter((x): x is number => x !== null))].sort();
+    const got = [...new Set(sel.multiple[i] ?? [])].sort();
+    mark(questionKey("multiple", i), got.length > 0, valid ? want.length === got.length && want.every((v, k) => v === got[k]) : null, q.question, want.map((w) => q.options[w]).join(", "));
   });
   quiz.true_false_questions.forEach((q, i) => {
-    const got = sel.tf[i];
+    const got = sel.tf[i] ?? null;
     mark(questionKey("tf", i), got !== null, got === q.correct_answer, q.question, q.correct_answer ? "True" : "False");
   });
   quiz.short_answer_questions.forEach((q, i) => {

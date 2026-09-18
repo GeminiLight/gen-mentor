@@ -55,7 +55,7 @@ export function DocumentToc({ items }: { items: TocItem[] }) {
   }, [items]);
   if (items.length < 2) return null;
   return (
-    <nav aria-label={t("session.contents")} className="text-sm" data-testid="doc-toc">
+    <nav aria-label={t("session.contents")} className="max-h-[50dvh] overflow-y-auto overscroll-contain pr-2 text-sm @3xl:max-h-[calc(100dvh-8rem)]" data-testid="doc-toc">
       <p className="eyebrow mb-3">{t("session.contents")}</p>
       <ol className="space-y-1 border-l">
         {items.map((i) => (
@@ -67,7 +67,7 @@ export function DocumentToc({ items }: { items: TocItem[] }) {
                 e.currentTarget.closest("details")?.removeAttribute("open");
               }}
               className={cn(
-                "-ml-px block border-l py-1 pl-3 text-muted-foreground transition-colors hover:text-foreground",
+                "-ml-px block border-l py-1 pl-3 pointer-coarse:py-3 text-muted-foreground transition-colors hover:text-foreground",
                 i.depth === 3 && "pl-6 text-xs",
                 active === i.id && "border-brand font-medium text-foreground",
               )}

@@ -23,7 +23,16 @@ export interface QuizDraft {
   order: string[];
 }
 
+export interface PracticeState {
+  sourceSubmittedAt: number;
+  draft?: QuizDraft;
+  results?: QuizResults;
+}
+
 export interface SessionState {
+  practice?: PracticeState;
+  /** Assessment waiting to update the model estimate; completion is already saved. */
+  profile_update?: { id: string; status: "pending" | "failed"; evidence: QuizResults };
   quiz_draft?: QuizDraft;
   reading_anchor?: string;
   knowledge_points?: KnowledgePoint[];

@@ -37,7 +37,7 @@ export function LibraryView() {
       {docs.length === 0 ? (
         <EmptyState title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3">
           {matches.map(({ session, index, state }) => (
             <Link key={index} href={`/session/${index}`} className="group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <Card className="h-full transition-colors group-hover:border-foreground/20" data-testid="library-card">

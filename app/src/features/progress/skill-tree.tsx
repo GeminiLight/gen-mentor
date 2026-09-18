@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { SessionItem } from "@/lib/schemas";
 import type { Goal } from "@/lib/store";
 import { useT } from "@/lib/i18n";
-import { skillLevels } from "@/lib/store/derive";
+import { targetSkills } from "@/lib/store/learning-evidence";
 import { cn } from "@/lib/utils";
 
 const LEVELS = ["unlearned", "beginner", "intermediate", "advanced"] as const;
@@ -19,7 +19,7 @@ const SESSION_R = 9;
  * the archive, so the tree cannot show progress that did not happen.
  */
 export function SkillTree({ goal }: { goal: Goal }) {
-  const skills = skillLevels(goal.learner_profile);
+  const skills = targetSkills(goal);
   const [focus, setFocus] = useState<string | null>(null);
   const { t } = useT();
   const scroller = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export function SkillTree({ goal }: { goal: Goal }) {
   if (skills.length === 0) return <p className="text-sm text-muted-foreground">{t("progress.noSkills")}</p>;
 
   return (
-    <div ref={scroller} className="overflow-x-auto" data-testid="skill-tree">
+    <div ref={scroller} className="overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-4" tabIndex={0} role="region" aria-label={t("progress.treeTitle")} data-testid="skill-tree">
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto block min-w-full" role="img" aria-label={t("progress.treeAria", { skills: skills.length, sessions: goal.learning_path.length })}>
         {/* goal */}
         <g>

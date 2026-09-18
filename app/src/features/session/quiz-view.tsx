@@ -90,6 +90,7 @@ export function QuizView({
       {quiz.multiple_choice_questions.map((q, i) => {
         const key = questionKey("multiple", i);
         const want = q.correct_options.map((c) => resolveOption(q.options, c));
+        const scorable = want.length > 0 && want.every((option) => option !== null);
         const locked = finished || order.includes(key);
         return (
           <Question
@@ -107,7 +108,7 @@ export function QuizView({
                 type="checkbox"
                 checked={sel.multiple[i]?.includes(k) ?? false}
                 judged={locked}
-                correct={want.includes(k)}
+                correct={scorable ? want.includes(k) : null}
                 onChange={() =>
                   setSel({
                     ...sel,

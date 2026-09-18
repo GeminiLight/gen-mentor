@@ -53,6 +53,7 @@ export function SessionView({ index }: { index: number }) {
           quiz: undefined,
           quiz_results: undefined,
           quiz_draft: undefined,
+          practice: undefined,
           reading_anchor: undefined,
         });
       setRunning(true);
@@ -111,6 +112,7 @@ export function SessionView({ index }: { index: number }) {
     // Deferred so the effect itself does not set state; the pipeline is a side effect of the visit.
     const pending = nextStage(goal.sessions[uid] ?? { opened_at: [] });
     void Promise.resolve().then(() => {
+      setTab(["#quiz", "#practice"].includes(window.location.hash) ? "quiz" : "read");
       openSession(uid);
       if (pending) void start();
     });
@@ -154,6 +156,8 @@ export function SessionView({ index }: { index: number }) {
               sources={state?.knowledge_drafts?.flatMap((d) => d.sources) ?? []}
               quiz={quiz}
               results={state?.quiz_results}
+              practice={state?.practice}
+              onPractice={(practice) => patchSession(uid, { practice })}
               draft={state?.quiz_draft}
               onDraft={(draft) => patchSession(uid, { quiz_draft: draft })}
               readingAnchor={state?.reading_anchor}

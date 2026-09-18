@@ -24,6 +24,8 @@ const Session = z.object({
   quiz: DocumentQuiz.optional(), quiz_results: Results.optional(),
   quiz_draft: z.object({ selections: Selections, order: z.array(z.string()) }).optional(),
   reading_anchor: z.string().optional(),
+  practice: z.object({ sourceSubmittedAt: Timestamp, draft: z.object({ selections: Selections, order: z.array(z.string()) }).optional(), results: Results.optional() }).optional(),
+  profile_update: z.object({ id: z.string().min(1), status: z.enum(["pending", "failed"]), evidence: Results }).optional(),
 });
 const Goal = z.object({
   id: z.string().min(1).refine((s) => !s.includes(":")), created_at: Timestamp,

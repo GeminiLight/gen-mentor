@@ -1,3 +1,6 @@
+import { coach } from "./zh-coach";
+import { journey } from "./zh-journey";
+import { navigation } from "./zh-navigation";
 import { review } from "./zh-review";
 import { polish } from "./zh-polish";
 import type { Dict } from "./en";
@@ -185,7 +188,7 @@ export const zh: Dict = {
   progress: {
     title: "进度",
     emptyBody: "设定目标后这里会有进度。",
-    overallAria: "总体进度 {n}%",
+    overallAria: "目标技能达成 {n}%",
     skillsMastered: "技能",
     sessions: "课程",
     minutesReading: "{n} 分钟",
@@ -267,4 +270,7 @@ export const zh: Dict = {
   command,
   polish,
   review,
+  navigation,
+  journey,
+  coach,
 };
