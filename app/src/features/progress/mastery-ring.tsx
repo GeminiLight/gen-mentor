@@ -40,7 +40,7 @@ export function MasteryRing({ current, required, size = 64, label, children }: {
   );
 }
 
-/** Overall progress as a single arc; the number is the profile's own `overall_progress`. */
+/** Goal attainment as a single arc; its value is derived from accepted targets. */
 export function ProgressRing({ value, size = 120 }: { value: number; size?: number }) {
   const { t } = useT();
   const r = (size - 12) / 2;

@@ -9,15 +9,13 @@ import {
   Moon,
   Plus,
   Route,
-  Search,
   Sun,
   TrendingUp,
   UserRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import {
   Command,
   CommandDialog,
@@ -28,13 +26,11 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { LANGS, useLangStore, useT } from "@/lib/i18n";
 import { useArchive, useActiveGoal } from "@/lib/store";
 
 /** ⌘K / Ctrl+K. Jumps to pages, sessions and goals; the only global keyboard surface. */
-export function CommandMenu({ compact = false }: { compact?: boolean }) {
-  const [open, setOpen] = useState(false);
+export function CommandMenu({ open, setOpen }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
   const goal = useActiveGoal();
@@ -45,13 +41,15 @@ export function CommandMenu({ compact = false }: { compact?: boolean }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        if (e.repeat || e.isComposing) return;
         e.preventDefault();
+        if (!open && document.querySelector('[role="dialog"][data-state="open"]')) return;
         setOpen((o) => !o);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [setOpen, open]);
 
   const go = (href: string) => {
     setOpen(false);
@@ -60,28 +58,11 @@ export function CommandMenu({ compact = false }: { compact?: boolean }) {
 
   return (
     <>
-      {compact ? (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("command.open")}>
-              <Search aria-hidden />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t("command.open")}</TooltipContent>
-        </Tooltip>
-      ) : (
-        <button
-          type="button"
-          className="flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
-          onClick={() => setOpen(true)}
-          aria-label={t("command.open")}
-        >
-          <Search className="size-4" aria-hidden />
-          {t("common.search")}
-          <kbd className="ml-auto rounded border bg-muted px-1 font-mono text-xs">⌘K</kbd>
-        </button>
-      )}
       <CommandDialog
+        onCloseAutoFocus={(e) => {
+          e.preventDefault();
+          Array.from(document.querySelectorAll<HTMLButtonElement>("[data-command-trigger]")).find((el) => el.getClientRects().length)?.focus();
+        }}
         open={open}
         onOpenChange={setOpen}
         title={t("command.title")}

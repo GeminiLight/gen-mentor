@@ -1,9 +1,10 @@
 "use client";
 
+import { ProfileRefreshNotice } from "@/features/session/profile-refresh-notice";
 import { Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { LangToggle } from "@/components/lang-toggle";
 import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -16,6 +17,8 @@ import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { sessionUid } from "@/lib/store/derive";
 import { cn } from "@/lib/utils";
+import { GoalSwitcher } from "./goal-switcher";
+import { CommandTrigger } from "./command-trigger";
 import { CommandMenu } from "./command-menu";
 import { NAV } from "./nav";
 
@@ -33,6 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const session = goal && sessionIndex !== undefined ? goal.learning_path[Number(sessionIndex)] : undefined;
   const context = goal && sessionIndex !== undefined ? goal.sessions[sessionUid(goal.id, Number(sessionIndex))]?.document?.markdown : undefined;
   const panel = useTutorPanel();
+  const [commandOpen, setCommandOpen] = useState(false);
   const tutor = (variant: "icon" | "rail") => (goal ? <TutorTrigger panel={panel} variant={variant} /> : null);
 
   return (
@@ -40,15 +44,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:ring-3 focus:ring-ring/50">
         {t("common.skipToContent")}
       </a>
-      <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col border-r bg-sidebar px-3 py-4 md:flex">
+      <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col overflow-y-auto overscroll-contain border-r bg-sidebar px-3 py-4 md:flex">
         <Link href="/" className="px-2 text-sm" aria-label={t("common.appName")}>
           <Brand />
         </Link>
-        {goal && (
-          <Link href="/goals" className="mt-4 block truncate rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground" title={goal.learning_goal}>
-            {goal.learning_goal}
-          </Link>
-        )}
+        {goal && <GoalSwitcher goal={goal} />}
         <nav className="mt-6 flex flex-col gap-0.5" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (
             <Link
@@ -67,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="mt-auto flex flex-col gap-0.5">
           {tutor("rail")}
-          <CommandMenu />
+          <CommandTrigger onOpen={() => setCommandOpen(true)} />
           <div className="mt-2 flex items-center gap-0.5 border-t pt-3">
             <ModelSettings />
             <LangToggle />
@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Brand />
           </Link>
           <div className="flex items-center">
-            <CommandMenu compact />
+            <CommandTrigger compact onOpen={() => setCommandOpen(true)} />
             {tutor("icon")}
             <ModelSettings />
             <details className="relative">
@@ -92,8 +92,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </details>
           </div>
         </header>
-        {goal && <Link href="/goals" className="truncate border-b px-4 py-2 text-xs text-muted-foreground md:hidden" title={goal.learning_goal}>{t("polish.currentGoal")} · {goal.original_goal}</Link>}
-        <main id="main" className="mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8" data-hydrated={hydrated ? "" : undefined}>
+        {goal && <GoalSwitcher goal={goal} compact />}
+        <main id="main" className="@container/workspace mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8" data-hydrated={hydrated ? "" : undefined}>
+          {goal && <ProfileRefreshNotice goal={goal} />}
           {children}
         </main>
         <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t pb-[env(safe-area-inset-bottom)] bg-background/95 backdrop-blur md:hidden" aria-label={t("polish.navigation")}>
@@ -110,6 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
       </div>
+      <CommandMenu open={commandOpen} setOpen={setCommandOpen} />
       {goal && <TutorSheet key={goal.id} goal={goal} session={session} context={context} panel={panel} />}
     </div>
   );

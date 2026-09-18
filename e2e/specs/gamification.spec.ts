@@ -23,7 +23,7 @@ test("seeded archive: every gamified value traces back to the archive", async ({
   const skills = profile.cognitive_status.mastered_skills.length + profile.cognitive_status.in_progress_skills.length;
   await page.goto("/progress");
 
-  await expect(page.getByTestId("overall-ring-value")).toHaveText(`${profile.cognitive_status.overall_progress}%`);
+  await expect(page.getByTestId("overall-ring-value")).toHaveText("25%");
   await expect(page.getByTestId("stat-mastered")).toHaveText(`${profile.cognitive_status.mastered_skills.length} / ${skills}`);
   await expect(page.getByTestId("stat-sessions")).toHaveText(`1 / ${goal.learning_path.length}`);
   const r = goal.sessions["g_seed:0"].quiz_results;

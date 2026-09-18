@@ -28,26 +28,28 @@ export function PathView() {
   const meta = [t("path.lede", { n: learned, total }), minutes > 0 ? t("common.minutes", { n: minutes }) : null].filter(Boolean).join(" · ");
   return (
     <>
-      <PageHeader eyebrow={t("polish.currentGoal")} title={t("path.eyebrow")} description={goal.original_goal} actions={<RescheduleDialog goal={goal} />} />
-      <p className="num mb-3 text-xs text-muted-foreground">{meta}</p>
+      <PageHeader eyebrow={t("polish.currentGoal")} title={t("path.eyebrow")} description={goal.learning_goal} />
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2"><p className="text-sm font-medium">{t("journey.courseProgress")}</p><p className="num text-xs text-muted-foreground">{meta}</p></div>
       <Progress value={(learned / Math.max(1, total)) * 100} className="mb-2 h-1" aria-label={meta} />
       {total > 0 && learned === total && (
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand/40 bg-brand-soft/40 px-4 py-3 text-sm" data-testid="path-all-done">
           <div>
-            <p className="font-medium">{t("path.allDoneTitle")}</p>
-            <p className="text-muted-foreground">{t("path.allDoneBody")}</p>
+            <p className="font-medium">{t("journey.courseDone")}</p>
+            <p className="text-muted-foreground">{t("journey.courseDoneBody")}</p>
           </div>
           <Button size="sm" variant="outline" asChild>
-            <Link href="/onboarding">{t("goals.newGoal")}</Link>
+            <Link href="/progress">{t("journey.viewProgress")}</Link>
           </Button>
         </div>
       )}
       <CurrentSession goal={goal} index={nextIndex} />
-      <h2 className="mt-10 mb-1 text-sm font-medium">{t("polish.coursePlan")}</h2>
-      <p className="mb-5 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p>
+      <div className="mt-10 mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div><h2 className="text-sm font-medium">{t("polish.coursePlan")}</h2><p className="mt-1 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p></div>
+        <RescheduleDialog goal={goal} />
+      </div>
       <ol className="divide-y" data-testid="path-stats">
         {goal.learning_path.map((s, i) => (
-          <SessionRow key={s.id + i} session={s} index={i} isNext={i === nextIndex} minutes={sessionMinutes(goal.sessions[sessionUid(goal.id, i)])} />
+          <SessionRow key={s.id + i} session={s} index={i} isNext={i === nextIndex} state={goal.sessions[sessionUid(goal.id, i)]} minutes={sessionMinutes(goal.sessions[sessionUid(goal.id, i)])} />
         ))}
       </ol>
     </>

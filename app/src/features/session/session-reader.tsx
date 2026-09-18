@@ -8,12 +8,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useT } from "@/lib/i18n";
 import type { DocumentQuiz, SessionItem, Source } from "@/lib/schemas";
-import type { QuizDraft, QuizResults } from "@/lib/store/types";
+import type { PracticeState, QuizDraft, QuizResults } from "@/lib/store/types";
 import { DocumentView } from "./document-view";
-import { QuizView } from "./quiz-view";
+import { QuizWorkspace } from "./quiz-workspace";
 import { ReadingBookmark } from "./reading-bookmark";
 import { scoredCount } from "@/lib/quiz";
 import { ReadingProgress } from "./reading-progress";
+import { AskTutor } from "./ask-tutor";
 import { ReadingTools } from "./reading-tools";
 
 const questionCount = (q: DocumentQuiz) =>
@@ -38,7 +39,7 @@ export function SessionReader({
   onComplete,
   onRegenerate,
   onSubmitQuiz,
-  draft, onDraft, quizStatus, readingAnchor, onReadingAnchor,
+  practice, onPractice, draft, onDraft, quizStatus, readingAnchor, onReadingAnchor,
 }: {
   session: SessionItem;
   /** The session after this one on the path, if any. */
@@ -46,6 +47,8 @@ export function SessionReader({
   markdown: string;
   sources: Source[];
   quiz?: DocumentQuiz;
+  practice?: PracticeState;
+  onPractice: (practice: PracticeState) => void;
   draft?: QuizDraft;
   onDraft: (draft: QuizDraft) => void;
   quizStatus?: React.ReactNode;
@@ -72,7 +75,7 @@ export function SessionReader({
 
   const complete = (testid?: string) =>
     session.if_learned ? null : (
-      <Button size="sm" onClick={requestComplete} disabled={completing} data-testid={testid}>
+      <Button size="sm" variant={testid ? "outline" : "default"} onClick={requestComplete} disabled={completing} data-testid={testid}>
         <CheckCircle2 aria-hidden /> {completing ? t("session.completing") : t("session.complete")}
       </Button>
     );
@@ -87,7 +90,7 @@ export function SessionReader({
 
   return (
     <Tabs ref={tabsRef} value={tab} onValueChange={selectTab} className="min-w-0 scroll-mt-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
+      <div className="sticky top-0 z-20 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b @lg/workspace:grid-cols-[auto_minmax(0,1fr)_auto] bg-background/95 py-3 backdrop-blur" data-testid="reading-toolbar">
         <TabsList>
           <TabsTrigger value="read">{t("session.read")}</TabsTrigger>
           <TabsTrigger value="quiz" data-testid="tab-quiz" disabled={!quiz}>
@@ -95,8 +98,11 @@ export function SessionReader({
             {results && scoredCount(results) > 0 ? ` · ${results.correct}/${scoredCount(results)}` : ""}
           </TabsTrigger>
         </TabsList>
-        <div className="flex items-center gap-2">
+        <div className="col-start-2 row-start-1 justify-self-end @lg/workspace:col-start-3">
           <ReadingTools markdown={markdown} disabled={completing || generating} onRegenerate={onRegenerate} />
+        </div>
+        <div className="col-span-2 row-start-2 flex items-center justify-between gap-2 @lg/workspace:col-span-1 @lg/workspace:col-start-2 @lg/workspace:row-start-1 @lg/workspace:justify-end">
+          <AskTutor />
           {complete("complete-session")}
         </div>
       </div>
@@ -106,21 +112,21 @@ export function SessionReader({
         <ReadingBookmark anchor={readingAnchor} onSave={onReadingAnchor} />
         <DocumentView markdown={markdown} sources={sources} />
         <div className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t pt-6 lg:max-w-(--w-measure)" data-testid="reading-end">
-          <div className="min-w-0 flex-1"><p className="text-sm font-medium">{t("session.finishedReading")}</p>{next && session.if_learned && <p className="mt-1 text-sm text-muted-foreground break-words">{next.title}</p>}</div>
+          <div className="min-w-0 flex-1"><p className="text-sm font-medium">{t(results ? "journey.reviewLesson" : "journey.checkUnderstanding")}</p><p className="mt-1 text-sm text-muted-foreground">{t(results ? "journey.reviewLessonBody" : "journey.checkBody")}</p>{next && session.if_learned && <p className="mt-1 text-sm text-muted-foreground break-words">{next.title}</p>}</div>
           <div className="flex flex-wrap gap-2">
-            <Button variant={session.if_learned ? "ghost" : "outline"} size="sm" onClick={() => selectTab("quiz")}>
+            <Button variant={!session.if_learned && quizPending && quiz ? "default" : "outline"} size="sm" disabled={!quiz} onClick={() => selectTab("quiz")}>
               {t("session.quiz")}
             </Button>
-            {complete()}
+            {!quizPending && complete()}
             {nextLink}
           </div>
         </div>
       </TabsContent>
       <TabsContent value="quiz" className="pt-6">
-        {quiz ? <QuizView key={results?.submittedAt ?? "fresh"} quiz={quiz} results={results} draft={draft} onDraft={onDraft} onSubmit={onSubmitQuiz} /> : quizStatus}
+        {quiz ? <QuizWorkspace quiz={quiz} results={results} draft={draft} onDraft={onDraft} onSubmit={onSubmitQuiz} practice={practice} onPractice={onPractice} /> : quizStatus}
         {results && (!session.if_learned || next) && (
           <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6" data-testid="quiz-end">
-            <p className="max-w-(--w-measure) text-sm text-muted-foreground">{session.if_learned ? "" : t("session.quizDoneHint")}</p>
+            <p className="max-w-(--w-measure) text-sm text-muted-foreground">{session.if_learned ? "" : t("journey.savedAnswers")}</p>
             <div className="flex flex-wrap gap-2">
               {complete()}
               {nextLink}
@@ -132,8 +138,8 @@ export function SessionReader({
       <Dialog open={askQuiz} onOpenChange={setAskQuiz}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("session.skipQuizTitle")}</DialogTitle>
-            <DialogDescription>{t("session.skipQuizBody")}</DialogDescription>
+            <DialogTitle>{t(quiz ? "session.skipQuizTitle" : "journey.quizUnavailable")}</DialogTitle>
+            <DialogDescription>{t(quiz ? "session.skipQuizBody" : "journey.quizUnavailableBody")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
@@ -149,10 +155,10 @@ export function SessionReader({
             <Button
               onClick={() => {
                 setAskQuiz(false);
-                selectTab("quiz");
+                if (quiz) selectTab("quiz");
               }}
             >
-              {t("session.takeQuiz")}
+              {t(quiz ? "session.takeQuiz" : "journey.keepReading")}
             </Button>
           </DialogFooter>
         </DialogContent>

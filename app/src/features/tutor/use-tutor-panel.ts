@@ -18,6 +18,13 @@ const usePreference = create<{ pinned: boolean; open: boolean; set: (value: { pi
   { name: "genmentor.tutor-panel.v1", skipHydration: true, partialize: ({ pinned, open }) => ({ pinned, open: pinned && open }) },
 ));
 
+let contextualTrigger: HTMLButtonElement | null = null;
+export function openTutorFrom(button: HTMLButtonElement) {
+  contextualTrigger = button;
+  usePreference.getState().set({ open: true });
+  requestAnimationFrame(() => document.querySelector<HTMLTextAreaElement>("[data-tutor-composer]")?.focus({ preventScroll: true }));
+}
+
 export function useTutorPanel() {
   const preference = usePreference();
   const wide = useSyncExternalStore(subscribe, wideSnapshot, serverSnapshot);
@@ -26,6 +33,7 @@ export function useTutorPanel() {
   const restoreFocus = () => {
     requestAnimationFrame(() => {
       if (usePreference.getState().open) return;
+      if (contextualTrigger?.isConnected && contextualTrigger.getClientRects().length) { contextualTrigger.focus({ preventScroll: true }); return; }
       const visibleTrigger = trigger.current?.getClientRects().length ? trigger.current :
         Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tutor-trigger]")).find((el) => el.getClientRects().length);
       visibleTrigger?.focus();
@@ -35,7 +43,7 @@ export function useTutorPanel() {
     open: preference.open,
     wide,
     docked: preference.open && preference.pinned && wide,
-    show: (button: HTMLButtonElement) => { trigger.current = button; preference.set({ open: true }); },
+    show: (button: HTMLButtonElement) => { contextualTrigger = null; trigger.current = button; preference.set({ open: true }); },
     close: () => { preference.set({ open: false }); restoreFocus(); },
     togglePin: () => preference.set({ pinned: !preference.pinned, open: true }),
     restoreFocus,

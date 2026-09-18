@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
 import type { SessionItem } from "@/lib/schemas";
+import type { SessionState } from "@/lib/store";
+import { lessonState } from "./lesson-state";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,10 +14,11 @@ import { cn } from "@/lib/utils";
  * The title is the link and it stretches over the whole row, so a phone tap anywhere opens the
  * session; the button is a second, visible affordance that shows on hover and for the next session.
  */
-export function SessionRow({ session, index, isNext, minutes }: { session: SessionItem; index: number; isNext: boolean; minutes: number }) {
+export function SessionRow({ session, index, isNext, minutes, state }: { session: SessionItem; index: number; isNext: boolean; minutes: number; state?: SessionState }) {
   const learned = session.if_learned;
   const { t } = useT();
-  const href = `/session/${index}`;
+  const status = lessonState(learned, state);
+  const href = `/session/${index}${status.quiz ? "#quiz" : ""}`;
   return (
     <li
       className={cn(
@@ -42,7 +45,7 @@ export function SessionRow({ session, index, isNext, minutes }: { session: Sessi
             <Link
               href={href}
               className="rounded-sm outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-3 focus-visible:after:ring-ring/50 group-hover:text-foreground"
-              aria-label={`${session.title} · ${learned ? t("path.review") : t("path.learn")}`}
+              aria-label={`${session.title} · ${t(status.action)}`}
             >
               {session.title}
             </Link>
@@ -51,16 +54,16 @@ export function SessionRow({ session, index, isNext, minutes }: { session: Sessi
           {learned && minutes > 0 && <span className="num text-xs text-muted-foreground">{t("common.minutes", { n: minutes })}</span>}
         </div>
         <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{session.abstract}</p>
-        <p className="mt-2 text-xs text-muted-foreground">{session.associated_skills.join(" · ")}</p>
+        <p className="mt-2 text-xs text-muted-foreground">{t(status.label)}{session.associated_skills.length ? ` · ${session.associated_skills.join(" · ")}` : ""}</p>
       </div>
       <Button
         size="sm"
-        variant={isNext ? "default" : "ghost"}
+        variant="ghost"
         asChild
-        className={cn("relative shrink-0 self-start", !isNext && "hidden text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 sm:inline-flex")}
+        className={cn("relative hidden shrink-0 self-start text-muted-foreground @3xl/workspace:inline-flex", !isNext && "opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100")}
       >
         <Link href={href} tabIndex={-1} aria-hidden>
-          {learned ? t("path.review") : t("path.learn")} <ArrowRight data-icon="inline-end" aria-hidden />
+          {t(status.action)} <ArrowRight data-icon="inline-end" aria-hidden />
         </Link>
       </Button>
     </li>

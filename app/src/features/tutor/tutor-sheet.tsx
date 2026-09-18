@@ -27,7 +27,7 @@ export function TutorSheet({ goal, session, context, panel }: { goal: Goal; sess
       <div className="flex items-center justify-between gap-2">
         <Title className="text-base font-medium">{t("tutor.title")}</Title>
         <div className="flex items-center gap-1">
-          {goal.tutor.length > 0 && <ClearConversation onClear={() => clearTutor(goal.id)} disabled={conversation.pending !== null} />}
+          {goal.tutor.length > 0 && <ClearConversation onClear={() => { clearTutor(goal.id); conversation.jumpToLatest(); }} disabled={conversation.pending !== null} />}
           <Button variant="ghost" size="icon-sm" aria-label={t("polish.close")} onClick={panel.close}><X aria-hidden /></Button>
         </div>
       </div>

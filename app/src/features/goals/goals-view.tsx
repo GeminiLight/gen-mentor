@@ -26,7 +26,7 @@ export function GoalsView() {
         }
       />
       {!hydrated ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-loading="">
+        <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3" data-loading="">
           {[0, 1].map((i) => (
             <Skeleton key={i} className="h-56 rounded-xl" />
           ))}
@@ -42,7 +42,7 @@ export function GoalsView() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3">
           {goals.map((g) => (
             <GoalCard key={g.id} goal={g} active={g.id === active_goal_id} />
           ))}

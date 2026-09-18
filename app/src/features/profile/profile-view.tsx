@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
+import { targetProgress, targetSkills } from "@/lib/store/learning-evidence";
 import { masteryRate } from "@/lib/store/derive";
 import { ArchivePanel } from "./archive-panel";
 import { HabitsCard } from "./habits-card";
@@ -38,6 +39,7 @@ export function ProfileView() {
     );
   }
   const p = goal.learner_profile;
+  const skills = targetSkills(goal);
 
   const update = async () => {
     if (!noteOk) {
@@ -63,7 +65,7 @@ export function ProfileView() {
   return (
     <>
       <PageHeader title={t("profile.title")} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 @3xl/workspace:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{t("profile.background")}</CardTitle>
@@ -79,26 +81,26 @@ export function ProfileView() {
         <Card>
           <CardHeader>
             <CardTitle>{t("profile.cognitive")}</CardTitle>
-            <CardDescription>{t("profile.overall", { n: p.cognitive_status.overall_progress })}</CardDescription>
+            <CardDescription>{`${t("coach.attainment")} · ${targetProgress(goal)}%`}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div>
-              <p className="eyebrow">{t("profile.mastered")}</p>
+              <p className="eyebrow">{t("coach.reached")}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {p.cognitive_status.mastered_skills.length === 0 && <span className="text-muted-foreground">{t("profile.noneYet")}</span>}
-                {p.cognitive_status.mastered_skills.map((s) => (
+                {!skills.some((s) => s.mastered) && <span className="text-muted-foreground">{t("profile.noneYet")}</span>}
+                {skills.filter((s) => s.mastered).map((s) => (
                   <Badge key={s.name} className="bg-success-soft text-success">
-                    {s.name} · {t(`levels.${s.proficiency_level}`)}
+                    {s.name} · {t(`levels.${s.current}`)}
                   </Badge>
                 ))}
               </div>
             </div>
             <div>
-              <p className="eyebrow">{t("profile.inProgress")}</p>
+              <p className="eyebrow">{t("coach.inProgress")}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {p.cognitive_status.in_progress_skills.map((s) => (
+                {skills.filter((s) => !s.mastered).map((s) => (
                   <Badge key={s.name} variant="outline">
-                    {s.name} · {t(`levels.${s.current_proficiency_level}`)} → {t(`levels.${s.required_proficiency_level}`)}
+                    {s.name} · {t(`levels.${s.current}`)} → {t(`levels.${s.required}`)}
                   </Badge>
                 ))}
               </div>

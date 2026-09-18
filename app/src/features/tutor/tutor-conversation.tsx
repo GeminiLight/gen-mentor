@@ -1,6 +1,6 @@
 "use client";
 
-import { Send, Square } from "lucide-react";
+import { ArrowDown, Send, Square } from "lucide-react";
 import { Prose } from "@/components/prose";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,18 +12,19 @@ import type { useTutorConversation } from "./use-tutor-conversation";
 
 export function TutorConversation({ goal, conversation }: { goal: Goal; conversation: ReturnType<typeof useTutorConversation> }) {
   const { t } = useT();
-  const { draft, setDraft, pending, question, followRef, attachList, suggestions, send, abort } = conversation;
+  const { draft, setDraft, pending, question, atBottom, onScroll, jumpToLatest, attachList, suggestions, send, abort } = conversation;
   return <>
-        <div ref={attachList} onScroll={(e) => { const el = e.currentTarget; followRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80; }} role="log" className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 text-sm" data-testid="tutor-messages">
+        <div className="relative min-h-0 flex-1">
+        <div ref={attachList} onScroll={onScroll} role="log" aria-label={t("tutor.title")} className="h-full space-y-4 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pb-12 text-sm" data-testid="tutor-messages">
           {goal.tutor.length === 0 && pending === null && (
             <div className="space-y-3">
               <p className="text-muted-foreground">{t("tutor.empty")}</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col gap-2">
                 {suggestions.map((q) => (
                   <button
                     key={q}
                     type="button"
-                    className="rounded-full border px-3 py-1.5 text-left text-xs transition-colors hover:bg-muted"
+                    className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
                     onClick={() => setDraft(q)}
                   >
                     {q}
@@ -38,14 +39,17 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
           {question && <Bubble turn={{ role: "user", content: question }} />}
           {pending !== null && <Bubble turn={{ role: "assistant", content: pending || t("polish.sending") }} streaming />}
         </div>
+        {!atBottom && <Button type="button" size="sm" variant="secondary" className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-sm" onClick={jumpToLatest}><ArrowDown aria-hidden />{t("navigation.latestMessage")}</Button>}
+        </div>
         <form
-          className="flex shrink-0 items-end gap-2 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+          className="shrink-0 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
           onSubmit={(e) => {
             e.preventDefault();
             void send();
           }}
         >
-          <Textarea
+          <div className="flex items-end gap-2">
+          <Textarea data-tutor-composer
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
@@ -57,7 +61,7 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
             rows={2}
             placeholder={t("tutor.placeholder")}
             aria-label={t("tutor.messageLabel")}
-            className="min-h-0 resize-none"
+            className="max-h-[min(10rem,25dvh)] min-h-11 resize-none overflow-y-auto"
           />
           {pending !== null ? (
             // Distinct keys so React does not turn this node into the submit button mid-click: the abort
@@ -81,6 +85,8 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
               <Send aria-hidden />
             </Button>
           )}
+          </div>
+          <p className="mt-2 hidden text-xs text-muted-foreground md:block">{t("navigation.composeHelp")}</p>
         </form>
   </>;
 }
@@ -91,7 +97,7 @@ function Bubble({ turn, streaming }: { turn: ChatTurn; streaming?: boolean }) {
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
       <div
         className={cn(
-          "max-w-[85%] rounded-lg px-3 py-2 leading-relaxed",
+          "min-w-0 max-w-[85%] wrap-anywhere rounded-lg px-3 py-2 leading-relaxed",
           mine ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-muted",
         )}
         aria-busy={streaming}

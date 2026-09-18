@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
@@ -14,12 +14,14 @@ export function useTutorConversation(goal: Goal, session?: SessionItem, context?
   const [pending, setPending] = useState<string | null>(null);
   const [question, setQuestion] = useState<string | null>(null);
   const followRef = useRef(true);
+  const [atBottom, setAtBottom] = useState(true);
   const listRef = useRef<HTMLDivElement>(null);
   const abort = useRef<AbortController | null>(null);
   // The sheet mounts its list on open; a stable callback ref lands the learner on the latest turn.
   const attachList = useCallback((el: HTMLDivElement | null) => {
     listRef.current = el;
     el?.scrollTo({ top: el.scrollHeight });
+    if (el) followRef.current = true;
   }, []);
   const focus = session ?? goal.learning_path.find((s) => !s.if_learned) ?? goal.learning_path[0];
   const suggestions = [
@@ -28,6 +30,31 @@ export function useTutorConversation(goal: Goal, session?: SessionItem, context?
   ];
 
   useEffect(() => () => { abort.current?.abort(); }, []);
+  useEffect(() => {
+    const quote = (event: Event) => {
+      const detail = (event as CustomEvent<{ goalId: string; quote: string }>).detail;
+      if (detail.goalId !== goal.id) return;
+      setDraft((current) => `${current}${current ? "\n\n" : ""}${detail.quote.split("\n").map((line) => `> ${line}`).join("\n")}\n\n`);
+    };
+    window.addEventListener("genmentor:quote", quote);
+    return () => window.removeEventListener("genmentor:quote", quote);
+  }, [goal.id]);
+
+  const jumpToLatest = () => {
+    followRef.current = true;
+    setAtBottom(true);
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+  };
+  const onScroll = () => {
+    const el = listRef.current;
+    if (!el) return;
+    followRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    setAtBottom(followRef.current);
+  };
+  // Follow after React has painted each streamed chunk, never before the new text exists.
+  useLayoutEffect(() => {
+    if (followRef.current) listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+  }, [pending, question, goal.tutor, draft]);
 
   const send = async () => {
     const content = draft.trim();
@@ -46,7 +73,6 @@ export function useTutorConversation(goal: Goal, session?: SessionItem, context?
         (text) => {
           partial = text;
           setPending(text);
-          if (followRef.current) listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
         },
         ctrl.signal,
       );
@@ -58,10 +84,10 @@ export function useTutorConversation(goal: Goal, session?: SessionItem, context?
       // Stopped by the learner: keep what has arrived, or hand the question back if nothing did.
       if (ctrl.signal.aborted) {
         if (partial.trim()) appendTutor(goal.id, [{ role: "user", content }, { role: "assistant", content: partial.trim() }]);
-        else setDraft(content);
+        else setDraft((current) => current.trim() ? `${content}\n\n${current}` : content);
       } else {
         toast.error(e instanceof Error ? e.message : t("tutor.failed"));
-        setDraft(content);
+        setDraft((current) => current.trim() ? `${content}\n\n${current}` : content);
       }
     } finally {
       abort.current = null;
@@ -70,5 +96,5 @@ export function useTutorConversation(goal: Goal, session?: SessionItem, context?
     }
   };
 
-  return { draft, setDraft, pending, question, followRef, attachList, suggestions, send, abort };
+  return { draft, setDraft, pending, question, atBottom, onScroll, jumpToLatest, attachList, suggestions, send, abort };
 }

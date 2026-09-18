@@ -75,6 +75,7 @@ test.describe("with a seeded archive", () => {
     await page.getByTestId("complete-session").click();
     await page.waitForURL("**/learning-path", { timeout: 300_000 });
     await expect(page.getByTestId("session-row").nth(1)).toHaveAttribute("data-learned", "true");
+    await expect.poll(async () => (await archiveOf(page)).state.goals.find((g: { id: string }) => g.id === GOAL_ID).mastery_history.length).toBeGreaterThan(2);
     const archive = await archiveOf(page);
     const goal = archive.state.goals.find((g: { id: string }) => g.id === GOAL_ID);
     expect(goal.mastery_history.length).toBeGreaterThan(2);
@@ -90,7 +91,7 @@ test.describe("with a seeded archive", () => {
 
   test("progress shows numbers from the archive, not placeholders", async ({ page }) => {
     await page.goto("/progress");
-    await expect(page.getByTestId("overall-ring-value")).toHaveText(`${sample.learner_profile.cognitive_status.overall_progress}%`);
+    await expect(page.getByTestId("overall-ring-value")).toHaveText("25%");
     await expect(page.getByTestId("mastery-rings").getByRole("listitem")).toHaveCount(sample.learner_profile.cognitive_status.mastered_skills.length + sample.learner_profile.cognitive_status.in_progress_skills.length);
   });
 
