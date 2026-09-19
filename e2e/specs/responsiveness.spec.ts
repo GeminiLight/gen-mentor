@@ -22,7 +22,7 @@ test("onboarding shows the stage list immediately after submit", async ({ page }
   await page.goto("/onboarding");
   await page.getByLabel("Goal", { exact: true }).fill(sample.learning_goal);
   await page.getByLabel("Background", { exact: true }).fill(sample.learner_information);
-  await page.getByRole("button", { name: "Build my path" }).click();
+  await page.getByRole("button", { name: "Analyze my goal" }).click();
   await expect(page.getByText("Refining your goal")).toBeVisible({ timeout: BUDGET_MS });
 });
 

@@ -17,10 +17,12 @@ import { maskKey, useLLMSettings } from "@/lib/store/llm-settings";
 const empty: Byok = { provider: "openai", apiKey: "", baseUrl: undefined, fastModel: "gpt-4.1-mini", smartModel: "gpt-4.1", disableThinking: false };
 
 /** Bring your own key: provider, endpoint, key and models, tested live before saving. */
-export function ModelSettings({ trigger }: { trigger?: React.ReactNode }) {
+export function ModelSettings({ trigger, open: controlledOpen, onOpenChange }: { trigger?: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) {
   const { t } = useT();
   const { byok, setByok } = useLLMSettings();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [form, setForm] = useState<Byok>(byok ?? empty);
   const [testing, setTesting] = useState(false);
   const [result, setResult] = useState<string | null>(null);

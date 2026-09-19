@@ -12,7 +12,7 @@ test("defaults to the browser language", async ({ browser }) => {
   const zh = await browser.newContext({ locale: "zh-CN" });
   const page = await zh.newPage();
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("朝着目标学。");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("把想做到的，变成下一步。");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await zh.close();
 });

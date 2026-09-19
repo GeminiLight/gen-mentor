@@ -20,7 +20,7 @@ test("Adaptive is the default, reaches the scheduler, and saves its chosen path"
   await expect(page.getByText("We’ll choose 1–10 sessions based on your goal and skill gaps.")).toBeVisible();
   await page.reload();
   await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("Adaptive");
-  await page.getByRole("button", { name: "Build my path" }).click();
+  await page.getByRole("button", { name: "Analyze my goal" }).click();
   await page.getByRole("button", { name: "Confirm and continue", exact: true }).click();
   await expect(page).toHaveURL(/\/learning-path$/);
   expect(requestedCount).toBe(0);

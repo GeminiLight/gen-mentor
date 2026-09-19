@@ -6,16 +6,15 @@ import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useT } from "@/lib/i18n";
 import { useArchive } from "@/lib/store";
-import { NoKeyBanner } from "@/features/settings/no-key-banner";
+
 import { OnboardingFlow } from "./onboarding-flow";
 
 export function OnboardingPage() {
   const { t } = useT();
   const hasGoals = useArchive((s) => s.hydrated && s.goals.length > 0);
   return (
-    <main className="mx-auto w-full max-w-(--w-content) px-6 py-6">
-      <NoKeyBanner />
-      <header className="my-6 flex items-center justify-between">
+    <main className="mx-auto w-full max-w-(--w-content) px-5 pb-12 sm:px-6">
+      <header className="py-5 mb-4 flex items-center justify-between">
         <Link href="/" className="text-sm" aria-label={t("common.appName")}>
           <Brand />
         </Link>

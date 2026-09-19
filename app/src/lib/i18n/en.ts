@@ -1,3 +1,4 @@
+import { entry } from "./en-entry";
 import { coach } from "./en-coach";
 import { journey } from "./en-journey";
 import { navigation } from "./en-navigation";
@@ -271,6 +272,7 @@ export const en = {
   review,
   navigation,
   journey,
+  entry,
   coach,
 } as const;
 
