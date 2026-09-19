@@ -18,7 +18,7 @@ test("model settings: test, save, and every agent call carries the key", async (
   await page.getByTestId("open-model-settings").first().click();
   await page.getByLabel("API key").fill("sk-test-1234567890");
   await page.getByLabel("Endpoint (optional)").fill("https://example.test/v1");
-  await page.getByLabel("Fast model").fill("test-model");
+  await page.getByLabel("Fast model", { exact: true }).fill("test-model");
   await page.getByRole("button", { name: "Test", exact: true }).click();
   await expect(page.getByTestId("llm-test-result")).toContainText("pong");
   expect(JSON.parse(seen[0])).toMatchObject({ provider: "openai", apiKey: "sk-test-1234567890", baseUrl: "https://example.test/v1", fastModel: "test-model" });

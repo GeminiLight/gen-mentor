@@ -1,5 +1,6 @@
 "use client";
 
+import { ModelFields } from "./model-fields";
 import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +17,7 @@ import { maskKey, useLLMSettings } from "@/lib/store/llm-settings";
 
 const empty: Byok = { provider: "openai", apiKey: "", baseUrl: undefined, fastModel: "gpt-4.1-mini", smartModel: "gpt-4.1", disableThinking: false };
 
-/** Bring your own key: provider, endpoint, key and models, tested live before saving. */
+/** Bring your own key, discover models, and optionally test the connection before saving. */
 export function ModelSettings({ trigger, open: controlledOpen, onOpenChange }: { trigger?: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) {
   const { t } = useT();
   const { byok, setByok } = useLLMSettings();
@@ -107,16 +108,7 @@ export function ModelSettings({ trigger, open: controlledOpen, onOpenChange }: {
             <Label htmlFor="llm-url">{t("settings.baseUrl")}</Label>
             <Input id="llm-url" value={form.baseUrl ?? ""} onChange={(e) => set({ baseUrl: e.target.value })} placeholder={form.provider === "openai" ? "https://api.openai.com/v1" : "https://api.anthropic.com"} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="grid gap-1.5">
-              <Label htmlFor="llm-fast">{t("settings.fastModel")}</Label>
-              <Input id="llm-fast" value={form.fastModel ?? ""} onChange={(e) => set({ fastModel: e.target.value })} placeholder={form.provider === "openai" ? "glm-5.3-flash" : "claude-sonnet-5"} />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="llm-smart">{t("settings.smartModel")}</Label>
-              <Input id="llm-smart" value={form.smartModel ?? ""} onChange={(e) => set({ smartModel: e.target.value })} placeholder={form.fastModel || (form.provider === "openai" ? "glm-5.3-flash" : "claude-opus-5")} />
-            </div>
-          </div>
+          <ModelFields key={JSON.stringify([form.provider, form.baseUrl, form.apiKey])} form={form} onChange={set} />
           <p className="text-xs text-muted-foreground">{t("settings.privacy")}</p>
           {!parsed.success && form.apiKey && <p role="alert" className="text-xs text-destructive">{t("polish.modelFields")}</p>}
           {result && (
