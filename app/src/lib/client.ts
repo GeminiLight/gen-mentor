@@ -3,6 +3,7 @@
  * protocol (`@@final` / `@@error`) and error shaping live in one place.
  */
 import type { z } from "zod";
+import { ModelCatalog, type ModelConnection, type ModelCatalogData } from "./schemas/model-catalog";
 import type {
   DraftKnowledgeRequest,
   ExploreKnowledgeRequest,
@@ -103,6 +104,11 @@ async function postStream<T>(url: string, body: unknown, onDelta?: (text: string
 type In<S extends z.ZodType> = z.input<S>;
 
 export const api = {
+  models: async (connection: ModelConnection, signal?: AbortSignal): Promise<ModelCatalogData> => {
+    const res = await fetch("/api/models", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(connection), cache: "no-store", signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15_000)]) : AbortSignal.timeout(15_000) });
+    if (!res.ok) return readError(res);
+    return ModelCatalog.parse(await res.json());
+  },
   health: async (): Promise<Health> => {
     const res = await fetch("/api/health", { cache: "no-store", headers: llmHeaders() });
     if (!res.ok) return readError(res);
