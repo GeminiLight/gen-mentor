@@ -1,5 +1,6 @@
 "use client";
 
+import { KeyRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api, type Health } from "@/lib/client";
 import { useT } from "@/lib/i18n";
@@ -17,15 +18,16 @@ export function HealthBadge() {
 
   const ready = health !== null && health !== "error" && (health.serverKey || !!byok);
   const label =
-    health === null ? t("health.checking") : health === "error" ? t("health.unreachable") : ready ? t("polish.modelConfigured") : t("health.noKey");
-  const tone = health === null ? "bg-muted-foreground/40" : ready ? "bg-primary" : "bg-destructive";
+    health === null ? t("health.checking") : health === "error" ? t("health.unreachable") : ready ? t("polish.modelConfigured") : t("entry.configure");
+  const tone = health === null ? "bg-muted-foreground/40" : ready ? "bg-primary" : health === "error" ? "bg-destructive" : "bg-muted-foreground";
 
   return (
     <ModelSettings
       trigger={
-        <button type="button" data-testid="health-badge" className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted">
-          <span className={`size-1.5 rounded-full ${tone}`} aria-hidden />
-          {label}
+        <button type="button" title={label} data-testid="health-badge" className="inline-flex items-center gap-2 min-h-11 min-w-11 rounded-lg px-3 py-2 text-xs whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted">
+          <span className={`hidden size-1.5 rounded-full sm:block ${tone}`} aria-hidden />
+          <KeyRound className="size-4 sm:hidden" aria-hidden />
+          <span className="sr-only sm:not-sr-only">{label}</span>
         </button>
       }
     />

@@ -1,32 +1,29 @@
 "use client";
 
-import { ArrowRight, Compass, Route, Sparkles } from "lucide-react";
+import { ArrowRight, Check, HardDrive } from "lucide-react";
 import Link from "next/link";
-import { Logo } from "@/components/brand";
+import { Brand } from "@/components/brand";
 import { LangToggle } from "@/components/lang-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { useT, type Key } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 import { useActiveGoal, useArchive } from "@/lib/store";
 import { LearningDesk } from "./learning-desk";
 import { HealthBadge } from "./health-badge";
-
-const steps: { icon: typeof Compass; title: Key; body: Key }[] = [
-  { icon: Compass, title: "home.step1Title", body: "home.step1Body" },
-  { icon: Route, title: "home.step2Title", body: "home.step2Body" },
-  { icon: Sparkles, title: "home.step3Title", body: "home.step3Body" },
-];
+import { PathPreview } from "./path-preview";
+import { useOnboardingDraft } from "@/lib/store/onboarding-draft";
 
 /** Returning learners see their goal and the next session before the fold; newcomers get the goal form. */
 export function HomeView() {
   const { t } = useT();
   const { goals, hydrated } = useArchive();
   const goal = useActiveGoal();
+  const draft = useOnboardingDraft((s) => !!(s.goal || s.info));
   const returning = hydrated && goals.length > 0 && goal;
   return (
     <main className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-(--w-content) items-center justify-between px-6 py-5">
-        <Logo width={168} className="h-auto w-28 sm:w-42" />
+        <Brand size={24} />
         <div className="flex items-center gap-2">
           <HealthBadge />
           <LangToggle />
@@ -35,26 +32,24 @@ export function HomeView() {
       </header>
 
       {returning ? <LearningDesk goal={goal} /> : (
-      <section className="mx-auto flex w-full max-w-(--w-content) flex-1 flex-col justify-center px-6 py-16">
-        <h1 className="max-w-2xl text-xl font-semibold leading-tight tracking-tight sm:text-2xl">{t("home.title")}</h1>
-        <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">{t("home.lede")}</p>
-        <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3" data-hydrated={hydrated ? "" : undefined}>
-          <Button size="lg" asChild className="h-11 px-5"><Link href="/onboarding">{t("home.cta")} <ArrowRight aria-hidden /></Link></Button>
-          <span className="text-sm text-muted-foreground">{t("home.noAccount")}</span>
-        </div>
-        <ol className="mt-20 grid gap-x-10 gap-y-8 border-t pt-8 sm:grid-cols-3">
-          {steps.map(({ icon: Icon, title, body }, i) => (
-            <li key={title}>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Icon className="size-4" aria-hidden />
-                <span className="num text-xs">0{i + 1}</span>
-              </div>
-              <h2 className="mt-3 font-medium">{t(title)}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(body)}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <div className="mx-auto w-full max-w-(--w-content) px-5 pb-8 sm:px-6">
+        <section className="grid items-center gap-10 py-9 sm:py-14 lg:grid-cols-2 lg:gap-16">
+          <div className="min-w-0">
+            <p className="eyebrow mb-4">{t("entry.eyebrow")}</p>
+            <h1 className="max-w-(--w-col) text-xl font-semibold leading-tight sm:text-2xl">{t("entry.title")}</h1>
+            <p className="mt-5 max-w-(--w-col) text-base leading-relaxed text-muted-foreground">{t("entry.lede")}</p>
+            <div className="mt-7 space-y-3" data-hydrated={hydrated ? "" : undefined}>
+              <Button size="lg" asChild className="h-11 px-5"><Link href="/onboarding">{t(hydrated && draft ? "entry.resume" : "home.cta")}<ArrowRight aria-hidden /></Link></Button>
+              <p className="text-xs leading-relaxed text-muted-foreground">{t(hydrated && draft ? "entry.draftNote" : "home.noAccount")}</p>
+            </div>
+            <p className="mt-6 max-w-(--w-col) text-xs leading-relaxed text-muted-foreground">{t("entry.setupNote")}</p>
+          </div>
+          <PathPreview />
+        </section>
+        <section className="grid gap-7 border-y py-7 sm:grid-cols-2 sm:gap-12">
+          {([{ icon: Check, title: "entry.howTitle", body: "entry.howBody" }, { icon: HardDrive, title: "entry.privacyTitle", body: "entry.privacyBody" }] as const).map(({ icon: Icon, title, body }) => <div key={title} className="flex gap-3"><Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden /><div><h2 className="text-sm font-medium">{t(title)}</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(body)}</p></div></div>)}
+        </section>
+      </div>
 
       )}
 

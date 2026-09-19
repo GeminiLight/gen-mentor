@@ -26,7 +26,7 @@ export async function startReview(page: Page) {
   await page.goto("/onboarding");
   await page.getByLabel("Goal", { exact: true }).fill("Build an AI research assistant");
   await page.getByLabel("Background", { exact: true }).fill("I know Python and am learning agents.");
-  await page.getByRole("button", { name: "Build my path", exact: true }).click();
+  await page.getByRole("button", { name: "Analyze my goal", exact: true }).click();
   await expect(page.getByTestId("review-controls")).toBeVisible();
 }
 export const checkpoint = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("genmentor.onboarding.v1")!).state.checkpoint);

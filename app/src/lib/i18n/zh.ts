@@ -1,3 +1,4 @@
+import { entry } from "./zh-entry";
 import { coach } from "./zh-coach";
 import { journey } from "./zh-journey";
 import { navigation } from "./zh-navigation";
@@ -272,5 +273,6 @@ export const zh: Dict = {
   review,
   navigation,
   journey,
+  entry,
   coach,
 };

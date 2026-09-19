@@ -104,7 +104,7 @@ test("a late skill analysis cannot replace the revised goal's analysis", async (
     await page.goto("/onboarding");
     await page.getByLabel("Goal", { exact: true }).fill("Build research tools");
     await page.getByLabel("Background", { exact: true }).fill("I know Python.");
-    await page.getByRole("button", { name: "Build my path" }).click();
+    await page.getByRole("button", { name: "Analyze my goal" }).click();
     await expect.poll(() => gapCount).toBe(1);
     await page.getByRole("button", { name: "Edit goal", exact: true }).click();
     await page.getByRole("textbox", { name: "Goal", exact: true }).fill("Evaluate research tools");

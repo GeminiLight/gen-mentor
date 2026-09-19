@@ -34,7 +34,7 @@ export function StartingPointReview({ flow }: { flow: Flow }) {
       </section>
       {preview.gaps && (
         <section aria-labelledby="skill-review-title" className="space-y-4">
-          <div className="space-y-1"><h2 id="skill-review-title" className="text-base font-semibold">{t("onboarding.skillGap")}</h2><p className="text-sm text-muted-foreground">{t(editable ? "review.skillHelp" : "review.skillSummary")}</p></div>
+          <div className="space-y-1"><h2 id="skill-review-title" className="text-base font-semibold">{t(editable ? "entry.reviewSummary" : "onboarding.skillGap", { n: preview.gaps.length })}</h2><p className="text-sm text-muted-foreground">{t(editable ? "review.skillHelp" : "review.skillSummary")}</p></div>
           <ol className="divide-y border-y">
             {preview.gaps.map((g, i) => (
               <li key={g.name} className="grid gap-4 py-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-8" data-testid="skill-review-row">

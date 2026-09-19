@@ -24,7 +24,7 @@ export function ReviewControls({ review, ready, onConfirm, onExtend }: {
   const seconds = review.deadline === null ? 180 : Math.max(0, Math.min(180, Math.ceil((review.deadline - now) / 1000)));
   const time = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
   return (
-    <div className="sticky bottom-0 z-20 -mx-5 border-t bg-card px-5 py-4 sm:-mx-8 sm:px-8" data-testid="review-controls">
+    <div className="sticky bottom-0 z-20 -mx-5 border-t bg-card px-5 py-4 sm:-mx-6 sm:px-6" data-testid="review-controls">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 space-y-1">
           <p className="flex items-center gap-2 text-sm font-medium"><Clock3 className="size-4 text-muted-foreground" aria-hidden />{editing ? t("review.timerPaused") : <>{t("review.autoContinue")} <span role="timer" className="num" data-testid="review-countdown">{time}</span></>}</p>

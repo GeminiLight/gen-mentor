@@ -17,9 +17,9 @@ test.describe("onboarding → path", () => {
     await page.getByLabel("Background", { exact: true }).fill(sample.learner_information);
     await page.getByLabel("Sessions", { exact: true }).click();
     await page.getByRole("option", { name: "5 sessions", exact: true }).click();
-    await page.getByRole("button", { name: "Build my path" }).click();
+    await page.getByRole("button", { name: "Analyze my goal" }).click();
     await expect(page.getByText("Finding the skill gap")).toBeVisible({ timeout: 300_000 });
-    await expect(page.getByText("Skill gap", { exact: true })).toBeVisible({ timeout: 300_000 });
+    await expect(page.getByRole("heading", { name: /skills to review/ })).toBeVisible({ timeout: 300_000 });
     await page.getByRole("button", { name: "Confirm and continue", exact: true }).click();
     await page.waitForURL("**/learning-path", { timeout: 600_000 });
     const rows = page.getByTestId("session-row");
