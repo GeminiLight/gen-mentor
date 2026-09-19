@@ -67,9 +67,19 @@ test.describe("with a seeded archive", () => {
     await expect(page.getByRole("tab", { name: /Quiz/ })).toBeVisible({ timeout: 800_000 });
     await expect(page.getByRole("article")).toContainText(/\w{3,}/);
     await page.getByTestId("tab-quiz").click();
+    // The pipeline now requests all four types. Answer one option per radio group
+    // (single choice, true/false), checkboxes + Confirm for multiple choice, and text
+    // for short answer, so submission is complete without the partial-confirmation path.
     const radios = page.getByRole("radio");
-    const n = await radios.count();
-    for (let i = 0; i < n; i++) if (i % 4 === 0) await radios.nth(i).check();
+    const groups = await radios.evaluateAll((els) => [...new Set(els.map((el) => (el as HTMLInputElement).name))]);
+    for (const group of groups) await page.locator(`input[type="radio"][name="${group}"]`).first().check();
+    const checkboxes = page.getByRole("checkbox");
+    if ((await checkboxes.count()) > 0) {
+      await checkboxes.first().check();
+      await page.getByRole("button", { name: "Confirm", exact: true }).first().click();
+    }
+    const shortAnswers = page.getByRole("textbox", { name: /Answer to question/ });
+    if ((await shortAnswers.count()) > 0) await shortAnswers.first().fill("A concise answer in my own words");
     await page.getByTestId("submit-quiz").click();
     await expect(page.getByTestId("quiz-score")).toBeVisible();
     await page.getByTestId("complete-session").click();

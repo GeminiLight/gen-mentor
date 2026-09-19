@@ -1,4 +1,4 @@
-<!-- Last verified: 2026-09-09 | Current stage: done -->
+<!-- Last verified: 2026-09-19 | Current stage: done -->
 
 # 项目路线图
 
@@ -194,3 +194,12 @@
 | 三阶段创建导向、可换行目标、非破坏性示例填写、按需帮助 | done |
 | 配置检查前置、就地配置、保存后手动开始与焦点恢复 | done |
 | 中英文双主题、手机长文本、错误状态与草稿保护 | done |
+
+## 产品审计与低成本修复（2026-09-19）
+
+审计全文见 [产品审计](reviews/review-2026-09-19-product-audit.md)，其余发现进 backlog"产品审计"节。
+
+| 功能 | 位置 | 状态 |
+|---|---|---|
+| 解锁全部四类题型：流水线请求 2 单选 + 1 多选 + 1 判断 + 1 简答，重录 quiz 与 profile-update fixture | `lib/pipeline.ts`、`e2e/fixtures/llm/` | done |
+| 根级错误边界，`/` 与 `/onboarding` 的渲染异常复用既有文案与重试 | `app/error.tsx` | done |
