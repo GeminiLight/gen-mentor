@@ -44,20 +44,21 @@ export function AppShell({ children }: { children: ReactNode }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:ring-3 focus:ring-ring/50">
         {t("common.skipToContent")}
       </a>
-      <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col overflow-y-auto overscroll-contain border-r bg-sidebar px-3 py-4 md:flex">
-        <Link href="/" className="px-2 text-sm" aria-label={t("common.appName")}>
+      <aside className="sticky top-0 hidden h-dvh w-(--w-rail) shrink-0 flex-col overflow-y-auto overscroll-contain border-r bg-sidebar px-4 py-6 md:flex">
+        <Link href="/" className="px-2 py-1 text-base" aria-label={t("common.appName")}>
           <Brand />
         </Link>
+        <div className="mt-6"><CommandTrigger onOpen={() => setCommandOpen(true)} /></div>
         {goal && <GoalSwitcher goal={goal} />}
-        <nav className="mt-6 flex flex-col gap-0.5" aria-label={t("polish.navigation")}>
+        <nav className="mt-7 flex flex-col gap-1" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
               className={cn(
-                "flex h-8 items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground",
-                isActive(href) && "bg-sidebar-accent font-medium text-foreground",
+                "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
+                isActive(href) && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
               )}
             >
               <Icon className="size-4" aria-hidden />
@@ -65,9 +66,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="mt-auto flex flex-col gap-0.5">
+        <div className="mt-auto flex flex-col gap-1 pt-8">
           {tutor("rail")}
-          <CommandTrigger onOpen={() => setCommandOpen(true)} />
           <div className="mt-2 flex items-center gap-0.5 border-t pt-3">
             <ModelSettings />
             <LangToggle />
@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         {goal && <GoalSwitcher goal={goal} compact />}
-        <main id="main" className="@container/workspace mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8" data-hydrated={hydrated ? "" : undefined}>
+        <main id="main" className="@container/workspace mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-10" data-hydrated={hydrated ? "" : undefined}>
           {goal && <ProfileRefreshNotice goal={goal} />}
           {children}
         </main>
@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
-              className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs text-muted-foreground", isActive(href) && "text-foreground")}
+              className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs text-muted-foreground", isActive(href) && "bg-brand-soft font-medium text-brand")}
             >
               <Icon className="size-5" aria-hidden />
               {t(label)}

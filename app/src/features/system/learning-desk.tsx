@@ -20,9 +20,9 @@ export function LearningDesk({ goal }: { goal: Goal }) {
   return (
     <section className="mx-auto w-full max-w-(--w-content) flex-1 px-6 py-12 sm:py-12" data-hydrated="" data-testid="home-resume">
       <p className="eyebrow">{t("coach.savedWork")}</p>
-      <h1 className="mt-3 text-xl font-semibold tracking-tight sm:text-2xl">{t("coach.deskTitle")}</h1>
+      <h1 className="mt-3 font-editorial text-xl font-normal sm:text-2xl">{t("coach.deskTitle")}</h1>
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
-        <div className="min-w-0 rounded-xl border bg-card p-6 sm:p-8">
+        <div className="min-w-0 rounded-xl border border-t-4 border-t-primary bg-card p-6 shadow-xs sm:p-8">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {next ? <BookOpen className="size-4" aria-hidden /> : <Check className="size-4" aria-hidden />}
             {next ? t("polish.lessonNumber", { n: index + 1, total: goal.learning_path.length }) : t("polish.completedPlan")}

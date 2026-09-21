@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { ArrowRight, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -19,7 +19,7 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
   const mastered = targets.filter((s) => s.mastered).length;
   const skills = targets.length;
   return (
-    <div data-testid="goal-card" data-active={active || undefined} className={cn("flex min-w-0 flex-col rounded-xl border bg-card p-5", active && "border-brand/60")}>
+    <div data-testid="goal-card" data-active={active || undefined} className={cn("flex min-w-0 flex-col rounded-xl border bg-card p-6 transition-shadow hover:shadow-sm", active && "border-brand/30")}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs text-muted-foreground">
           {active && <span className="mr-2 font-medium text-brand">{t("common.active")}</span>}
@@ -47,8 +47,8 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
           </DialogContent>
         </Dialog>
       </div>
-      <h2 className="mt-2 font-medium leading-snug wrap-anywhere">{goal.learning_goal}</h2>
-      <div className="mt-5 space-y-1.5">
+      <h2 className="mt-5 text-lg font-medium leading-snug wrap-anywhere">{goal.learning_goal}</h2>
+      <div className="mt-6 space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span>{t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })}</span>
           <span className="num">
@@ -57,13 +57,13 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
         </div>
         <Progress value={(learned / Math.max(1, goal.learning_path.length)) * 100} aria-label={t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })} />
       </div>
-      <div className="mt-auto pt-5">
+      <div className="mt-auto pt-6">
         {active ? (
-          <Button size="sm" asChild>
-            <Link href="/learning-path">{t("goals.openPath")}</Link>
+          <Button className="min-h-11 w-full justify-between" asChild>
+            <Link href="/learning-path">{t("goals.openPath")}<ArrowRight aria-hidden /></Link>
           </Button>
         ) : (
-          <Button size="sm" variant="outline" onClick={() => setActiveGoal(goal.id)}>
+          <Button className="min-h-11 w-full" variant="outline" onClick={() => setActiveGoal(goal.id)}>
             {t("goals.makeActive")}
           </Button>
         )}

@@ -19,7 +19,7 @@ export function HealthBadge() {
   const ready = health !== null && health !== "error" && (health.serverKey || !!byok);
   const label =
     health === null ? t("health.checking") : health === "error" ? t("health.unreachable") : ready ? t("polish.modelConfigured") : t("entry.configure");
-  const tone = health === null ? "bg-muted-foreground/40" : ready ? "bg-primary" : health === "error" ? "bg-destructive" : "bg-muted-foreground";
+  const tone = health === null ? "bg-muted-foreground/40" : ready ? "bg-brand" : health === "error" ? "bg-destructive" : "bg-muted-foreground";
 
   return (
     <ModelSettings

@@ -22,8 +22,8 @@ export function SessionRow({ session, index, isNext, minutes, state }: { session
   return (
     <li
       className={cn(
-        "group relative flex gap-4 py-5 transition-colors sm:gap-6",
-        isNext && "before:absolute before:inset-y-3 before:-left-4 before:w-0.5 before:rounded-full before:bg-brand sm:before:-left-6",
+        "group relative flex gap-4 rounded-lg px-3 py-5 transition-colors hover:bg-card sm:gap-6",
+        isNext && "before:absolute before:inset-y-5 before:left-0 before:w-0.5 before:rounded-full before:bg-brand",
       )}
       data-testid="session-row"
       data-learned={learned || undefined}

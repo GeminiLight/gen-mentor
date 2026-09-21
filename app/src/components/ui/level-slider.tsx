@@ -9,9 +9,9 @@ export function LevelSlider({ value, min = 0, label, valueText, disabled, onChan
   return (
     <Slider.Root min={min} max={3} step={1} value={[value]} disabled={disabled} onFocus={(e) => { if (e.target.matches(":focus-visible")) e.currentTarget.scrollIntoView({ block: "center" }); }} onKeyDown={(e) => { if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) e.currentTarget.scrollIntoView({ block: "center", behavior: "instant" }); }} onValueChange={([next]) => onChange(next)} className="relative flex h-11 w-full touch-none select-none items-center data-disabled:opacity-50">
       <Slider.Track className="relative h-1.5 grow overflow-hidden rounded-full bg-muted">
-        <Slider.Range className="absolute h-full rounded-full bg-primary" />
+        <Slider.Range className="absolute h-full rounded-full bg-brand" />
       </Slider.Track>
-      <Slider.Thumb aria-label={label} aria-valuetext={valueText} className="block size-5 rounded-full border-2 border-primary bg-background shadow-xs outline-none ring-offset-background focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2" />
+      <Slider.Thumb aria-label={label} aria-valuetext={valueText} className="block size-5 rounded-full border-2 border-brand bg-background shadow-xs outline-none ring-offset-background focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2" />
     </Slider.Root>
   );
 }

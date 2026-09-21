@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { scoredCount } from "@/lib/quiz";
-import { BookOpen } from "lucide-react";
+import { ArrowUpRight, BookOpen, Search } from "lucide-react";
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -32,7 +32,7 @@ export function LibraryView() {
   return (
     <>
       <PageHeader title={t("library.title")} description={t("polish.libraryLede")} />
-      {docs.length > 0 && <Input type="search" className="mb-6 max-w-(--w-col)" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("polish.searchLibrary")} aria-label={t("polish.searchLibrary")} />}
+      {docs.length > 0 && <div className="relative mb-8 max-w-(--w-col)"><Search className="pointer-events-none absolute top-3.5 left-3 size-4 text-muted-foreground" aria-hidden /><Input type="search" className="h-11 bg-card pl-10" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("polish.searchLibrary")} aria-label={t("polish.searchLibrary")} /></div>}
       {docs.length > 0 && matches.length === 0 && <p role="status" className="py-12 text-sm text-muted-foreground">{t("polish.noSearch")}</p>}
       {docs.length === 0 ? (
         <EmptyState title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
@@ -40,16 +40,16 @@ export function LibraryView() {
         <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3">
           {matches.map(({ session, index, state }) => (
             <Link key={index} href={`/session/${index}`} className="group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-              <Card className="h-full transition-colors group-hover:border-foreground/20" data-testid="library-card">
-                <CardHeader>
+              <Card className="h-full border border-border ring-0 shadow-xs transition-shadow group-hover:shadow-md" data-testid="library-card">
+                <CardHeader className="gap-3">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <BookOpen className="size-3.5" aria-hidden /> {session.id}
+                    <BookOpen className="size-3.5" aria-hidden /> {t("entry.previewLesson", { n: index + 1 })}
                     {session.if_learned && <Badge className="ml-auto bg-success-soft text-success">{t("common.learned")}</Badge>}
                   </div>
-                  <CardTitle className="leading-snug">{state!.document!.structure.title}</CardTitle>
-                  <CardDescription className="line-clamp-3">{state!.document!.structure.overview}</CardDescription>
+                  <CardTitle className="text-lg leading-snug">{state!.document!.structure.title}</CardTitle>
+                  <CardDescription className="line-clamp-3 leading-relaxed">{state!.document!.structure.overview}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <CardContent className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-4 text-xs text-muted-foreground">
                   <span className="num">{t("library.points", { n: state!.knowledge_points?.length ?? 0 })}</span>
                   {(state!.knowledge_drafts?.some((d) => d.sources.length > 0) ?? false) && (
                     <span className="num">{t("library.sources", { n: state!.knowledge_drafts!.reduce((a, d) => a + d.sources.length, 0) })}</span>
@@ -58,6 +58,7 @@ export function LibraryView() {
                     <span className="num">{t("library.quiz", { correct: state!.quiz_results.correct, answered: scoredCount(state!.quiz_results) })}</span>
                   )}
                   {sessionMinutes(state) > 0 && <span className="num">{t("common.minutes", { n: sessionMinutes(state) })}</span>}
+                  <ArrowUpRight className="ml-auto size-4 text-brand" aria-hidden />
                 </CardContent>
               </Card>
             </Link>

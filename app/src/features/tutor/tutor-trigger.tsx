@@ -10,7 +10,7 @@ export function TutorTrigger({ panel, variant }: { panel: TutorPanelState; varia
   const { t } = useT();
   const props = { "data-tutor-trigger": "", "aria-expanded": panel.open, onClick: (e: React.MouseEvent<HTMLButtonElement>) => panel.show(e.currentTarget) };
   if (variant === "rail") return (
-    <button type="button" {...props} className="flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground">
+    <button type="button" {...props} className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring">
       <MessageCircle className="size-4" aria-hidden />{t("tutor.open")}
     </button>
   );

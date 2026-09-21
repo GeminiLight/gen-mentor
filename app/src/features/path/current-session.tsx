@@ -17,8 +17,8 @@ export function CurrentSession({ goal, index }: { goal: Goal; index: number }) {
   const state = goal.sessions[sessionUid(goal.id, index)];
   const status = lessonState(session.if_learned, state);
   return (
-    <section className="my-8 overflow-hidden rounded-xl border bg-card" aria-label={t("polish.currentSession")}>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-5 py-3 sm:px-7">
+    <section className="my-8 overflow-hidden rounded-xl border bg-card shadow-xs" aria-label={t("polish.currentSession")}>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-brand-soft/60 px-5 py-3 sm:px-7">
         <p className="flex items-center gap-2 text-sm font-medium"><BookOpen className="size-4 text-brand" aria-hidden />{t("polish.lessonNumber", { n: index + 1, total: goal.learning_path.length })}</p>
         <span className="text-xs text-muted-foreground">{t(status.label)}</span>
       </div>

@@ -137,3 +137,30 @@ test("leaving during a configuration check cannot start an abandoned analysis", 
   await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("Analyze sales with Python");
   expect(analyses).toBe(0);
 });
+
+test("a chosen sample starts an editable draft without generating a plan", async ({ page }) => {
+  await health(page);
+  let calls = 0;
+  await page.route("**/api/refine-goal", (route) => { calls++; return route.abort(); });
+  await page.goto("/");
+  await page.getByRole("button", { name: "AI agents", exact: true }).click();
+  await page.getByTestId("use-example").click();
+  await expect(page).toHaveURL(/\/onboarding$/);
+  await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("Build and evaluate an AI research assistant");
+  await expect(page.getByLabel("Background", { exact: true })).toHaveValue("");
+  await page.reload();
+  await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("Build and evaluate an AI research assistant");
+  expect(calls).toBe(0);
+});
+
+test("the sample action continues a saved draft without replacing its background or count", async ({ page }) => {
+  await health(page);
+  await page.addInitScript(() => localStorage.setItem("genmentor.onboarding.v1", JSON.stringify({ state: { goal: "My existing goal", info: "My own background", count: "6", checkpoint: null }, version: 0 })));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Career growth", exact: true }).click();
+  await expect(page.getByTestId("use-example")).toHaveText("Continue your draft");
+  await page.getByTestId("use-example").click();
+  await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("My existing goal");
+  await expect(page.getByLabel("Background", { exact: true })).toHaveValue("My own background");
+  await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("6 sessions");
+});

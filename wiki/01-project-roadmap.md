@@ -203,3 +203,15 @@
 |---|---|---|
 | 解锁全部四类题型：流水线请求 2 单选 + 1 多选 + 1 判断 + 1 简答，重录 quiz 与 profile-update fixture | `lib/pipeline.ts`、`e2e/fixtures/llm/` | done |
 | 根级错误边界，`/` 与 `/onboarding` 的渲染异常复用既有文案与重试 | `app/error.tsx` | done |
+
+## Siyo 参考与淡蓝体验精修（2026-09-21）
+
+| 功能 | 状态 |
+|---|---|
+| 淡蓝主行动、深蓝文字与进度、双主题语义 token | done |
+| 首页书页排版、课程示例切换、学习过程与页内导航 | done |
+| 示例目标预填，已有草稿与 checkpoint 优先保留 | done |
+| 侧栏搜索前置、目标与文库卡片层级、创建页帮助、空态与焦点反馈 | done |
+
+验证：`GENMENTOR_LLM_MODE=replay make gate` 与 `make verify-ui` 同模式通过，
+197 项 Playwright 全绿；9 路由 × 3 视口 × 2 主题截图齐全，另核对中英文首次访问与 320px 触控页。

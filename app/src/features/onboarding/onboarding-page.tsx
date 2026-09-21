@@ -14,7 +14,7 @@ export function OnboardingPage() {
   const hasGoals = useArchive((s) => s.hydrated && s.goals.length > 0);
   return (
     <main className="mx-auto w-full max-w-(--w-content) px-5 pb-12 sm:px-6">
-      <header className="py-5 mb-4 flex items-center justify-between">
+      <header className="mb-7 flex items-center justify-between border-b py-5">
         <Link href="/" className="text-sm" aria-label={t("common.appName")}>
           <Brand />
         </Link>
