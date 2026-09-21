@@ -4,6 +4,7 @@ import { ReviewQueue } from "@/features/progress/review-queue";
 import { lessonState } from "@/features/path/lesson-state";
 import { ArrowRight, BookOpen, Check, Route } from "lucide-react";
 import Link from "next/link";
+import { FeatureIcon } from "@/components/feature-icon";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useT } from "@/lib/i18n";
@@ -23,8 +24,8 @@ export function LearningDesk({ goal }: { goal: Goal }) {
       <h1 className="mt-3 font-editorial text-xl font-normal sm:text-2xl">{t("coach.deskTitle")}</h1>
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <div className="min-w-0 rounded-xl border border-t-4 border-t-primary bg-card p-6 shadow-xs sm:p-8">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {next ? <BookOpen className="size-4" aria-hidden /> : <Check className="size-4" aria-hidden />}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <FeatureIcon icon={next ? BookOpen : Check} />
             {next ? t("polish.lessonNumber", { n: index + 1, total: goal.learning_path.length }) : t("polish.completedPlan")}
           </div>
           <h2 className="mt-5 text-xl font-semibold leading-snug text-balance">{next?.title ?? t("home.allDone")}</h2>
@@ -32,7 +33,7 @@ export function LearningDesk({ goal }: { goal: Goal }) {
           {state?.reading_anchor && <p className="mt-5 text-xs text-muted-foreground">{t("polish.savedPlace")}</p>}
           <Button size="lg" asChild className="mt-8 h-11 px-5">
             <Link href={next ? `/session/${index}${status.quiz ? "#quiz" : ""}` : "/progress"} data-testid="continue-link">
-              {next ? t(status.action) : t("progress.title")} <ArrowRight aria-hidden />
+              {next ? t(status.action) : t("progress.title")} <ArrowRight data-icon="inline-end" aria-hidden />
             </Link>
           </Button>
         </div>

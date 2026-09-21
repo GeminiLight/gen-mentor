@@ -83,9 +83,10 @@ export function Option({
   return (
     <Label
       className={cn(
-        "flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-normal transition-colors has-checked:border-brand has-checked:bg-brand-soft/40",
+        "flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-normal transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/40 has-checked:border-brand has-checked:bg-brand-soft/40",
         judged && correct === true && "border-success/60 bg-success-soft/50",
         judged && checked && correct === false && "border-destructive/60 bg-destructive-soft/50",
+        !judged && "hover:border-brand/40 hover:bg-brand-soft/20",
         judged && "cursor-default",
       )}
     >

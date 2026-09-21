@@ -1,5 +1,7 @@
 "use client";
 
+import { Route } from "lucide-react";
+
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -19,7 +21,7 @@ export function PathView() {
   const { t } = useT();
   if (!hydrated) return <PathSkeleton />;
   if (!goal) {
-    return <EmptyState title={t("common.noActiveGoal")} body={t("path.emptyBody")} action={<Button asChild><Link href="/goals">{t("common.goToGoals")}</Link></Button>} />;
+    return <EmptyState icon={Route} title={t("common.noActiveGoal")} body={t("path.emptyBody")} action={<Button asChild><Link href="/goals">{t("common.goToGoals")}</Link></Button>} />;
   }
   const total = goal.learning_path.length;
   const learned = learnedCount(goal);
@@ -28,7 +30,7 @@ export function PathView() {
   const meta = [t("path.lede", { n: learned, total }), minutes > 0 ? t("common.minutes", { n: minutes }) : null].filter(Boolean).join(" · ");
   return (
     <>
-      <PageHeader eyebrow={t("polish.currentGoal")} title={t("path.eyebrow")} description={goal.learning_goal} />
+      <PageHeader icon={Route} eyebrow={t("polish.currentGoal")} title={t("path.eyebrow")} description={goal.learning_goal} />
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2"><p className="text-sm font-medium">{t("journey.courseProgress")}</p><p className="num text-xs text-muted-foreground">{meta}</p></div>
       <Progress value={(learned / Math.max(1, total)) * 100} className="mb-2 h-1" aria-label={meta} />
       {total > 0 && learned === total && (

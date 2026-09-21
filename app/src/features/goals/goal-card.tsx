@@ -1,7 +1,9 @@
 "use client";
 
-import { ArrowRight, Trash2 } from "lucide-react";
+import { ArrowRight, Compass, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { FeatureIcon } from "@/components/feature-icon";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -21,16 +23,17 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
   return (
     <div data-testid="goal-card" data-active={active || undefined} className={cn("flex min-w-0 flex-col rounded-xl border bg-card p-6 transition-shadow hover:shadow-sm", active && "border-brand/30")}>
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          {active && <span className="mr-2 font-medium text-brand">{t("common.active")}</span>}
+        <div className="flex min-w-0 items-center gap-3"><FeatureIcon icon={Compass} />
+        <p className="min-w-0 text-xs leading-relaxed text-muted-foreground">
+          {active && <span className="mb-1 block font-medium text-brand">{t("common.active")}</span>}
           {fmtDate(goal.created_at)}
-        </p>
+        </p></div>
         <Dialog>
-          <DialogTrigger asChild>
+          <Tooltip><TooltipTrigger asChild><DialogTrigger asChild>
             <Button size="icon-xs" variant="ghost" aria-label={t("goals.deleteGoal")} className="-mt-1 -mr-1 text-muted-foreground">
               <Trash2 aria-hidden />
             </Button>
-          </DialogTrigger>
+          </DialogTrigger></TooltipTrigger><TooltipContent>{t("goals.deleteGoal")}</TooltipContent></Tooltip>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{t("goals.deleteTitle")}</DialogTitle>
@@ -60,7 +63,7 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
       <div className="mt-auto pt-6">
         {active ? (
           <Button className="min-h-11 w-full justify-between" asChild>
-            <Link href="/learning-path">{t("goals.openPath")}<ArrowRight aria-hidden /></Link>
+            <Link href="/learning-path">{t("goals.openPath")}<ArrowRight data-icon="inline-end" aria-hidden /></Link>
           </Button>
         ) : (
           <Button className="min-h-11 w-full" variant="outline" onClick={() => setActiveGoal(goal.id)}>

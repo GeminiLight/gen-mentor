@@ -42,6 +42,7 @@
   --shadow-xs: 0 1px 2px oklch(0.2 0.01 260 / 0.06);
   --shadow-sm: 0 1px 3px oklch(0.2 0.01 260 / 0.08), 0 1px 2px oklch(0.2 0.01 260 / 0.04);
   --shadow-md: 0 6px 16px -6px oklch(0.2 0.01 260 / 0.14), 0 2px 6px -2px oklch(0.2 0.01 260 / 0.06);
+  --shadow-paper: 0 2px 4px oklch(0.28 0.035 250 / 0.03), 0 18px 48px -18px oklch(0.35 0.08 245 / 0.18);
   --shadow-lg: 0 16px 40px -12px oklch(0.2 0.01 260 / 0.22), 0 4px 12px -4px oklch(0.2 0.01 260 / 0.08);
 }
 
@@ -286,6 +287,18 @@
 }
 
 @layer components {
+  .paper-panel {
+    box-shadow: var(--shadow-paper);
+  }
+  /* Directional icons respond only to deliberate pointer/focus interaction. */
+  [data-slot="button"] [data-icon="inline-end"] {
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-slot="button"]:not(:disabled):is(:hover, :focus-visible) [data-icon="inline-end"] {
+      transform: translateX(2px);
+    }
+  }
   /* Numbers that must line up: metrics, tables, timers. */
   .num {
     font-variant-numeric: tabular-nums;

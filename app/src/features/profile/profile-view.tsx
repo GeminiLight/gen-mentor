@@ -1,5 +1,7 @@
 "use client";
 
+import { UserRound } from "lucide-react";
+
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +35,7 @@ export function ProfileView() {
   if (!goal) {
     return (
       <div className="space-y-6">
-        <EmptyState title={t("common.noActiveGoal")} body={t("profile.emptyBody")} action={<Button asChild><Link href="/onboarding">{t("common.startWithGoal")}</Link></Button>} />
+        <EmptyState icon={UserRound} title={t("common.noActiveGoal")} body={t("profile.emptyBody")} action={<Button asChild><Link href="/onboarding">{t("common.startWithGoal")}</Link></Button>} />
         <ArchivePanel />
       </div>
     );
@@ -64,7 +66,7 @@ export function ProfileView() {
 
   return (
     <>
-      <PageHeader title={t("profile.title")} />
+      <PageHeader icon={UserRound} title={t("profile.title")} />
       <div className="grid gap-6 @3xl/workspace:grid-cols-2">
         <Card>
           <CardHeader>

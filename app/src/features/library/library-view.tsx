@@ -1,6 +1,9 @@
 "use client";
 
+import { LibraryBig } from "lucide-react";
+
 import { useState } from "react";
+import { FeatureIcon } from "@/components/feature-icon";
 import { Input } from "@/components/ui/input";
 import { scoredCount } from "@/lib/quiz";
 import { ArrowUpRight, BookOpen, Search } from "lucide-react";
@@ -22,7 +25,7 @@ export function LibraryView() {
   const hydrated = useArchive((s) => s.hydrated);
   const { t } = useT();
   if (!hydrated) return <Skeleton className="h-64 rounded-xl" data-loading="" />;
-  if (!goal) return <EmptyState title={t("common.noActiveGoal")} body={t("library.emptyGoalBody")} action={<Button asChild><Link href="/goals">{t("common.goToGoals")}</Link></Button>} />;
+  if (!goal) return <EmptyState icon={LibraryBig} title={t("common.noActiveGoal")} body={t("library.emptyGoalBody")} action={<Button asChild><Link href="/goals">{t("common.goToGoals")}</Link></Button>} />;
 
   const docs = goal.learning_path
     .map((s, i) => ({ session: s, index: i, state: goal.sessions[sessionUid(goal.id, i)] }))
@@ -31,11 +34,11 @@ export function LibraryView() {
   const matches = docs.filter(({ session, state }) => `${session.title} ${state?.document?.markdown}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   return (
     <>
-      <PageHeader title={t("library.title")} description={t("polish.libraryLede")} />
+      <PageHeader icon={LibraryBig} title={t("library.title")} description={t("polish.libraryLede")} />
       {docs.length > 0 && <div className="relative mb-8 max-w-(--w-col)"><Search className="pointer-events-none absolute top-3.5 left-3 size-4 text-muted-foreground" aria-hidden /><Input type="search" className="h-11 bg-card pl-10" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("polish.searchLibrary")} aria-label={t("polish.searchLibrary")} /></div>}
       {docs.length > 0 && matches.length === 0 && <p role="status" className="py-12 text-sm text-muted-foreground">{t("polish.noSearch")}</p>}
       {docs.length === 0 ? (
-        <EmptyState title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
+        <EmptyState icon={LibraryBig} title={t("library.emptyTitle")} body={t("library.emptyBody")} action={<Button asChild><Link href="/learning-path">{t("library.openPath")}</Link></Button>} />
       ) : (
         <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3">
           {matches.map(({ session, index, state }) => (
@@ -43,7 +46,7 @@ export function LibraryView() {
               <Card className="h-full border border-border ring-0 shadow-xs transition-shadow group-hover:shadow-md" data-testid="library-card">
                 <CardHeader className="gap-3">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <BookOpen className="size-3.5" aria-hidden /> {t("entry.previewLesson", { n: index + 1 })}
+                    <FeatureIcon icon={BookOpen} className="size-10 rounded-lg" /> {t("entry.previewLesson", { n: index + 1 })}
                     {session.if_learned && <Badge className="ml-auto bg-success-soft text-success">{t("common.learned")}</Badge>}
                   </div>
                   <CardTitle className="text-lg leading-snug">{state!.document!.structure.title}</CardTitle>
@@ -58,7 +61,7 @@ export function LibraryView() {
                     <span className="num">{t("library.quiz", { correct: state!.quiz_results.correct, answered: scoredCount(state!.quiz_results) })}</span>
                   )}
                   {sessionMinutes(state) > 0 && <span className="num">{t("common.minutes", { n: sessionMinutes(state) })}</span>}
-                  <ArrowUpRight className="ml-auto size-4 text-brand" aria-hidden />
+                  <ArrowUpRight className="ml-auto size-4 text-brand transition-transform motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden />
                 </CardContent>
               </Card>
             </Link>

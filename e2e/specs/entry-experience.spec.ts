@@ -164,3 +164,25 @@ test("the sample action continues a saved draft without replacing its background
   await expect(page.getByLabel("Background", { exact: true })).toHaveValue("My own background");
   await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("6 sessions");
 });
+
+test("sample lessons expand by keyboard and reset coherently when the goal changes", async ({ page }) => {
+  await health(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const preview = page.getByTestId("path-preview");
+  const first = preview.getByRole("button", { name: /Explore a real dataset/ });
+  const second = preview.getByRole("button", { name: /Find patterns and test assumptions/ });
+  await expect(first).toHaveAttribute("aria-expanded", "true");
+  await second.focus();
+  await second.press("Enter");
+  await expect(second).toBeFocused();
+  await expect(second).toHaveAttribute("aria-expanded", "true");
+  await expect(first).toHaveAttribute("aria-expanded", "false");
+  await expect(preview.getByText("Practice: test a business assumption", { exact: true })).toBeVisible();
+  await second.press("Enter");
+  await expect(second).toHaveAttribute("aria-expanded", "false");
+  await preview.getByRole("button", { name: "AI agents", exact: true }).click();
+  await expect(preview.getByRole("button", { name: /Connect a model to useful tools/ })).toHaveAttribute("aria-expanded", "true");
+  await expect(preview.getByText("Practice: connect a research tool", { exact: true })).toBeVisible();
+  await expect(preview.getByText("Practice: test a business assumption", { exact: true })).toHaveCount(0);
+});

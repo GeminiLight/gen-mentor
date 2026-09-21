@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight, BookOpen, PencilLine, MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import { Brand } from "@/components/brand";
 import { LangToggle } from "@/components/lang-toggle";
@@ -38,19 +38,23 @@ export function HomeView() {
 
       {returning ? <LearningDesk goal={goal} /> : (
       <div className="mx-auto w-full max-w-(--w-content) px-5 pb-8 sm:px-6">
-        <section className="grid items-center gap-12 py-10 sm:py-16 lg:grid-cols-2 lg:gap-20">
-          <div className="min-w-0">
+        <section className="grid items-start gap-12 py-10 sm:py-16 lg:grid-cols-2 lg:gap-20">
+          <div className="min-w-0 lg:pt-12">
             <p className="eyebrow mb-6 flex items-center gap-3"><span className="h-px w-8 bg-brand" aria-hidden />{t("entry.eyebrow")}</p>
             <h1 className="max-w-(--w-col) font-editorial text-2xl font-normal leading-tight text-balance">{t("entry.title")}</h1>
             <p className="mt-5 max-w-(--w-col) text-base leading-relaxed text-muted-foreground">{t("entry.lede")}</p>
             <div className="mt-7 space-y-3" data-hydrated={hydrated ? "" : undefined}>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                <Button size="lg" asChild className="min-h-12 gap-6 px-6"><Link href="/onboarding">{t(hydrated && draft ? "entry.resume" : "home.cta")}<ArrowRight aria-hidden /></Link></Button>
+                <Button size="lg" asChild className="min-h-12 gap-6 px-6"><Link href="/onboarding">{t(hydrated && draft ? "entry.resume" : "home.cta")}<ArrowRight data-icon="inline-end" aria-hidden /></Link></Button>
                 <a href="#path-example" className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-ring">{t("entry.explore")}<ArrowDown className="size-4" aria-hidden /></a>
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">{t(hydrated && draft ? "entry.draftNote" : "home.noAccount")}</p>
             </div>
             <p className="mt-6 max-w-(--w-col) text-xs leading-relaxed text-muted-foreground">{t("entry.setupNote")}</p>
+            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-3 border-t pt-5">
+              {([{ icon: BookOpen, label: "featureRead" }, { icon: PencilLine, label: "featurePractice" }, { icon: MessagesSquare, label: "featureTutor" }] as const).map(({ icon: Icon, label }) =>
+                <li key={label} className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="size-4 text-brand" strokeWidth={1.6} aria-hidden />{t(`entry.${label}`)}</li>)}
+            </ul>
           </div>
           <PathPreview />
         </section>

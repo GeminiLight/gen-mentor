@@ -29,14 +29,19 @@ export function useTutorPanel() {
   const preference = usePreference();
   const wide = useSyncExternalStore(subscribe, wideSnapshot, serverSnapshot);
   const trigger = useRef<HTMLButtonElement | null>(null);
+  const focusReturned = useRef(false);
   useEffect(() => { void usePreference.persist.rehydrate(); }, []);
+  useEffect(() => { if (preference.open) focusReturned.current = false; }, [preference.open]);
   const restoreFocus = () => {
     requestAnimationFrame(() => {
-      if (usePreference.getState().open) return;
-      if (contextualTrigger?.isConnected && contextualTrigger.getClientRects().length) { contextualTrigger.focus({ preventScroll: true }); return; }
-      const visibleTrigger = trigger.current?.getClientRects().length ? trigger.current :
-        Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tutor-trigger]")).find((el) => el.getClientRects().length);
-      visibleTrigger?.focus();
+      // close() and the sheet's exit callback share this path. A second focus can
+      // clear a new reading selection made while the sheet finishes animating.
+      if (usePreference.getState().open || focusReturned.current) return;
+      const visibleTrigger = contextualTrigger?.isConnected && contextualTrigger.getClientRects().length ? contextualTrigger :
+        trigger.current?.getClientRects().length ? trigger.current :
+          Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tutor-trigger]")).find((el) => el.getClientRects().length);
+      visibleTrigger?.focus({ preventScroll: true });
+      focusReturned.current = !!visibleTrigger && document.activeElement === visibleTrigger;
     });
   };
   return {

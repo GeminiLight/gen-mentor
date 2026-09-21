@@ -1,5 +1,7 @@
 "use client";
 
+import { TrendingUp } from "lucide-react";
+
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -22,14 +24,14 @@ export function ProgressView() {
   const hydrated = useArchive((s) => s.hydrated);
   const { t } = useT();
   if (!hydrated) return <Skeleton className="h-64 rounded-xl" data-loading="" />;
-  if (!goal) return <EmptyState title={t("common.noActiveGoal")} body={t("progress.emptyBody")} action={<Button asChild><Link href="/onboarding">{t("common.startWithGoal")}</Link></Button>} />;
+  if (!goal) return <EmptyState icon={TrendingUp} title={t("common.noActiveGoal")} body={t("progress.emptyBody")} action={<Button asChild><Link href="/onboarding">{t("common.startWithGoal")}</Link></Button>} />;
   const skills = targetSkills(goal);
   const toReview = reviewQueue(goal).reduce((n, item) => n + item.total, 0);
   const met = skills.filter((s) => s.mastered).length;
   const quizzes = Object.values(goal.sessions).filter((s) => s.quiz_results && scoredCount(s.quiz_results) > 0);
   const accuracy = quizzes.length ? Math.round(quizzes.reduce((a, s) => a + s.quiz_results!.correct, 0) / quizzes.reduce((a, s) => a + scoredCount(s.quiz_results!), 0) * 100) : null;
   return <>
-    <PageHeader eyebrow={t("progress.title")} title={t("coach.title")} description={t("coach.lede")} />
+    <PageHeader icon={TrendingUp} eyebrow={t("progress.title")} title={t("coach.title")} description={t("coach.lede")} />
     <div className="grid gap-8 border-t border-b py-7 @3xl/workspace:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="flex min-w-0 items-center gap-5">
         <ProgressRing value={targetProgress(goal)} size={104} />

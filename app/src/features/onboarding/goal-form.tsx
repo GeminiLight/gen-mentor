@@ -1,6 +1,6 @@
 "use client";
 
-import { FileUp, Loader2, ArrowRight, Check, KeyRound } from "lucide-react";
+import { FileUp, Loader2, ArrowRight, Check, KeyRound, Target, UserRound, Route, CircleCheck, Plug, CircleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -67,7 +67,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
 
   return (
     <form
-      className="space-y-5"
+      className="space-y-7"
       noValidate
       onSubmit={async (e) => {
         e.preventDefault();
@@ -89,7 +89,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
       }}
     >
       <div className="space-y-2">
-        <Label htmlFor="goal">{t("onboarding.goalLabel")}</Label>
+        <Label htmlFor="goal" className="gap-2"><Target className="size-4 text-brand" aria-hidden />{t("onboarding.goalLabel")}</Label>
         <Textarea
           ref={goalRef}
           id="goal"
@@ -101,7 +101,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           aria-invalid={goalInvalid || undefined}
           aria-describedby={goalInvalid ? "goal-hint goal-error" : "goal-hint"}
           rows={2}
-          className="min-h-16 resize-y text-base"
+          className="min-h-20 resize-y bg-background/50 px-3 py-3 text-base focus:bg-card"
         />
         <p id="goal-hint" className="text-xs leading-relaxed text-muted-foreground">{t("entry.goalHelp")}</p>
         {!goal.trim() && <div className="pt-1"><div className="flex flex-wrap gap-1" role="group" aria-label={t("entry.examples")}>{(["data", "agents", "career"] as const).map((key) => <Button key={key} variant="outline" size="sm" type="button" className="min-h-11" disabled={disabled} onClick={() => { setGoal(t(`entry.${key}Goal`)); goalRef.current?.focus(); }}>{t(`entry.${key}`)}</Button>)}</div></div>}
@@ -114,7 +114,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
 
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Label htmlFor="info">{t("onboarding.infoLabel")}</Label>
+          <Label htmlFor="info" className="gap-2"><UserRound className="size-4 text-brand" aria-hidden />{t("onboarding.infoLabel")}</Label>
           <input ref={fileRef} type="file" accept=".pdf,.txt,.md,application/pdf,text/plain" className="sr-only" id="resume" aria-label={t("onboarding.uploadFile")} onChange={(e) => void onFile(e.target.files?.[0])} disabled={disabled || parsing} />
           <Button type="button" variant="ghost" size="sm" onClick={() => fileRef.current?.click()} disabled={disabled || parsing}>
             {parsing ? <Loader2 className="animate-spin" aria-hidden /> : <FileUp aria-hidden />}
@@ -130,7 +130,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           onChange={(e) => setInfo(e.target.value)}
           disabled={disabled}
           rows={4}
-          className="min-h-24 resize-y"
+          className="min-h-28 resize-y bg-background/50 px-3 py-3 focus:bg-card"
           placeholder={t("entry.backgroundHelp")}
           aria-invalid={infoInvalid || undefined}
           aria-describedby="info-hint"
@@ -142,7 +142,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
 
       <div className="flex flex-wrap items-start justify-between gap-4 border-t pt-5">
         <div className="space-y-2">
-          <Label htmlFor="count">{t("onboarding.countLabel")}</Label>
+          <Label htmlFor="count" className="gap-2"><Route className="size-4 text-brand" aria-hidden />{t("onboarding.countLabel")}</Label>
           <Select value={count} onValueChange={setCount} disabled={disabled}>
             <SelectTrigger id="count" className="min-h-11 w-40" aria-describedby="count-hint">
               <SelectValue />
@@ -160,14 +160,14 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
         <p id="count-hint" className="max-w-(--w-col) flex-1 basis-48 text-xs leading-relaxed text-muted-foreground sm:pt-7">{t(count === "0" ? "polish.adaptiveCountHelp" : "polish.countHelp")}</p>
       </div>
       <div className="space-y-4 border-t pt-5">
-        <div className="flex flex-wrap items-center justify-between gap-3" data-testid="entry-model">
-          <p className="min-w-0 flex-1 basis-48 text-xs leading-relaxed text-muted-foreground" role="status">{t(model.state === "ready" ? "entry.modelReady" : model.state === "loading" ? "entry.modelChecking" : model.state === "offline" ? "entry.modelOffline" : "entry.modelNeeded")}</p>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background/60 p-3" data-testid="entry-model">
+          <p className="flex min-w-0 flex-1 basis-48 items-start gap-2 text-xs leading-relaxed text-muted-foreground" role="status">{model.state === "ready" ? <CircleCheck className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden /> : model.state === "loading" ? <Loader2 className="mt-0.5 size-4 shrink-0 motion-safe:animate-spin" aria-hidden /> : model.state === "offline" ? <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden /> : <Plug className="mt-0.5 size-4 shrink-0" aria-hidden />}{t(model.state === "ready" ? "entry.modelReady" : model.state === "loading" ? "entry.modelChecking" : model.state === "offline" ? "entry.modelOffline" : "entry.modelNeeded")}</p>
           <ModelSettings open={settingsOpen} onOpenChange={setSettingsOpen} trigger={<Button type="button" variant="outline" size="sm" className="min-h-11"><KeyRound aria-hidden />{t(model.state === "ready" ? "settings.title" : "entry.configure")}</Button>} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">{(goal || info) && <><Check className="size-3" aria-hidden />{t("entry.saved")}</>}</span>
           <Button type="submit" size="lg" className="h-11 w-full px-5 sm:w-auto" disabled={disabled || parsing || checking}>
-            {checking ? t("entry.modelChecking") : t("entry.analyze")}<ArrowRight aria-hidden />
+            {checking ? t("entry.modelChecking") : t("entry.analyze")}<ArrowRight data-icon="inline-end" aria-hidden />
           </Button>
         </div>
         <p className="text-xs text-muted-foreground sm:text-right">{t("entry.afterAnalyze")}</p>

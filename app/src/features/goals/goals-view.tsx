@@ -1,5 +1,7 @@
 "use client";
 
+import { Compass } from "lucide-react";
+
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
@@ -15,7 +17,7 @@ export function GoalsView() {
   const { t } = useT();
   return (
     <>
-      <PageHeader
+      <PageHeader icon={Compass}
         title={t("goals.title")}
         actions={
           <Button asChild>
@@ -32,7 +34,7 @@ export function GoalsView() {
           ))}
         </div>
       ) : goals.length === 0 ? (
-        <EmptyState
+        <EmptyState icon={Compass}
           title={t("goals.emptyTitle")}
           body={t("goals.emptyBody")}
           action={
