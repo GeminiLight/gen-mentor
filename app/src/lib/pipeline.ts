@@ -96,7 +96,10 @@ export async function runPipeline(input: PipelineInput, ev: PipelineEvents): Pro
 
   if (!state.quiz) {
     ev.onStage("quiz", "running");
-    const { document_quiz } = await api.generateQuiz({ learner_profile, learning_document: document.markdown, single_choice_count: 3, true_false_count: 1 });
+    // All four types: recognition (single, true/false), discrimination (multiple) and recall
+    // (short answer). The schema, judging, drafts and review queue support all of them;
+    // pinning the pipeline to single-choice-only left the richest quiz UI unreachable.
+    const { document_quiz } = await api.generateQuiz({ learner_profile, learning_document: document.markdown, single_choice_count: 2, multiple_choice_count: 1, true_false_count: 1, short_answer_count: 1 });
     checkpoint({ quiz: document_quiz });
     ev.onStage("quiz", "done");
   }
