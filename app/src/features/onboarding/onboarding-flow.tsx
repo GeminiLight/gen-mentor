@@ -28,16 +28,16 @@ export function OnboardingFlow() {
   }, [started]);
   const building = status.profile !== "pending" || status.path !== "pending";
   return (
-    <>
+    <div className={!started ? "mx-auto max-w-3xl" : undefined}>
       <EntryPhases phase={started ? building ? 2 : 1 : 0} />
       <div className="mb-8 max-w-(--w-measure)">
-        <p className="eyebrow mb-3">{t(started ? "review.eyebrow" : "entry.eyebrow")}</p>
+        {started && <p className="eyebrow mb-3">{t("review.eyebrow")}</p>}
         <h1 ref={heading} tabIndex={-1} className="text-xl font-semibold">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(started ? review ? "review.intro" : "review.preparingHelp" : "entry.formIntro")}</p>
+        {started && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(review ? "review.intro" : "review.preparingHelp")}</p>}
       </div>
       <div className="rounded-xl border bg-card p-5 shadow-xs sm:p-8">
         {!started ? (
-          <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+          <div>
             <GoalForm disabled={running} onSubmit={(v) => void run(v)} />
             <EntryGuide />
           </div>
@@ -69,6 +69,6 @@ export function OnboardingFlow() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

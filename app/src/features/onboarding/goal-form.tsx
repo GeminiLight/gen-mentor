@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { useOnboardingDraft } from "@/lib/store/onboarding-draft";
-import { countWords } from "@/lib/utils";
 import { ModelSettings } from "@/features/settings/model-settings";
 import { useEntryModel } from "./use-entry-model";
 
@@ -99,11 +98,10 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           disabled={disabled}
           placeholder={t("onboarding.goalPlaceholder")}
           aria-invalid={goalInvalid || undefined}
-          aria-describedby={goalInvalid ? "goal-hint goal-error" : "goal-hint"}
+          aria-describedby={goalInvalid ? "goal-error" : undefined}
           rows={2}
           className="min-h-20 resize-y bg-background/50 px-3 py-3 text-base focus:bg-card"
         />
-        <p id="goal-hint" className="text-xs leading-relaxed text-muted-foreground">{t("entry.goalHelp")}</p>
         {!goal.trim() && <div className="pt-1"><div className="flex flex-wrap gap-1" role="group" aria-label={t("entry.examples")}>{(["data", "agents", "career"] as const).map((key) => <Button key={key} variant="outline" size="sm" type="button" className="min-h-11" disabled={disabled} onClick={() => { setGoal(t(`entry.${key}Goal`)); goalRef.current?.focus(); }}>{t(`entry.${key}`)}</Button>)}</div></div>}
         {goalInvalid && (
           <p id="goal-error" className="text-xs text-destructive" role="alert">
@@ -119,9 +117,9 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           <Button type="button" variant="ghost" size="sm" onClick={() => fileRef.current?.click()} disabled={disabled || parsing}>
             {parsing ? <Loader2 className="animate-spin" aria-hidden /> : <FileUp aria-hidden />}
             {parsing ? t("onboarding.reading") : t("onboarding.upload")}
+            {!parsing && <span className="text-xs text-muted-foreground">{t("entry.optional")}</span>}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">{t("entry.uploadHelp")}</p>
         <Textarea
           ref={infoRef}
           id="info"
@@ -133,18 +131,16 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           className="min-h-28 resize-y bg-background/50 px-3 py-3 focus:bg-card"
           placeholder={t("entry.backgroundHelp")}
           aria-invalid={infoInvalid || undefined}
-          aria-describedby="info-hint"
+          aria-describedby={infoInvalid ? "info-error" : undefined}
         />
-        <p id="info-hint" className={infoInvalid ? "text-xs text-destructive" : "text-xs text-muted-foreground"} role={infoInvalid ? "alert" : undefined}>
-          {infoInvalid ? t("onboarding.infoRequired") : info.trim().length < 40 ? t("onboarding.infoHintShort") : t("onboarding.infoWords", { n: countWords(info) })}
-        </p>
+        {infoInvalid && <p id="info-error" className="text-xs text-destructive" role="alert">{t("onboarding.infoRequired")}</p>}
       </div>
 
-      <div className="flex flex-wrap items-start justify-between gap-4 border-t pt-5">
-        <div className="space-y-2">
+      <div className="border-t pt-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Label htmlFor="count" className="gap-2"><Route className="size-4 text-brand" aria-hidden />{t("onboarding.countLabel")}</Label>
           <Select value={count} onValueChange={setCount} disabled={disabled}>
-            <SelectTrigger id="count" className="min-h-11 w-40" aria-describedby="count-hint">
+            <SelectTrigger id="count" className="min-h-11 w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -157,12 +153,11 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
             </SelectContent>
           </Select>
         </div>
-        <p id="count-hint" className="max-w-(--w-col) flex-1 basis-48 text-xs leading-relaxed text-muted-foreground sm:pt-7">{t(count === "0" ? "polish.adaptiveCountHelp" : "polish.countHelp")}</p>
       </div>
       <div className="space-y-4 border-t pt-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background/60 p-3" data-testid="entry-model">
+        <div className="flex flex-wrap items-center justify-between gap-2" data-testid="entry-model">
           <p className="flex min-w-0 flex-1 basis-48 items-start gap-2 text-xs leading-relaxed text-muted-foreground" role="status">{model.state === "ready" ? <CircleCheck className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden /> : model.state === "loading" ? <Loader2 className="mt-0.5 size-4 shrink-0 motion-safe:animate-spin" aria-hidden /> : model.state === "offline" ? <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden /> : <Plug className="mt-0.5 size-4 shrink-0" aria-hidden />}{t(model.state === "ready" ? "entry.modelReady" : model.state === "loading" ? "entry.modelChecking" : model.state === "offline" ? "entry.modelOffline" : "entry.modelNeeded")}</p>
-          <ModelSettings open={settingsOpen} onOpenChange={setSettingsOpen} trigger={<Button type="button" variant="outline" size="sm" className="min-h-11"><KeyRound aria-hidden />{t(model.state === "ready" ? "settings.title" : "entry.configure")}</Button>} />
+          <ModelSettings open={settingsOpen} onOpenChange={setSettingsOpen} trigger={<Button type="button" variant="ghost" size="sm" className="min-h-11"><KeyRound aria-hidden />{t(model.state === "ready" ? "settings.title" : "entry.configure")}</Button>} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">{(goal || info) && <><Check className="size-3" aria-hidden />{t("entry.saved")}</>}</span>
@@ -170,7 +165,6 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
             {checking ? t("entry.modelChecking") : t("entry.analyze")}<ArrowRight data-icon="inline-end" aria-hidden />
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground sm:text-right">{t("entry.afterAnalyze")}</p>
       </div>
     </form>
   );

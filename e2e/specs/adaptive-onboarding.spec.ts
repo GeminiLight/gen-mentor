@@ -17,6 +17,8 @@ test("Adaptive is the default, reaches the scheduler, and saves its chosen path"
   await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("Adaptive");
   await page.getByLabel("Goal", { exact: true }).fill(sample.learning_goal);
   await page.getByLabel("Background", { exact: true }).fill(sample.learner_information);
+  await expect(page.getByText("We’ll choose 1–10 sessions based on your goal and skill gaps.")).toBeHidden();
+  await page.getByText("Make the path useful to you", { exact: true }).click();
   await expect(page.getByText("We’ll choose 1–10 sessions based on your goal and skill gaps.")).toBeVisible();
   await page.reload();
   await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("Adaptive");
@@ -36,5 +38,7 @@ test("an explicit session count survives a draft reload", async ({ page }) => {
   await page.getByLabel("Goal", { exact: true }).fill("Learn to analyze sales data");
   await page.reload();
   await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("6 sessions");
+  await expect(page.getByText("You can adapt the path as you learn.")).toBeHidden();
+  await page.getByText("Make the path useful to you", { exact: true }).click();
   await expect(page.getByText("You can adapt the path as you learn.")).toBeVisible();
 });
