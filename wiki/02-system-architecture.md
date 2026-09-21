@@ -184,4 +184,7 @@ replay 模式供测试离线执行。配置缺失打开受控 ModelSettings，�
 新题型的 selections 分别保存 `{ order, confirmed }` 与 `{ value, confirmed }`；输入事件即时落盘，
 明确检查后才参与评分。`quiz.ts` 负责纯本地判定，`configuration.ts` 比较 JSON 数据，不执行文本。
 确认后的错误和跳过沿用 `quiz-review.ts` 的首次成绩/复练分离机制；档案导入导出保留完整题目与状态。
-生成接入及完整验收状态见 `wiki/specs/spec-hands-on-questions.md`。
+课程流水线通过 `hands_on: true` 启用文档适配出题。`generateQuiz` 先用 fast 档生成并校验数量/结构，
+非空操作题再由 `reviewHandsOn` 用 smart 档独立核对来源、唯一顺序和参数类型；只保留认可的题目，
+原有四类题不受剔除影响。没有候选操作题时不调用复核；复核故障走同一断点重试，阅读文档已保存。
+每次调用使用既有 LLM 封装与真实 record/replay。边界与验收见 `wiki/archive/specs/spec-hands-on-questions.md`。

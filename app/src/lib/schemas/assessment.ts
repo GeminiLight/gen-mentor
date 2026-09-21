@@ -30,6 +30,7 @@ export const DocumentQuiz = z.object({
 export type DocumentQuiz = z.infer<typeof DocumentQuiz>;
 
 export const QuizCounts = z.object({
+  hands_on: z.boolean().optional(),
   single_choice_count: z.number().int().min(0).max(20).default(3),
   multiple_choice_count: z.number().int().min(0).max(20).default(0),
   true_false_count: z.number().int().min(0).max(20).default(0),

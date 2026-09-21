@@ -21,7 +21,7 @@
 | POST | `/api/explore-knowledge` | Knowledge Explorer | smart | `{ knowledge_points }` | 120 |
 | POST | `/api/draft-knowledge` | Knowledge Drafter | smart | 流式，`@@final` 为 `{ title, content, sources }` | 180 |
 | POST | `/api/integrate-document` | Document Integrator | smart | 流式，`@@final` 为 `{ structure, markdown }` | 180 |
-| POST | `/api/generate-quiz` | Quiz Generator | fast | `{ document_quiz }` | 120 |
+| POST | `/api/generate-quiz` | Quiz Generator | fast（出题）+ smart（操作题复核） | `{ document_quiz }` | 240 |
 | POST | `/api/simulate-feedback` | Learner Feedback Simulator | fast | `{ feedback, suggestions }`；`target: path` 或 `content` | 120 |
 | POST | `/api/tutor` | AI Chatbot Tutor | fast | 纯文本流 | 60 |
 | POST | `/api/parse-resume` | 无（unpdf） | 无 | multipart `file` → `{ text, pages }`；PDF 之外按纯文本读 | 30 |
@@ -72,3 +72,21 @@ OpenAI 兼容端点在配置地址后追加 `/models`；Anthropic 按 SDK 的 AP
 
 协议依据：[OpenAI Models](https://developers.openai.com/api/reference/resources/models/methods/list)、
 [Anthropic Models](https://platform.claude.com/docs/en/api/models/list)。
+
+## 操作型测验（2026-09-21，issue #31）
+
+`POST /api/generate-quiz` 新增可选 `hands_on: boolean`。省略或 `false` 保持原生成提示词与四种题型；
+课程流水线发送 `true`，在保留原定题数的基础上，让模型根据文档生成至多一道排序题、至多一道配置题。
+不适用的类型返回空列表，不虚构配置参数；没有强制把所有学科转换为 JSON 任务。
+
+返回 `document_quiz.ordering_questions`：`question`、`items`（3–8 个唯一字符串）、`correct_order`
+（完整零基排列且非初始顺序）、`explanation`。`configuration_questions`：`question`、
+`starter_configuration`（有效 JSON 对象的字符串）、`correct_configurations`（1–4 个有效完整配置字符串）、
+`explanation`；起始配置不能是任一正确答案。配置比较忽略空白和对象键顺序，保留值类型、数组顺序及额外字段。
+
+`hands_on: true` 时严格校验四种基础题的请求数量，并要求两种新增题型列表存在且各不超过一道；
+错数量、缺列表、无效排列或配置使用现有的单次纠正重试，仍失败返回 502。每个调用沿用既有 SDK、token 预算、凭证及回放机制。非空操作题增加一次 smart 档独立复核，
+只保留复核通过的题目；复核不另造答案。复核失败沿用错误恢复，不把未审核题目当作成功返回。
+路由时长预算为 240 秒，以覆盖出题、契约纠正和复核。
+自动生成的配置进一步要求相同的 2–5 个字段，值限字符串、数字、布尔或 null，避免嵌套配置和数组的等价答案歧义。
+操作题的评分在浏览器本地完成，不执行代码、不调用终端、不访问学习者文件系统。
