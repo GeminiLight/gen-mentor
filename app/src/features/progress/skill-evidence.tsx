@@ -13,7 +13,7 @@ export function SkillEvidence({ goal }: { goal: Goal }) {
   return <section className="mt-12">
     <h2 className="text-lg font-semibold">{t("coach.skills")}</h2>
     <p className="mt-2 text-sm text-muted-foreground">{t("journey.targetHint")}</p>
-    <ul className="mt-6 divide-y border-t border-b" data-testid="mastery-rings">
+    <ul className="mt-6 divide-y rounded-xl border bg-card px-4 sm:px-5" data-testid="mastery-rings">
       {targetSkills(goal).map((skill) => {
         const lessons = goal.learning_path.map((session, index) => ({ session, index, state: goal.sessions[sessionUid(goal.id, index)] }))
           .filter(({ session }) => session.associated_skills.some((name) => skillKey(name) === skill.key) || session.desired_outcome_when_completed.some((o) => skillKey(o.name) === skill.key));

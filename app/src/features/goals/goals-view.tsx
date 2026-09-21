@@ -18,7 +18,7 @@ export function GoalsView() {
   return (
     <>
       <PageHeader icon={Compass}
-        title={t("goals.title")}
+        title={t("goals.title")} description={t("polish.goalsLede")}
         actions={
           <Button asChild>
             <Link href="/onboarding">

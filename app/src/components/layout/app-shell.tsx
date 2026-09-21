@@ -1,7 +1,7 @@
 "use client";
 
 import { ProfileRefreshNotice } from "@/features/session/profile-refresh-notice";
-import { Settings2 } from "lucide-react";
+import { Settings2, HardDrive } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-current={isActive(href) ? "page" : undefined}
               className={cn(
                 "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
-                isActive(href) && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+                isActive(href) && "bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-xs ring-1 ring-brand/10",
               )}
             >
               <Icon className="size-4" aria-hidden />
@@ -68,6 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="mt-auto flex flex-col gap-1 pt-8">
           {tutor("rail")}
+          <p className="mt-3 flex items-center gap-2 px-3 text-xs leading-relaxed text-muted-foreground"><HardDrive className="size-3.5 shrink-0" aria-hidden />{t("polish.localArchive")}</p>
           <div className="mt-2 flex items-center gap-0.5 border-t pt-3">
             <ModelSettings />
             <LangToggle />

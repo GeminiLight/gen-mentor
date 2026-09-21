@@ -33,13 +33,13 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
         <summary className="cursor-pointer text-sm font-medium">{t("session.contents")}</summary>
         <div className="pt-4"><DocumentToc items={toc} /></div>
       </details>}
-      <article className="reading min-w-0 text-base">
+      <article className="reading min-w-0 rounded-xl border bg-card p-4 text-base shadow-xs @xl:p-7">
         <Markdown
           remarkPlugins={[remarkGfm]}
           components={{
             h1: () => null,
             h2: ({ children }) => (
-              <h2 id={idFor(children)} className="mt-10 scroll-mt-48 @3xl:scroll-mt-24 border-b pb-3 text-lg font-semibold">
+              <h2 id={idFor(children)} className="mt-10 first:mt-0 scroll-mt-48 @3xl:scroll-mt-24 border-b pb-3 text-lg font-semibold">
                 {children}
               </h2>
             ),
@@ -64,14 +64,14 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
               </a>
             ),
             blockquote: ({ children }) => (
-              <blockquote className="mt-4 border-l-2 border-brand pl-4 text-muted-foreground">{children}</blockquote>
+              <blockquote className="mt-5 rounded-r-lg border-l-2 border-brand bg-brand-soft/40 px-4 pb-4 pt-1 text-muted-foreground">{children}</blockquote>
             ),
             code: ({ className, children }) => {
               const lang = /language-(\w+)/.exec(className ?? "")?.[1];
               return lang ? (
                 <CodeBlock code={String(children).replace(/\n$/, "")} lang={lang} />
               ) : (
-                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">{children}</code>
+                <code className="wrap-anywhere rounded bg-muted px-1.5 py-0.5 font-mono text-sm">{children}</code>
               );
             },
             // Fenced blocks render through CodeBlock; the wrapping <pre> would double the frame.

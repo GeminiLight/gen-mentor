@@ -19,10 +19,16 @@ export function ReadingTools({ markdown, disabled, onRegenerate }: { markdown: s
     menu.current?.removeAttribute("open");
   };
   return (
-    <details ref={menu} className="relative">
+    <details ref={menu} className="relative" onKeyDown={(e) => {
+      if (e.key === "Escape" && menu.current?.open) {
+        e.preventDefault(); e.stopPropagation();
+        menu.current.open = false;
+        menu.current.querySelector("summary")?.focus();
+      }
+    }}>
       <summary className="flex size-11 cursor-pointer list-none items-center justify-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50" aria-label={t("polish.more")}><Ellipsis className="size-5" aria-hidden /></summary>
       <div className="absolute right-0 z-30 mt-2 flex w-(--w-toc) flex-col items-stretch gap-1 rounded-lg border bg-popover p-2 shadow-sm">
-        <Button variant="ghost" size="sm" onClick={download} className="justify-start"><Download aria-hidden />{t("polish.downloadDocument")}</Button>
+        <Button variant="ghost" size="sm" onClick={download} className="min-h-11 justify-start"><Download aria-hidden />{t("polish.downloadDocument")}</Button>
         <RegenerateButton disabled={disabled} onConfirm={() => { menu.current?.removeAttribute("open"); onRegenerate(); }} />
       </div>
     </details>

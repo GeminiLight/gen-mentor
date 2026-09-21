@@ -17,14 +17,14 @@ export function ReviewQueue({ goal, compact = false }: { goal: Goal; compact?: b
       <RotateCcw className="mt-1 size-5 shrink-0 text-muted-foreground" aria-hidden />
     </div>
     {queue.length ? <>
-      <ol className="divide-y border-t border-b">
-        {(compact ? queue.slice(0, 2) : queue).map(({ index, session, incorrect, skipped, total }) => <li key={index} className="group relative flex flex-wrap items-center gap-4 py-5">
+      <ol className="divide-y rounded-xl border bg-card px-4 sm:px-5">
+        {(compact ? queue.slice(0, 2) : queue).map(({ index, session, incorrect, skipped, total }) => <li key={index} className="group relative flex flex-wrap items-center gap-4 py-5 transition-colors hover:bg-brand-soft/30">
           <span className="num flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning-soft text-sm font-medium text-warning" aria-hidden>{total}</span>
           <div className="min-w-0 flex-1 basis-48">
             <h3 className="text-sm font-medium leading-relaxed wrap-anywhere"><Link href={`/session/${index}#practice`} className="after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-3 focus-visible:after:ring-ring/50">{session.title}</Link></h3>
             <p className="mt-1 text-xs text-muted-foreground">{t("coach.reviewReason", { wrong: incorrect, skipped })}</p>
           </div>
-          <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" aria-hidden />
+          <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform motion-safe:group-hover:translate-x-1" aria-hidden />
         </li>)}
       </ol>
       {compact ? <Button variant="link" asChild className="mt-3 -ml-2"><Link href="/progress">{t("coach.reviewLink")}<ArrowRight aria-hidden /></Link></Button> : <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t("coach.reviewOrdering")}</p>}

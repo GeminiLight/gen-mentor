@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Compass, Trash2 } from "lucide-react";
+import { ArrowRight, Compass, Trash2, CheckCheck, Target } from "lucide-react";
 import Link from "next/link";
 import { FeatureIcon } from "@/components/feature-icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -51,10 +51,10 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
         </Dialog>
       </div>
       <h2 className="mt-5 text-lg font-medium leading-snug wrap-anywhere">{goal.learning_goal}</h2>
-      <div className="mt-6 space-y-2">
+      <div className="mt-6 space-y-3 border-t pt-5">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <span>{t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })}</span>
-          <span className="num">
+          <span className="inline-flex items-center gap-1.5"><CheckCheck className="size-3.5" aria-hidden />{t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })}</span>
+          <span className="num inline-flex items-center gap-1.5"><Target className="size-3.5" aria-hidden />
             {t("coach.attainment")} {mastered} / {skills}
           </span>
         </div>

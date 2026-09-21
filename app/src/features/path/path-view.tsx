@@ -46,10 +46,10 @@ export function PathView() {
       )}
       <CurrentSession goal={goal} index={nextIndex} />
       <div className="mt-10 mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div><h2 className="text-sm font-medium">{t("polish.coursePlan")}</h2><p className="mt-1 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p></div>
+        <div><h2 className="flex items-center gap-2 text-sm font-medium"><Route className="size-4 text-brand" aria-hidden />{t("polish.coursePlan")}</h2><p className="mt-1 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p></div>
         <RescheduleDialog goal={goal} />
       </div>
-      <ol className="divide-y" data-testid="path-stats">
+      <ol className="space-y-1" data-testid="path-stats">
         {goal.learning_path.map((s, i) => (
           <SessionRow key={s.id + i} session={s} index={i} isNext={i === nextIndex} state={goal.sessions[sessionUid(goal.id, i)]} minutes={sessionMinutes(goal.sessions[sessionUid(goal.id, i)])} />
         ))}

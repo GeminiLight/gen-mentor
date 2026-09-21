@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, Send, Square } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Send, Square, MessagesSquare } from "lucide-react";
 import { Prose } from "@/components/prose";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,17 +17,17 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
         <div className="relative min-h-0 flex-1">
         <div ref={attachList} onScroll={onScroll} role="log" aria-label={t("tutor.title")} className="h-full space-y-4 overflow-x-hidden overflow-y-auto overscroll-contain px-4 pb-12 text-sm" data-testid="tutor-messages">
           {goal.tutor.length === 0 && pending === null && (
-            <div className="space-y-3">
+            <div className="space-y-4 pt-2">
               <p className="text-muted-foreground">{t("tutor.empty")}</p>
               <div className="flex flex-col gap-2">
                 {suggestions.map((q) => (
                   <button
                     key={q}
                     type="button"
-                    className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+                    className="group flex min-h-11 items-start gap-3 rounded-xl border bg-card px-3 py-3 text-left text-sm leading-relaxed shadow-xs transition-colors hover:border-brand/30 hover:bg-brand-soft/40 focus-visible:outline-2 focus-visible:outline-ring"
                     onClick={() => setDraft(q)}
                   >
-                    {q}
+                    <MessagesSquare className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden /><span className="flex-1">{q}</span><ArrowUpRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" aria-hidden />
                   </button>
                 ))}
               </div>
@@ -42,13 +42,13 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
         {!atBottom && <Button type="button" size="sm" variant="secondary" className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-sm" onClick={jumpToLatest}><ArrowDown aria-hidden />{t("navigation.latestMessage")}</Button>}
         </div>
         <form
-          className="shrink-0 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+          className="shrink-0 border-t bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
           onSubmit={(e) => {
             e.preventDefault();
             void send();
           }}
         >
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-2 rounded-xl border bg-background/50 p-2 shadow-xs focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
           <Textarea data-tutor-composer
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -61,7 +61,7 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
             rows={2}
             placeholder={t("tutor.placeholder")}
             aria-label={t("tutor.messageLabel")}
-            className="max-h-[min(10rem,25dvh)] min-h-11 resize-none overflow-y-auto"
+            className="max-h-[min(10rem,25dvh)] min-h-11 resize-none overflow-y-auto border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
           {pending !== null ? (
             // Distinct keys so React does not turn this node into the submit button mid-click: the abort
@@ -93,12 +93,13 @@ export function TutorConversation({ goal, conversation }: { goal: Goal; conversa
 
 function Bubble({ turn, streaming }: { turn: ChatTurn; streaming?: boolean }) {
   const mine = turn.role === "user";
+  const { t } = useT();
   return (
-    <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
+    <div className={cn("flex flex-col gap-1.5", mine ? "items-end" : "items-start")}><p className="px-1 text-xs text-muted-foreground">{t(mine ? "polish.tutorYou" : "polish.tutorAssistant")}</p>
       <div
         className={cn(
-          "min-w-0 max-w-[85%] wrap-anywhere rounded-lg px-3 py-2 leading-relaxed",
-          mine ? "bg-primary text-primary-foreground whitespace-pre-wrap" : "bg-muted",
+          "min-w-0 max-w-[85%] wrap-anywhere rounded-xl border px-4 py-3 leading-relaxed shadow-xs",
+          mine ? "rounded-tr-sm border-brand/15 bg-brand-soft text-foreground whitespace-pre-wrap" : "rounded-tl-sm border-border bg-card",
         )}
         aria-busy={streaming}
       >

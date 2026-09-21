@@ -1,6 +1,6 @@
 "use client";
 
-import { UserRound } from "lucide-react";
+import { UserRound, Fingerprint, Target, SlidersHorizontal, PencilLine, ArrowUpRight } from "lucide-react";
 
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -66,23 +66,23 @@ export function ProfileView() {
 
   return (
     <>
-      <PageHeader icon={UserRound} title={t("profile.title")} />
+      <PageHeader icon={UserRound} title={t("profile.title")} description={t("polish.profileLede")} />
       <div className="grid gap-6 @3xl/workspace:grid-cols-2">
-        <Card>
+        <Card className="[--card-spacing:--spacing(6)] shadow-xs">
           <CardHeader>
-            <CardTitle>{t("profile.background")}</CardTitle>
+            <CardTitle className="flex items-center gap-3"><Fingerprint className="size-5 text-brand" aria-hidden />{t("profile.background")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-relaxed">
             <p>{p.learner_information}</p>
-            <div>
+            <div className="border-l-2 border-brand/30 bg-brand-soft/30 py-3 pl-4 pr-3">
               <p className="eyebrow">{t("profile.goal")}</p>
               <p className="mt-1">{p.learning_goal}</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="[--card-spacing:--spacing(6)] shadow-xs">
           <CardHeader>
-            <CardTitle>{t("profile.cognitive")}</CardTitle>
+            <CardTitle className="flex items-center gap-3"><Target className="size-5 text-brand" aria-hidden />{t("profile.cognitive")}</CardTitle>
             <CardDescription>{`${t("coach.attainment")} · ${targetProgress(goal)}%`}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
@@ -109,29 +109,29 @@ export function ProfileView() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="[--card-spacing:--spacing(6)] shadow-xs">
           <CardHeader>
-            <CardTitle>{t("profile.preferences")}</CardTitle>
+            <CardTitle className="flex items-center gap-3"><SlidersHorizontal className="size-5 text-brand" aria-hidden />{t("profile.preferences")}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm leading-relaxed">
+          <CardContent className="space-y-4 text-sm leading-relaxed">
             <p>
-              <span className="text-muted-foreground">{t("profile.contentStyle")} · </span>
+              <span className="mb-1 block text-xs text-muted-foreground">{t("profile.contentStyle")}</span>
               {p.learning_preferences.content_style}
             </p>
             <p>
-              <span className="text-muted-foreground">{t("profile.activityType")} · </span>
+              <span className="mb-1 block text-xs text-muted-foreground">{t("profile.activityType")}</span>
               {p.learning_preferences.activity_type}
             </p>
             {p.learning_preferences.additional_notes && <p className="text-muted-foreground">{p.learning_preferences.additional_notes}</p>}
           </CardContent>
         </Card>
         <HabitsCard goal={goal} />
-        <Card className="lg:col-span-2">
+        <Card className="@3xl/workspace:col-span-2 [--card-spacing:--spacing(6)] shadow-xs">
           <CardHeader>
-            <CardTitle>{t("profile.tellTitle")}</CardTitle>
+            <CardTitle className="flex items-center gap-3"><PencilLine className="size-5 text-brand" aria-hidden />{t("profile.tellTitle")}</CardTitle>
             <CardDescription>{t("profile.tellLede")}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <Label htmlFor="note" className="sr-only">
               {t("profile.tellLabel")}
             </Label>
@@ -139,6 +139,7 @@ export function ProfileView() {
               ref={noteRef}
               id="note"
               rows={3}
+              className="bg-background/60 focus:bg-card"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               disabled={busy}
@@ -152,11 +153,11 @@ export function ProfileView() {
               </p>
             )}
             <Button onClick={() => void update()} disabled={busy}>
-              {busy ? t("profile.updating") : t("profile.update")}
+              {busy ? t("profile.updating") : t("profile.update")}<ArrowUpRight aria-hidden />
             </Button>
           </CardContent>
         </Card>
-        <div className="lg:col-span-2">
+        <div className="@3xl/workspace:col-span-2">
           <ArchivePanel />
         </div>
       </div>
