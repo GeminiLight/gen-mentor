@@ -4,6 +4,8 @@
  * as evidence for the profiler.
  */
 import type { DocumentQuiz } from "@/lib/schemas";
+import { sameConfiguration, configurationObject, validOrder } from "./configuration";
+import type { OrderingAnswer, ConfigurationAnswer } from "./schemas/hands-on";
 import type { QuizResults } from "@/lib/store/types";
 
 export type Verdict = "correct" | "incorrect" | "unanswered" | "answered";
@@ -13,6 +15,8 @@ export interface Selections {
   multiple: number[][];
   tf: (boolean | null)[];
   short: string[];
+  ordering?: OrderingAnswer[];
+  configuration?: ConfigurationAnswer[];
 }
 
 export const emptySelections = (quiz: DocumentQuiz): Selections => ({
@@ -20,6 +24,8 @@ export const emptySelections = (quiz: DocumentQuiz): Selections => ({
   multiple: quiz.multiple_choice_questions.map(() => []),
   tf: quiz.true_false_questions.map(() => null),
   short: quiz.short_answer_questions.map(() => ""),
+  ordering: (quiz.ordering_questions ?? []).map((q) => ({ order: q.items.map((_, i) => i), confirmed: false })),
+  configuration: (quiz.configuration_questions ?? []).map((q) => ({ value: JSON.stringify(configurationObject(q.starter_configuration), null, 2), confirmed: false })),
 });
 
 /** `correct_option` arrives as an index, a letter or the option text. Resolve to an index. */
@@ -73,6 +79,16 @@ export function judge(quiz: DocumentQuiz, sel: Selections): QuizResults {
   quiz.short_answer_questions.forEach((q, i) => {
     mark(questionKey("short", i), (sel.short[i] ?? "").trim().length > 0, null, q.question, q.expected_answer);
   });
+  (quiz.ordering_questions ?? []).forEach((q, i) => {
+    const got = sel.ordering?.[i];
+    mark(questionKey("ordering", i), !!got?.confirmed && validOrder(got.order, q.items.length),
+      !!got && got.order.every((v, k) => v === q.correct_order[k]), q.question, q.correct_order.map((index) => q.items[index]).join(" → "));
+  });
+  (quiz.configuration_questions ?? []).forEach((q, i) => {
+    const got = sel.configuration?.[i];
+    mark(questionKey("configuration", i), !!got?.confirmed && configurationObject(got.value) !== null,
+      !!got && q.correct_configurations.some((value) => sameConfiguration(got.value, value)), q.question, q.correct_configurations.join("\n"));
+  });
   return r;
 }
 
@@ -91,3 +107,5 @@ export function quizPerformance(results: QuizResults, session_title: string) {
     wrong_questions: results.wrong_questions,
   };
 }
+
+export const questionCount = (q: DocumentQuiz): number => q.single_choice_questions.length + q.multiple_choice_questions.length + q.true_false_questions.length + q.short_answer_questions.length + (q.ordering_questions?.length ?? 0) + (q.configuration_questions?.length ?? 0);

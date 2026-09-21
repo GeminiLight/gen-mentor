@@ -12,13 +12,10 @@ import type { PracticeState, QuizDraft, QuizResults } from "@/lib/store/types";
 import { DocumentView } from "./document-view";
 import { QuizWorkspace } from "./quiz-workspace";
 import { ReadingBookmark } from "./reading-bookmark";
-import { scoredCount } from "@/lib/quiz";
+import { scoredCount, questionCount } from "@/lib/quiz";
 import { ReadingProgress } from "./reading-progress";
 import { AskTutor } from "./ask-tutor";
 import { ReadingTools } from "./reading-tools";
-
-const questionCount = (q: DocumentQuiz) =>
-  q.single_choice_questions.length + q.multiple_choice_questions.length + q.true_false_questions.length + q.short_answer_questions.length;
 
 /**
  * The finished session: reading and quiz as two tabs. "Mark done" appears in the toolbar and

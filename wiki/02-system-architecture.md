@@ -177,3 +177,11 @@ replay 模式供测试离线执行。配置缺失打开受控 ModelSettings，�
 浏览与切换示例仅改变 PathPreview 的局部状态，不写学习档案。用户点击示例行动时，
 即时读取 onboarding draft；仅当目标、背景、checkpoint 均为空，才 patch 选中示例的目标文本。
 已有内容则原样继续到创建页，课数与 checkpoint 不变。不触发模型调用，也不保存示例课程为真实路径。
+
+## 操作型测验数据（issue #31）
+
+测验契约增加可选的 `ordering_questions`、`configuration_questions`，版本 1 的旧档案不补写题目。
+新题型的 selections 分别保存 `{ order, confirmed }` 与 `{ value, confirmed }`；输入事件即时落盘，
+明确检查后才参与评分。`quiz.ts` 负责纯本地判定，`configuration.ts` 比较 JSON 数据，不执行文本。
+确认后的错误和跳过沿用 `quiz-review.ts` 的首次成绩/复练分离机制；档案导入导出保留完整题目与状态。
+生成接入及完整验收状态见 `wiki/specs/spec-hands-on-questions.md`。

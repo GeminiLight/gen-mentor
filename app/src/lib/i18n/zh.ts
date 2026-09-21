@@ -1,3 +1,4 @@
+import { handsOn } from "./zh-hands-on";
 import { entry } from "./zh-entry";
 import { coach } from "./zh-coach";
 import { journey } from "./zh-journey";
@@ -275,4 +276,5 @@ export const zh: Dict = {
   journey,
   entry,
   coach,
+  handsOn,
 };
