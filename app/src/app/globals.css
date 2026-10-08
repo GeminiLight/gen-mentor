@@ -4,6 +4,7 @@
 @import "./interaction.css";
 @import "./motion.css";
 @import "./composer.css";
+@import "./journey-art.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -180,11 +181,17 @@
   --edge-light: oklch(1 0 0 / 0.85);
   --surface-shadow: oklch(0.28 0.035 250 / 0.12);
 
+  --entry-panel: oklch(0.935 0.033 242);
+  --atlas-paper: oklch(0.995 0.002 245);
+  --atlas-line: oklch(0.77 0.055 245);
+  --atlas-underlay: oklch(0.82 0.055 242);
+
   /* Shape */
   --radius: 0.375rem;
 
   /* Widths: every fixed width in the app is one of these */
   --w-entry: 46rem;
+  --w-entry-art: 8rem;
   --w-rail: 15rem; /* desktop navigation rail */
   --w-toc: 13rem;
   --w-col: 30rem; /* single reading column on phones */
@@ -206,6 +213,10 @@
 }
 
 .dark {
+  --entry-panel: oklch(0.235 0.036 246);
+  --atlas-paper: oklch(0.28 0.035 244);
+  --atlas-line: oklch(0.44 0.064 245);
+  --atlas-underlay: oklch(0.2 0.027 244);
   color-scheme: dark;
   --edge-light: oklch(1 0 0 / 0.08);
   --surface-shadow: oklch(0.08 0.01 250 / 0.6);
