@@ -3,6 +3,7 @@
 import { ProfileRefreshNotice } from "@/features/session/profile-refresh-notice";
 import { Settings2, HardDrive } from "lucide-react";
 import Link from "next/link";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { LangToggle } from "@/components/lang-toggle";
@@ -25,6 +26,7 @@ import { NAV } from "./nav";
 /** Desktop: a fixed rail. Phones: a top bar plus a bottom tab bar. Content is one column. */
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const reduce = useReducedMotion();
   const goal = useActiveGoal();
   const hydrated = useArchive((s) => s.hydrated);
   const { t } = useT();
@@ -50,22 +52,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
         <div className="mt-6"><CommandTrigger onOpen={() => setCommandOpen(true)} /></div>
         {goal && <GoalSwitcher goal={goal} />}
-        <nav className="mt-7 flex flex-col gap-1" aria-label={t("polish.navigation")}>
+        <LayoutGroup id="desktop-navigation"><nav className="mt-7 flex flex-col gap-1" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
-                isActive(href) && "bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-xs ring-1 ring-brand/10",
+                "relative isolate flex min-h-11 items-center gap-3 rounded-md px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
+                isActive(href) && "font-medium text-sidebar-accent-foreground",
               )}
             >
-              <Icon className="size-4" aria-hidden />
+              {isActive(href) && <motion.span layoutId="navigation-active" className="absolute inset-0 -z-10 rounded-md border border-brand/10 bg-sidebar-accent" transition={{ duration: reduce ? 0 : 0.18, ease: [0.2, 0, 0, 1] }} aria-hidden />}
+              <Icon className="size-4" strokeWidth={1.6} aria-hidden />
               {t(label)}
             </Link>
           ))}
-        </nav>
+        </nav></LayoutGroup>
         <div className="mt-auto flex flex-col gap-1 pt-8">
           {tutor("rail")}
           <p className="mt-3 flex items-center gap-2 px-3 text-xs leading-relaxed text-muted-foreground"><HardDrive className="size-3.5 shrink-0" aria-hidden />{t("polish.localArchive")}</p>
@@ -96,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {goal && <GoalSwitcher goal={goal} compact />}
         <main id="main" className="@container/workspace mx-auto w-full max-w-(--w-content) flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-10" data-hydrated={hydrated ? "" : undefined}>
           {goal && <ProfileRefreshNotice goal={goal} />}
-          {children}
+          <div key={pathname} className="workspace-route">{children}</div>
         </main>
         <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t pb-[env(safe-area-inset-bottom)] bg-background/95 backdrop-blur md:hidden" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (

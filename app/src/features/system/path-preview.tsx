@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, BookOpen, ChartNoAxesCombined, Workflow, BriefcaseBusiness, Compass } from "lucide-react";
 import { FeatureIcon } from "@/components/feature-icon";
@@ -16,6 +17,7 @@ const EXAMPLE_ICONS = { data: ChartNoAxesCombined, agents: Workflow, career: Bri
 /** A sample syllabus, never represented as generated work or learner progress. */
 export function PathPreview() {
   const { t } = useT();
+  const reduce = useReducedMotion();
   const router = useRouter();
   const hydrated = useArchive((s) => s.hydrated);
   const hasDraft = useOnboardingDraft((s) => !!(s.goal || s.info || s.checkpoint));
@@ -34,18 +36,19 @@ export function PathPreview() {
         <span className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground">{t("entry.sample")}</span>
       </div>
       <div className="paper-panel overflow-hidden rounded-xl border bg-card">
-        <div className="flex flex-wrap border-b bg-brand-soft/50 px-3" role="group" aria-label={t("entry.exampleLabel")}>
+        <LayoutGroup id="sample-selector"><div className="flex flex-wrap border-b bg-background/60 px-3" role="group" aria-label={t("entry.exampleLabel")}>
           {EXAMPLES.map((key) => { const Icon = EXAMPLE_ICONS[key]; return (
             <button key={key} type="button" aria-pressed={example === key} onClick={() => { setExample(key); setExpanded(0); }}
-              className="relative inline-flex min-h-14 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-2 sm:flex-row sm:gap-2 sm:px-3 py-3 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ring aria-pressed:font-medium aria-pressed:text-brand aria-pressed:after:absolute aria-pressed:after:inset-x-3 aria-pressed:after:bottom-0 aria-pressed:after:h-0.5 aria-pressed:after:bg-brand">
+              className="relative inline-flex min-h-14 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 px-2 sm:flex-row sm:gap-2 sm:px-3 py-3 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ring aria-pressed:font-medium aria-pressed:text-brand">
               <Icon className="size-4 shrink-0" aria-hidden />{t(`entry.${key}`)}
+              {example === key && <motion.span layoutId="sample-active" className="absolute inset-x-3 bottom-0 h-0.5 bg-brand" transition={{ duration: reduce ? 0 : 0.24, ease: [0.2, 0, 0, 1] }} aria-hidden />}
             </button>
           ); })}
-        </div>
+        </div></LayoutGroup>
         <div className="px-5 pt-6 pb-6 sm:px-7 sm:pt-7" aria-live="polite" aria-atomic="true">
           <div className="flex items-start gap-4 border-b pb-5">
-            <FeatureIcon icon={Compass} className="hidden size-12 rounded-full sm:inline-flex" />
-            <div className="min-w-0"><p className="eyebrow mb-2">{t("onboarding.goalLabel")}</p>
+            <FeatureIcon icon={Compass} className="hidden size-10 sm:inline-flex" />
+            <div key={example} className="surface-enter min-w-0"><p className="eyebrow mb-2">{t("onboarding.goalLabel")}</p>
               <p className="text-lg font-medium leading-snug text-balance">{t(`entry.${example}Goal`)}</p>
             </div>
           </div>

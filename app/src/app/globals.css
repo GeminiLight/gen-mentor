@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./interaction.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -42,6 +43,8 @@
   --shadow-xs: 0 1px 2px oklch(0.2 0.01 260 / 0.06);
   --shadow-sm: 0 1px 3px oklch(0.2 0.01 260 / 0.08), 0 1px 2px oklch(0.2 0.01 260 / 0.04);
   --shadow-md: 0 6px 16px -6px oklch(0.2 0.01 260 / 0.14), 0 2px 6px -2px oklch(0.2 0.01 260 / 0.06);
+  --shadow-control: inset 0 1px 0 var(--edge-light), 0 1px 2px var(--surface-shadow);
+  --shadow-workspace: 0 1px 3px var(--surface-shadow), 0 20px 60px -28px var(--surface-shadow);
   --shadow-paper: 0 2px 4px oklch(0.28 0.035 250 / 0.03), 0 18px 48px -18px oklch(0.35 0.08 245 / 0.18);
   --shadow-lg: 0 16px 40px -12px oklch(0.2 0.01 260 / 0.22), 0 4px 12px -4px oklch(0.2 0.01 260 / 0.08);
 }
@@ -114,7 +117,7 @@
   color-scheme: light;
 
   /* Neutrals: cool, low chroma */
-  --background: oklch(0.979 0.009 240);
+  --background: oklch(0.983 0.004 240);
   --foreground: oklch(0.28 0.035 250);
   --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
@@ -126,8 +129,8 @@
   --muted-foreground: oklch(0.46 0.025 250);
   --accent: oklch(0.945 0.006 250);
   --accent-foreground: var(--foreground);
-  --border: oklch(0.89 0.018 240);
-  --input: oklch(0.83 0.025 240);
+  --border: oklch(0.895 0.009 245);
+  --input: oklch(0.85 0.012 245);
 
   /* The one signal color: progress and the primary action only */
   --brand: oklch(0.46 0.105 245);
@@ -163,7 +166,7 @@
   --chart-4: oklch(0.55 0.15 340);
   --chart-5: oklch(0.55 0.13 120);
 
-  --sidebar: oklch(0.958 0.016 240);
+  --sidebar: oklch(0.972 0.007 240);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-foreground);
@@ -172,10 +175,14 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 
+  --edge-light: oklch(1 0 0 / 0.85);
+  --surface-shadow: oklch(0.28 0.035 250 / 0.12);
+
   /* Shape */
-  --radius: 0.5rem;
+  --radius: 0.375rem;
 
   /* Widths: every fixed width in the app is one of these */
+  --w-entry: 46rem;
   --w-rail: 15rem; /* desktop navigation rail */
   --w-toc: 13rem;
   --w-col: 30rem; /* single reading column on phones */
@@ -188,12 +195,15 @@
   --dur-fast: 120ms;
   --dur-base: 180ms;
   --dur-slow: 240ms;
+  --dur-working: 1800ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
   color-scheme: dark;
+  --edge-light: oklch(1 0 0 / 0.08);
+  --surface-shadow: oklch(0.08 0.01 250 / 0.6);
 
   --background: oklch(0.18 0.018 250);
   --foreground: oklch(0.95 0.005 250);

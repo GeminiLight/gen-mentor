@@ -28,21 +28,23 @@ export function OnboardingFlow() {
   }, [started]);
   const building = status.profile !== "pending" || status.path !== "pending";
   return (
-    <div className={!started ? "mx-auto max-w-3xl" : undefined}>
-      <EntryPhases phase={started ? building ? 2 : 1 : 0} />
+    <div className="entry-workspace" data-stage={started ? building ? "build" : "review" : "details"}>
+      <div className="entry-intro">
       <div className="mb-8 max-w-(--w-measure)">
         {started && <p className="eyebrow mb-3">{t("review.eyebrow")}</p>}
-        <h1 ref={heading} tabIndex={-1} className="text-xl font-semibold">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
+        <h1 ref={heading} tabIndex={-1} className="entry-title text-xl font-medium tracking-tight text-balance lg:text-2xl">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
         {started && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(review ? "review.intro" : "review.preparingHelp")}</p>}
       </div>
-      <div className="rounded-xl border bg-card p-5 shadow-xs sm:p-8">
+      <EntryPhases phase={started ? building ? 2 : 1 : 0} />
+      </div>
+      <div className="entry-surface rounded-xl border bg-card p-5 sm:p-8">
         {!started ? (
           <div>
             <GoalForm disabled={running} onSubmit={(v) => void run(v)} />
             <EntryGuide />
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="surface-enter space-y-8">
             <div className="flex items-center justify-between"><Button variant="ghost" size="sm" onClick={back}><ArrowLeft className="size-4" aria-hidden />{t("review.back")}</Button><span className="text-xs text-muted-foreground">{t("polish.savedDraft")}</span></div>
             <OnboardingProgress status={status} reviewing={!!review} />
             {running && <section className="space-y-3 rounded-lg bg-muted/40 p-5" role="status" data-loading="true">

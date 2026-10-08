@@ -21,7 +21,7 @@ export function LearningDesk({ goal }: { goal: Goal }) {
   return (
     <section className="mx-auto w-full max-w-(--w-content) flex-1 px-6 py-12 sm:py-12" data-hydrated="" data-testid="home-resume">
       <p className="eyebrow">{t("coach.savedWork")}</p>
-      <h1 className="mt-3 font-editorial text-xl font-normal sm:text-2xl">{t("coach.deskTitle")}</h1>
+      <h1 className="mt-3 font-heading text-xl font-normal sm:text-2xl">{t("coach.deskTitle")}</h1>
       <p className="mt-4 max-w-(--w-measure) text-sm leading-relaxed text-muted-foreground">{t("coach.deskBody")}</p>
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <div className="paper-panel min-w-0 rounded-xl border border-t-4 border-t-primary bg-card p-6 sm:p-8">

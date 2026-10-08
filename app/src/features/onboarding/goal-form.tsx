@@ -1,6 +1,6 @@
 "use client";
 
-import { FileUp, Loader2, ArrowRight, Check, KeyRound, Target, UserRound, Route, CircleCheck, Plug, CircleAlert } from "lucide-react";
+import { FileUp, Loader2, ArrowRight, Check, KeyRound, CircleCheck, Plug, CircleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
 
   return (
     <form
-      className="space-y-7"
+      className="goal-composer space-y-7"
       noValidate
       onSubmit={async (e) => {
         e.preventDefault();
@@ -87,8 +87,8 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
         onSubmit({ learning_goal: goal.trim(), learner_information: info.trim(), session_count: Number(count) });
       }}
     >
-      <div className="space-y-2">
-        <Label htmlFor="goal" className="gap-2"><Target className="size-4 text-brand" aria-hidden />{t("onboarding.goalLabel")}</Label>
+      <div className="composer-field space-y-3">
+        <div className="flex items-center gap-2"><span className="field-index" aria-hidden>01</span><Label htmlFor="goal">{t("onboarding.goalLabel")}</Label></div>
         <Textarea
           ref={goalRef}
           id="goal"
@@ -100,9 +100,9 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           aria-invalid={goalInvalid || undefined}
           aria-describedby={goalInvalid ? "goal-error" : undefined}
           rows={2}
-          className="min-h-20 resize-y bg-background/50 px-3 py-3 text-base focus:bg-card"
+          className="min-h-24 resize-y bg-background/40 px-4 py-4 text-base leading-relaxed focus:bg-card"
         />
-        {!goal.trim() && <div className="pt-1"><div className="flex flex-wrap gap-1" role="group" aria-label={t("entry.examples")}>{(["data", "agents", "career"] as const).map((key) => <Button key={key} variant="outline" size="sm" type="button" className="min-h-11" disabled={disabled} onClick={() => { setGoal(t(`entry.${key}Goal`)); goalRef.current?.focus(); }}>{t(`entry.${key}`)}</Button>)}</div></div>}
+        {!goal.trim() && <div className="pt-1"><div className="flex flex-wrap gap-1" role="group" aria-label={t("entry.examples")}>{(["data", "agents", "career"] as const).map((key) => <Button key={key} variant="outline" size="sm" type="button" className="example-choice min-h-9" disabled={disabled} onClick={() => { setGoal(t(`entry.${key}Goal`)); goalRef.current?.focus(); }}>{t(`entry.${key}`)}</Button>)}</div></div>}
         {goalInvalid && (
           <p id="goal-error" className="text-xs text-destructive" role="alert">
             {t("onboarding.goalRequired")}
@@ -110,9 +110,9 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="composer-field space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Label htmlFor="info" className="gap-2"><UserRound className="size-4 text-brand" aria-hidden />{t("onboarding.infoLabel")}</Label>
+          <div className="flex items-center gap-2"><span className="field-index" aria-hidden>02</span><Label htmlFor="info">{t("onboarding.infoLabel")}</Label></div>
           <input ref={fileRef} type="file" accept=".pdf,.txt,.md,application/pdf,text/plain" className="sr-only" id="resume" aria-label={t("onboarding.uploadFile")} onChange={(e) => void onFile(e.target.files?.[0])} disabled={disabled || parsing} />
           <Button type="button" variant="ghost" size="sm" onClick={() => fileRef.current?.click()} disabled={disabled || parsing}>
             {parsing ? <Loader2 className="animate-spin" aria-hidden /> : <FileUp aria-hidden />}
@@ -128,7 +128,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           onChange={(e) => setInfo(e.target.value)}
           disabled={disabled}
           rows={4}
-          className="min-h-28 resize-y bg-background/50 px-3 py-3 focus:bg-card"
+          className="min-h-28 resize-y bg-background/40 px-4 py-4 leading-relaxed focus:bg-card"
           placeholder={t("entry.backgroundHelp")}
           aria-invalid={infoInvalid || undefined}
           aria-describedby={infoInvalid ? "info-error" : undefined}
@@ -138,7 +138,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
 
       <div className="border-t pt-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Label htmlFor="count" className="gap-2"><Route className="size-4 text-brand" aria-hidden />{t("onboarding.countLabel")}</Label>
+          <div className="flex items-center gap-2"><span className="field-index" aria-hidden>03</span><Label htmlFor="count">{t("onboarding.countLabel")}</Label></div>
           <Select value={count} onValueChange={setCount} disabled={disabled}>
             <SelectTrigger id="count" className="min-h-11 w-40">
               <SelectValue />
@@ -161,7 +161,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">{(goal || info) && <><Check className="size-3" aria-hidden />{t("entry.saved")}</>}</span>
-          <Button type="submit" size="lg" className="h-11 w-full px-5 sm:w-auto" disabled={disabled || parsing || checking}>
+          <Button type="submit" size="lg" className="h-12 w-full px-5 sm:ml-auto sm:w-auto" disabled={disabled || parsing || checking}>
             {checking ? t("entry.modelChecking") : t("entry.analyze")}<ArrowRight data-icon="inline-end" aria-hidden />
           </Button>
         </div>

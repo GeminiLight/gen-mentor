@@ -51,7 +51,7 @@ export function LibraryView() {
       ) : (
         <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3">
           {matches.map(({ session, index, state }) => (
-            <Link key={index} href={`/session/${index}`} className="group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+            <Link key={index} href={`/session/${index}`} className="interactive-surface group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <Card className="h-full border border-border ring-0 shadow-xs transition-[border-color,box-shadow] group-hover:border-brand/30 group-hover:shadow-md [--card-spacing:--spacing(5)]" data-testid="library-card">
                 <CardHeader className="gap-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">

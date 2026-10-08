@@ -41,7 +41,7 @@ export function HomeView() {
         <section className="grid items-start gap-12 py-10 sm:py-16 lg:grid-cols-2 lg:gap-20">
           <div className="min-w-0 lg:pt-12">
             <p className="eyebrow mb-6 flex items-center gap-3"><span className="h-px w-8 bg-brand" aria-hidden />{t("entry.eyebrow")}</p>
-            <h1 className="max-w-(--w-col) font-editorial text-2xl font-normal leading-tight text-balance">{t("entry.title")}</h1>
+            <h1 className="max-w-(--w-col) font-heading text-2xl font-medium leading-tight tracking-tight text-balance">{t("entry.title")}</h1>
             <p className="mt-5 max-w-(--w-col) text-base leading-relaxed text-muted-foreground">{t("entry.lede")}</p>
             <div className="mt-7 space-y-3" data-hydrated={hydrated ? "" : undefined}>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
