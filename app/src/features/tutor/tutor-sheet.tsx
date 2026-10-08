@@ -1,7 +1,8 @@
 "use client";
 
-import { Pin, PinOff, X } from "lucide-react";
+import { Pin, PinOff, X, MessagesSquare, BookOpen } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { FeatureIcon } from "@/components/feature-icon";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useT } from "@/lib/i18n";
@@ -23,15 +24,16 @@ export function TutorSheet({ goal, session, context, panel }: { goal: Goal; sess
   const Title = panel.docked ? "h2" : SheetTitle;
   const Description = panel.docked ? "p" : SheetDescription;
   const content = <>
-    <header className="shrink-0 space-y-3 border-b p-4">
+    <header className="shrink-0 space-y-3 border-b bg-brand-soft/30 p-4">
       <div className="flex items-center justify-between gap-2">
-        <Title className="text-base font-medium">{t("tutor.title")}</Title>
+        <div className="flex items-center gap-3"><FeatureIcon icon={MessagesSquare} className="size-10 rounded-xl" /><Title className="text-base font-medium">{t("tutor.title")}</Title></div>
         <div className="flex items-center gap-1">
           {goal.tutor.length > 0 && <ClearConversation onClear={() => { clearTutor(goal.id); conversation.jumpToLatest(); }} disabled={conversation.pending !== null} />}
           <Button variant="ghost" size="icon-sm" aria-label={t("polish.close")} onClick={panel.close}><X aria-hidden /></Button>
         </div>
       </div>
       <Description className="text-sm text-muted-foreground">{t("tutor.lede", { context: context ? t("tutor.ledeContext") : "" })}</Description>
+      {session && <p className="flex items-start gap-2 rounded-lg border bg-card/70 px-3 py-2 text-xs leading-relaxed text-muted-foreground"><BookOpen className="mt-0.5 size-3.5 shrink-0" aria-hidden /><span className="line-clamp-2">{session.title}</span></p>}
       {panel.wide && <Button variant="outline" size="sm" className="w-full justify-start" aria-pressed={panel.docked} onClick={panel.togglePin}>
         {panel.docked ? <PinOff aria-hidden /> : <Pin aria-hidden />}
         {t(panel.docked ? "tutor.unpin" : "tutor.pin")}

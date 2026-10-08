@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Trash2, Upload } from "lucide-react";
+import { Download, Trash2, Upload, HardDrive } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -42,9 +42,9 @@ export function ArchivePanel() {
   };
 
   return (
-    <Card>
+    <Card className="bg-card/60 [--card-spacing:--spacing(6)]">
       <CardHeader>
-        <CardTitle>{t("profile.archiveTitle")}</CardTitle>
+        <CardTitle className="flex items-center gap-3"><HardDrive className="size-5 text-brand" aria-hidden />{t("profile.archiveTitle")}</CardTitle>
         <CardDescription>{t("profile.archiveLede")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap items-center gap-2">

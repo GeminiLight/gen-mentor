@@ -1,3 +1,4 @@
+import { handsOn } from "./en-hands-on";
 import { entry } from "./en-entry";
 import { coach } from "./en-coach";
 import { journey } from "./en-journey";
@@ -274,6 +275,7 @@ export const en = {
   journey,
   entry,
   coach,
+  handsOn,
 } as const;
 
 export type Dict = { [K in keyof typeof en]: { [P in keyof (typeof en)[K]]: string } };

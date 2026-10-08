@@ -3,14 +3,14 @@ import type { Goal, QuizResults, SessionState } from "@/lib/store/types";
 import { questionKey, type Selections } from "./quiz";
 import { sessionUid } from "./store/derive";
 
-const kinds = { single: "single_choice_questions", multiple: "multiple_choice_questions", tf: "true_false_questions", short: "short_answer_questions" } as const;
+const kinds = { single: "single_choice_questions", multiple: "multiple_choice_questions", tf: "true_false_questions", short: "short_answer_questions", ordering: "ordering_questions", configuration: "configuration_questions" } as const;
 
 /** Retain original keys alongside a compact practice quiz, so partial reviews map back correctly. */
 export function reviewQuiz(quiz: DocumentQuiz, results: QuizResults) {
   const keys: Record<string, string> = {};
   const selected = (Object.keys(kinds) as (keyof Selections)[]).map((kind) => {
-    const items = quiz[kinds[kind]].filter((_, i) => ["incorrect", "unanswered"].includes(results.verdicts[questionKey(kind, i)]));
-    const original = quiz[kinds[kind]].map((_, i) => questionKey(kind, i)).filter((key) => ["incorrect", "unanswered"].includes(results.verdicts[key]));
+    const items = (quiz[kinds[kind]] ?? []).filter((_, i) => ["incorrect", "unanswered"].includes(results.verdicts[questionKey(kind, i)]));
+    const original = (quiz[kinds[kind]] ?? []).map((_, i) => questionKey(kind, i)).filter((key) => ["incorrect", "unanswered"].includes(results.verdicts[key]));
     original.forEach((key, i) => { keys[questionKey(kind, i)] = key; });
     return [kinds[kind], items];
   });

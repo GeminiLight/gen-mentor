@@ -1,5 +1,17 @@
 import type { Dict } from "./en";
 export const polish: Dict["polish"] = {
+  filterReadings: "筛选教材",
+  filterall: "全部",
+  filterreading: "学习中",
+  filtercompleted: "已完成",
+  clearSearch: "清除搜索",
+  resetFilters: "重置筛选",
+  readingCount: "显示 {n} / {total} 篇教材",
+  goalsLede: "让每个目标都有清晰的方向，选择接下来专注的事。",
+  profileLede: "你的起点、学习偏好与真实记录，汇集在这里。",
+  localArchive: "保存在这台设备上",
+  tutorYou: "你",
+  tutorAssistant: "学习导师",
   welcome: "从上次停下的地方，继续。",
   workspace: "你的学习书桌",
   currentGoal: "当前目标",

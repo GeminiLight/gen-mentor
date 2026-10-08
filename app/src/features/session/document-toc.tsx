@@ -1,5 +1,6 @@
 "use client";
 
+import { List } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -56,7 +57,7 @@ export function DocumentToc({ items }: { items: TocItem[] }) {
   if (items.length < 2) return null;
   return (
     <nav aria-label={t("session.contents")} className="max-h-[50dvh] overflow-y-auto overscroll-contain pr-2 text-sm @3xl:max-h-[calc(100dvh-8rem)]" data-testid="doc-toc">
-      <p className="eyebrow mb-3">{t("session.contents")}</p>
+      <p className="eyebrow mb-3 flex items-center gap-2"><List className="size-4" aria-hidden />{t("session.contents")}</p>
       <ol className="space-y-1 border-l">
         {items.map((i) => (
           <li key={i.id}>
@@ -67,9 +68,9 @@ export function DocumentToc({ items }: { items: TocItem[] }) {
                 e.currentTarget.closest("details")?.removeAttribute("open");
               }}
               className={cn(
-                "-ml-px block border-l py-1 pl-3 pointer-coarse:py-3 text-muted-foreground transition-colors hover:text-foreground",
+                "-ml-px block rounded-r-lg border-l py-2 pl-3 pointer-coarse:py-3 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2",
                 i.depth === 3 && "pl-6 text-xs",
-                active === i.id && "border-brand font-medium text-foreground",
+                active === i.id && "border-brand bg-brand-soft/60 font-medium text-brand",
               )}
             >
               {i.text}

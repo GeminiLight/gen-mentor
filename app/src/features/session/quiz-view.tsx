@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { DocumentQuiz } from "@/lib/schemas";
 import { useT } from "@/lib/i18n";
-import { judge, questionKey, resolveOption } from "@/lib/quiz";
+import { judge, questionKey, resolveOption, questionCount } from "@/lib/quiz";
 import type { QuizDraft, QuizResults } from "@/lib/store/types";
 import { Option, Question } from "./quiz-question";
 import { useQuizDraft } from "./use-quiz-draft";
+import { HandsOnQuestions } from "./hands-on-questions";
 import { QuizStatus } from "./quiz-status";
 
 /**
@@ -46,11 +47,7 @@ export function QuizView({
     return run;
   }, [order, verdicts]);
   const answered = Object.values(live.verdicts).filter((v) => v !== "unanswered").length;
-  const total =
-    quiz.single_choice_questions.length +
-    quiz.multiple_choice_questions.length +
-    quiz.true_false_questions.length +
-    quiz.short_answer_questions.length;
+  const total = questionCount(quiz);
   let n = 0;
 
   return (
@@ -183,6 +180,8 @@ export function QuizView({
           </Question>
         );
       })}
+
+      <HandsOnQuestions quiz={quiz} sel={sel} start={n} finished={finished} verdicts={verdicts} setSel={setSel} confirm={answer} />
 
       {!finished && warn && answered < total && (
         <div role="alert" className="space-y-3 rounded-lg border border-warning/40 bg-warning-soft p-4 text-sm">

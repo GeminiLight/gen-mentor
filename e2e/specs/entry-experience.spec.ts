@@ -137,3 +137,52 @@ test("leaving during a configuration check cannot start an abandoned analysis", 
   await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("Analyze sales with Python");
   expect(analyses).toBe(0);
 });
+
+test("a chosen sample starts an editable draft without generating a plan", async ({ page }) => {
+  await health(page);
+  let calls = 0;
+  await page.route("**/api/refine-goal", (route) => { calls++; return route.abort(); });
+  await page.goto("/");
+  await page.getByRole("button", { name: "AI agents", exact: true }).click();
+  await page.getByTestId("use-example").click();
+  await expect(page).toHaveURL(/\/onboarding$/);
+  await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("Build and evaluate an AI research assistant");
+  await expect(page.getByLabel("Background", { exact: true })).toHaveValue("");
+  await page.reload();
+  await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("Build and evaluate an AI research assistant");
+  expect(calls).toBe(0);
+});
+
+test("the sample action continues a saved draft without replacing its background or count", async ({ page }) => {
+  await health(page);
+  await page.addInitScript(() => localStorage.setItem("genmentor.onboarding.v1", JSON.stringify({ state: { goal: "My existing goal", info: "My own background", count: "6", checkpoint: null }, version: 0 })));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Career growth", exact: true }).click();
+  await expect(page.getByTestId("use-example")).toHaveText("Continue your draft");
+  await page.getByTestId("use-example").click();
+  await expect(page.getByLabel("Goal", { exact: true })).toHaveValue("My existing goal");
+  await expect(page.getByLabel("Background", { exact: true })).toHaveValue("My own background");
+  await expect(page.getByLabel("Sessions", { exact: true })).toHaveText("6 sessions");
+});
+
+test("sample lessons expand by keyboard and reset coherently when the goal changes", async ({ page }) => {
+  await health(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const preview = page.getByTestId("path-preview");
+  const first = preview.getByRole("button", { name: /Explore a real dataset/ });
+  const second = preview.getByRole("button", { name: /Find patterns and test assumptions/ });
+  await expect(first).toHaveAttribute("aria-expanded", "true");
+  await second.focus();
+  await second.press("Enter");
+  await expect(second).toBeFocused();
+  await expect(second).toHaveAttribute("aria-expanded", "true");
+  await expect(first).toHaveAttribute("aria-expanded", "false");
+  await expect(preview.getByText("Practice: test a business assumption", { exact: true })).toBeVisible();
+  await second.press("Enter");
+  await expect(second).toHaveAttribute("aria-expanded", "false");
+  await preview.getByRole("button", { name: "AI agents", exact: true }).click();
+  await expect(preview.getByRole("button", { name: /Connect a model to useful tools/ })).toHaveAttribute("aria-expanded", "true");
+  await expect(preview.getByText("Practice: connect a research tool", { exact: true })).toBeVisible();
+  await expect(preview.getByText("Practice: test a business assumption", { exact: true })).toHaveCount(0);
+});

@@ -1,0 +1,4 @@
+{
+  "learner_profile": "A beginner learning to deploy a small web service. Respond in English.",
+  "learning_document": "# Deploy a web service\n\nFirst build the release artifact. Validation needs that artifact and must pass before deployment. Deploy the validated artifact to the server last.\n\nThe service reads a JSON configuration with exactly two fields: enabled (boolean) and port (number). Use enabled: true to start serving requests. The production reverse proxy forwards requests to port 8080, so production must use port: 8080. A disabled development setup is {\"enabled\":false,\"port\":3000}. For the production exercise, enable the service and set the port required by the proxy."
+}

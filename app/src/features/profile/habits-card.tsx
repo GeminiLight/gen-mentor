@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarDays, Clock3 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useT } from "@/lib/i18n";
 import type { Goal } from "@/lib/store";
@@ -19,9 +20,9 @@ export function HabitsCard({ goal }: { goal: Goal }) {
     { label: t("profile.habitsAvg"), value: a.avgMinutes === null ? "—" : t("common.minutes", { n: a.avgMinutes }) },
   ];
   return (
-    <Card data-testid="habits-card">
+    <Card data-testid="habits-card" className="[--card-spacing:--spacing(6)] shadow-xs">
       <CardHeader>
-        <CardTitle>{t("profile.behavior")}</CardTitle>
+        <CardTitle className="flex items-center gap-3"><CalendarDays className="size-5 text-brand" aria-hidden />{t("profile.behavior")}</CardTitle>
         <CardDescription>{t("profile.habitsNote")}</CardDescription>
       </CardHeader>
       <CardContent className="text-sm">
@@ -29,15 +30,15 @@ export function HabitsCard({ goal }: { goal: Goal }) {
           <p className="text-muted-foreground">{t("profile.habitsNone")}</p>
         ) : (
           <>
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-5">
               {stats.map((s) => (
-                <div key={s.label}>
+                <div key={s.label} className="border-l-2 border-brand/20 pl-3">
                   <dt className="text-xs text-muted-foreground">{s.label}</dt>
                   <dd className="num mt-0.5 text-lg font-semibold">{s.value}</dd>
                 </div>
               ))}
             </dl>
-            {a.lastActive !== null && <p className="mt-4 text-xs text-muted-foreground">{t("profile.habitsLast", { date: fmtDate(a.lastActive) })}</p>}
+            {a.lastActive !== null && <p className="mt-5 flex items-center gap-2 border-t pt-4 text-xs text-muted-foreground"><Clock3 className="size-3.5 shrink-0" aria-hidden />{t("profile.habitsLast", { date: fmtDate(a.lastActive) })}</p>}
           </>
         )}
       </CardContent>

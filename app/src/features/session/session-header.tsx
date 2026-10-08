@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock3, ChevronDown, Target } from "lucide-react";
 import Link from "next/link";
 import { LessonOutcomes } from "./lesson-outcomes";
 import { Badge } from "@/components/ui/badge";
@@ -17,9 +17,9 @@ export function SessionHeader({ session, readingMinutes }: { session: SessionIte
           <ArrowLeft aria-hidden /> {t("session.path")}
         </Link>
       </Button>
-      <p className="eyebrow mt-4">
+      <p className="eyebrow mt-5 flex flex-wrap items-center gap-2"><BookOpen className="size-4 text-brand" aria-hidden />
         {session.id}
-        {readingMinutes ? <span className="num ml-3 normal-case tracking-normal">{t("session.readingTime", { n: readingMinutes })}</span> : null}
+        {readingMinutes ? <span className="num ml-2 inline-flex items-center gap-1.5 normal-case tracking-normal"><Clock3 className="size-3.5" aria-hidden />{t("session.readingTime", { n: readingMinutes })}</span> : null}
       </p>
       <h1 className="mt-2 max-w-(--w-measure) text-xl font-semibold tracking-tight">{session.title}</h1>
 
@@ -32,8 +32,8 @@ export function SessionHeader({ session, readingMinutes }: { session: SessionIte
         ))}
         {session.if_learned && <Badge className="bg-success-soft text-success">{t("common.learned")}</Badge>}
       </div>
-      {!!session.desired_outcome_when_completed.length && <details className="group mt-4 max-w-(--w-measure) border-t border-b">
-        <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium marker:text-muted-foreground">{t("journey.outcome")}<span aria-hidden className="ml-auto text-muted-foreground transition-transform group-open:rotate-45">+</span></summary>
+      {!!session.desired_outcome_when_completed.length && <details className="group mt-5 max-w-(--w-measure) rounded-xl border bg-card px-4">
+        <summary className="flex min-h-11 cursor-pointer items-center gap-2 list-none text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring"><Target className="size-4 text-brand" aria-hidden />{t("journey.outcome")}<ChevronDown aria-hidden className="ml-auto size-4 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none" /></summary>
         <div className="pb-4"><LessonOutcomes session={session} /></div>
       </details>}
     </div>

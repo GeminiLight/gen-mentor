@@ -170,3 +170,21 @@ replay 模式供测试离线执行。配置缺失打开受控 ModelSettings，�
 `/api/models`，服务端 `llm/model-catalog` 读取供应商元数据。首次展开时才读取；目录不持久化。
 供应商、地址或密钥改变会重建选择器并取消旧请求，避免把旧连接的目录用于新连接。
 选择目录项只改对应输入框，保留自定义名称；刷新失败仍保留同一连接的旧目录供参考。
+
+
+### 首页示例到草稿（2026-09-21）
+
+浏览与切换示例仅改变 PathPreview 的局部状态，不写学习档案。用户点击示例行动时，
+即时读取 onboarding draft；仅当目标、背景、checkpoint 均为空，才 patch 选中示例的目标文本。
+已有内容则原样继续到创建页，课数与 checkpoint 不变。不触发模型调用，也不保存示例课程为真实路径。
+
+## 操作型测验数据（issue #31）
+
+测验契约增加可选的 `ordering_questions`、`configuration_questions`，版本 1 的旧档案不补写题目。
+新题型的 selections 分别保存 `{ order, confirmed }` 与 `{ value, confirmed }`；输入事件即时落盘，
+明确检查后才参与评分。`quiz.ts` 负责纯本地判定，`configuration.ts` 比较 JSON 数据，不执行文本。
+确认后的错误和跳过沿用 `quiz-review.ts` 的首次成绩/复练分离机制；档案导入导出保留完整题目与状态。
+课程流水线通过 `hands_on: true` 启用文档适配出题。`generateQuiz` 先用 fast 档生成并校验数量/结构，
+非空操作题再由 `reviewHandsOn` 用 smart 档独立核对来源、唯一顺序和参数类型；只保留认可的题目，
+原有四类题不受剔除影响。没有候选操作题时不调用复核；复核故障走同一断点重试，阅读文档已保存。
+每次调用使用既有 LLM 封装与真实 record/replay。边界与验收见 `wiki/archive/specs/spec-hands-on-questions.md`。

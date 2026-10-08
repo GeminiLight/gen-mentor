@@ -1,0 +1,31 @@
+import { expect, test } from "@playwright/test";
+import { mockReview } from "./onboarding-review-helpers";
+
+test("learning brief reflects the saved draft and edit links return to the right field", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 800 });
+  const calls = await mockReview(page);
+  await page.goto("/onboarding");
+  await expect(page.getByRole("button", { name: "Analyze my goal" })).toBeInViewport({ ratio: 1 });
+  const brief = page.getByRole("complementary", { name: "Learning brief" });
+  const goal = page.getByLabel("Goal", { exact: true });
+  const info = page.getByLabel("Background", { exact: true });
+  await goal.fill("Build an AI research assistant");
+  await info.fill("I know Python.");
+  await page.getByRole("combobox", { name: "Sessions", exact: true }).click();
+  await page.getByRole("option", { name: "6 sessions", exact: true }).click();
+  await expect(brief).toContainText("6 sessions");
+  await expect(brief).toContainText("I know Python.");
+  await page.reload();
+  await expect(brief.getByRole("heading", { level: 3 })).toHaveText("Build an AI research assistant");
+  await brief.getByRole("button", { name: "Edit goal", exact: true }).click();
+  await expect(goal).toBeFocused();
+  await brief.getByRole("button", { name: "Edit background", exact: true }).click();
+  await expect(info).toBeFocused();
+  expect(calls.refine).toBe(0);
+  await info.press("Control+Enter");
+  await expect(page.getByTestId("review-controls")).toBeVisible();
+  await expect(page.locator('[aria-current="step"]')).toContainText("Review together");
+  await page.getByRole("button", { name: "Back to details", exact: true }).click();
+  await expect(info).toHaveValue("I know Python.");
+  await expect(brief).toContainText("6 sessions");
+});

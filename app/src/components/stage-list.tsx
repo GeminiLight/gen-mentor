@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, CircleDashed } from "lucide-react";
+import { Check, CircleAlert } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n";
@@ -23,32 +23,21 @@ export function StageList({
   const running = stages.find((s) => s.status === "running")?.key ?? null;
   const elapsed = useElapsed(running);
   return (
-    <ol className="space-y-2" aria-live="polite">
+    <ol className="stage-list space-y-2" aria-live="polite">
       {stages.map((s, i) => (
         <motion.li
           key={s.key}
-          initial={reduce ? false : { opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.18, delay: i * 0.04, ease: [0.2, 0, 0, 1] }}
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduce ? 0 : 0.28, delay: reduce ? 0 : i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+          data-status={s.status}
           className="flex items-start gap-3 text-sm"
         >
-          <span
-            className={cn(
-              "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
-              s.status === "done" && "border-brand bg-brand text-brand-foreground",
-              s.status === "running" && "border-brand text-brand",
-              s.status === "error" && "border-destructive text-destructive",
-              s.status === "pending" && "text-muted-foreground",
-            )}
-            aria-hidden
-          >
-            {s.status === "done" ? (
-              <Check className="size-3" />
-            ) : (
-              <CircleDashed
-                className={cn("size-3", s.status === "running" && "animate-spin [animation-duration:2s]")}
-              />
-            )}
+          <span className="stage-mark" aria-hidden>
+            {s.status === "done" ? <Check className="stage-check size-4" strokeWidth={1.75} />
+              : s.status === "error" ? <CircleAlert className="size-4" />
+              : s.status === "running" ? <span className="working-dots"><i /><i /><i /></span>
+              : <span className="num">{String(i + 1).padStart(2, "0")}</span>}
           </span>
           <span
             className={cn(

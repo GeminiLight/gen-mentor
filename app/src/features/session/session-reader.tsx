@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, BookOpen, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,13 +12,10 @@ import type { PracticeState, QuizDraft, QuizResults } from "@/lib/store/types";
 import { DocumentView } from "./document-view";
 import { QuizWorkspace } from "./quiz-workspace";
 import { ReadingBookmark } from "./reading-bookmark";
-import { scoredCount } from "@/lib/quiz";
+import { scoredCount, questionCount } from "@/lib/quiz";
 import { ReadingProgress } from "./reading-progress";
 import { AskTutor } from "./ask-tutor";
 import { ReadingTools } from "./reading-tools";
-
-const questionCount = (q: DocumentQuiz) =>
-  q.single_choice_questions.length + q.multiple_choice_questions.length + q.true_false_questions.length + q.short_answer_questions.length;
 
 /**
  * The finished session: reading and quiz as two tabs. "Mark done" appears in the toolbar and
@@ -92,8 +89,8 @@ export function SessionReader({
     <Tabs ref={tabsRef} value={tab} onValueChange={selectTab} className="min-w-0 scroll-mt-6">
       <div className="sticky top-0 z-20 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b @lg/workspace:grid-cols-[auto_minmax(0,1fr)_auto] bg-background/95 py-3 backdrop-blur" data-testid="reading-toolbar">
         <TabsList>
-          <TabsTrigger value="read">{t("session.read")}</TabsTrigger>
-          <TabsTrigger value="quiz" data-testid="tab-quiz" disabled={!quiz}>
+          <TabsTrigger value="read"><BookOpen className="size-4" aria-hidden />{t("session.read")}</TabsTrigger>
+          <TabsTrigger value="quiz" data-testid="tab-quiz" disabled={!quiz}><ListChecks className="size-4" aria-hidden />
             {t("session.quiz")}
             {results && scoredCount(results) > 0 ? ` · ${results.correct}/${scoredCount(results)}` : ""}
           </TabsTrigger>

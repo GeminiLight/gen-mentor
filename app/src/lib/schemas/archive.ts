@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OrderingAnswer, ConfigurationAnswer } from "./hands-on";
 import { LearnerProfile, SkillRequirement, SkillGap } from "./learning";
 import { DocumentQuiz } from "./assessment";
 import { DocumentStructure, KnowledgeDraft, KnowledgePoint, SessionItem } from "./content";
@@ -10,6 +11,8 @@ const Selections = z.object({
   multiple: z.array(z.array(z.number().int().nonnegative())),
   tf: z.array(z.boolean().nullable()),
   short: z.array(z.string()),
+  ordering: z.array(OrderingAnswer).optional(),
+  configuration: z.array(ConfigurationAnswer).optional(),
 });
 const Results = z.object({
   answered: z.number().int().nonnegative(), correct: z.number().int().nonnegative(),

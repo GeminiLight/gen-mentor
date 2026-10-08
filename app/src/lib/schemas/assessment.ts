@@ -1,5 +1,6 @@
 /** Quiz shapes. Option indices may come back as strings from the model; keep both like the original. */
 import { z } from "zod";
+import { OrderingQuestion, ConfigurationQuestion } from "./hands-on";
 
 const OptionIndex = z.union([z.number().int(), z.string()]);
 
@@ -23,10 +24,13 @@ export const DocumentQuiz = z.object({
   multiple_choice_questions: z.array(MultipleChoiceQuestion).default([]),
   true_false_questions: z.array(TrueFalseQuestion).default([]),
   short_answer_questions: z.array(ShortAnswerQuestion).default([]),
+  ordering_questions: z.array(OrderingQuestion).max(5).optional(),
+  configuration_questions: z.array(ConfigurationQuestion).max(5).optional(),
 });
 export type DocumentQuiz = z.infer<typeof DocumentQuiz>;
 
 export const QuizCounts = z.object({
+  hands_on: z.boolean().optional(),
   single_choice_count: z.number().int().min(0).max(20).default(3),
   multiple_choice_count: z.number().int().min(0).max(20).default(0),
   true_false_count: z.number().int().min(0).max(20).default(0),

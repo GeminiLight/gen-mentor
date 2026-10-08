@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X } from "lucide-react";
+import { Check, X, Lightbulb } from "lucide-react";
 import type { ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import type { Verdict } from "@/lib/quiz";
@@ -47,16 +47,16 @@ export function Question({
 }) {
   const { t } = useT();
   return (
-    <fieldset className="space-y-3" data-testid="question" data-verdict={verdict}>
-      <legend className="font-medium">
-        <span className="num text-muted-foreground">{n}.</span> {text}
+    <fieldset className="min-w-0 space-y-3 rounded-xl border bg-card p-4 shadow-xs sm:p-5" data-testid="question" data-verdict={verdict}>
+      <legend className="max-w-full px-2 text-sm font-medium leading-relaxed">
+        <span className="num mr-2 inline-flex size-7 items-center justify-center rounded-lg border bg-brand-soft text-xs text-brand">{n}</span> {text}
         {hint && <span className="ml-2 text-xs font-normal text-muted-foreground">{hint}</span>}
         <VerdictMark v={verdict} />
       </legend>
       {children}
       {verdict === "answered" && <p className="text-sm text-muted-foreground">{t("polish.reviewPending")}</p>}
       {verdict && verdict !== "unanswered" && explanation && (
-        <p className="text-sm leading-relaxed text-muted-foreground">{explanation}</p>
+        <p className="flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-sm leading-relaxed text-muted-foreground"><Lightbulb className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden /><span>{explanation}</span></p>
       )}
     </fieldset>
   );
@@ -83,9 +83,10 @@ export function Option({
   return (
     <Label
       className={cn(
-        "flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-normal transition-colors has-checked:border-brand has-checked:bg-brand-soft/40",
+        "flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm font-normal transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/40",
         judged && correct === true && "border-success/60 bg-success-soft/50",
         judged && checked && correct === false && "border-destructive/60 bg-destructive-soft/50",
+        !judged && "hover:border-brand/40 hover:bg-brand-soft/20 has-checked:border-brand has-checked:bg-brand-soft/40",
         judged && "cursor-default",
       )}
     >

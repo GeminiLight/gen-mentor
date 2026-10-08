@@ -1,13 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { validOrder } from "@/lib/configuration";
 import { emptySelections, type Selections } from "@/lib/quiz";
 import type { DocumentQuiz } from "@/lib/schemas";
 import type { QuizDraft, QuizResults } from "@/lib/store/types";
 
 /** Persist on the interaction, so leaving a tab cannot lose the last keystroke. */
 export function useQuizDraft(quiz: DocumentQuiz, results: QuizResults | undefined, draft: QuizDraft | undefined, onDraft?: (draft: QuizDraft) => void) {
-  const [sel, updateSel] = useState<Selections>(() => results?.selections ?? draft?.selections ?? emptySelections(quiz));
+  const [sel, updateSel] = useState<Selections>(() => {
+    const initial = emptySelections(quiz);
+    const saved = results?.selections ?? draft?.selections;
+    return { ...initial, ...saved,
+      ordering: initial.ordering!.map((answer, i) => {
+        const stored = saved?.ordering?.[i];
+        return stored && validOrder(stored.order, answer.order.length) ? stored : answer;
+      }),
+      configuration: initial.configuration!.map((answer, i) => saved?.configuration?.[i] ?? answer),
+    };
+  });
   const [order, updateOrder] = useState<string[]>(() => draft?.order ?? []);
   const save = (selections: Selections, sequence: string[]) => {
     updateSel(selections);

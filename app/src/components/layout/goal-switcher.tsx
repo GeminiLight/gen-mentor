@@ -18,7 +18,7 @@ export function GoalSwitcher({ goal, compact = false }: { goal: Goal; compact?: 
   const go = (href: string) => { setOpen(false); router.push(href); };
   return <>
     <button data-goal-trigger type="button" onClick={() => setOpen(true)} aria-label={t("navigation.switchGoal")} aria-haspopup="dialog" aria-expanded={open}
-      className={cn("group min-w-0 items-center gap-3 text-left transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50", compact ? "flex min-h-11 border-b px-4 py-2 md:hidden" : "mt-5 hidden w-full rounded-lg border bg-background/60 p-3 md:flex")}>
+      className={cn("group min-w-0 items-center gap-3 text-left transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50", compact ? "flex min-h-11 border-b px-4 py-2 md:hidden" : "mt-5 hidden w-full rounded-lg border border-transparent p-3 md:flex")}>
       <span className="min-w-0 flex-1">
         <span className={cn("text-xs text-muted-foreground", compact ? "sr-only" : "mb-1 block")}>{t("polish.currentGoal")}</span>
         <span className={cn("block text-sm font-medium", compact ? "truncate" : "line-clamp-2 wrap-anywhere")}>{goal.original_goal || goal.learning_goal}</span>

@@ -189,3 +189,25 @@ test("long chapters and selected-text tools remain usable on a 320px touch scree
     await page.screenshot({ path: `${evidenceDir}/reader-320-touch.png`, animations: "disabled" });
   } finally { await context.close(); }
 });
+
+test("closing the tutor restores focus once and preserves a new reading selection", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 800 });
+  await polishSeed(page);
+  await page.goto("/session/0");
+  const trigger = page.getByTestId("ask-tutor");
+  await trigger.click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(trigger).toBeFocused();
+  await page.locator("article.reading p").nth(2).evaluate((el) => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const selection = window.getSelection()!;
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.dispatchEvent(new Event("selectionchange"));
+  });
+  await expect(page.locator('[data-slot="sheet-content"]')).toHaveCount(0);
+  await expect(trigger).toHaveText("Ask about selection");
+  await trigger.click();
+  await expect(page.getByLabel("Message to the tutor")).toHaveValue(/^> Create arrays/);
+});

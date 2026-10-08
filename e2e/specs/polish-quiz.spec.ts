@@ -83,6 +83,7 @@ test("reading stays available but regeneration waits for the pending quiz", asyn
   let requests = 0;
   await page.route("**/api/generate-quiz", async (route) => {
     requests++;
+    expect(route.request().postDataJSON().hands_on).toBe(true);
     await pending;
     await route.fulfill({ json: { document_quiz: choiceQuiz } });
   });
