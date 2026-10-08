@@ -39,7 +39,7 @@ export function DocumentView({ markdown, sources }: { markdown: string; sources:
           components={{
             h1: () => null,
             h2: ({ children }) => (
-              <h2 id={idFor(children)} className="mt-10 first:mt-0 scroll-mt-48 @3xl:scroll-mt-24 border-b pb-3 text-lg font-semibold">
+              <h2 id={idFor(children)} className="mt-10 first:mt-0 scroll-mt-48 @3xl:scroll-mt-24 border-b pb-3 display text-lg">
                 {children}
               </h2>
             ),

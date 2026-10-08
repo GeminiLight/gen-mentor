@@ -11,7 +11,7 @@ import { reviewNeed } from "@/lib/quiz-review";
 export function SkillEvidence({ goal }: { goal: Goal }) {
   const { t } = useT();
   return <section className="mt-12">
-    <h2 className="text-lg font-semibold">{t("coach.skills")}</h2>
+    <h2 className="display text-lg">{t("coach.skills")}</h2>
     <p className="mt-2 text-sm text-muted-foreground">{t("journey.targetHint")}</p>
     <ul className="mt-6 divide-y rounded-xl border bg-card px-4 sm:px-5" data-testid="mastery-rings">
       {targetSkills(goal).map((skill) => {

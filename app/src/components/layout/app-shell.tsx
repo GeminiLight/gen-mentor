@@ -52,19 +52,19 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
         <div className="mt-6"><CommandTrigger onOpen={() => setCommandOpen(true)} /></div>
         {goal && <GoalSwitcher goal={goal} />}
-        <LayoutGroup id="desktop-navigation"><nav className="mt-7 flex flex-col gap-1" aria-label={t("polish.navigation")}>
+        <LayoutGroup id="desktop-navigation"><nav className="rail-nav mt-7 flex flex-col gap-1" aria-label={t("polish.navigation")}>
           {items.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
               className={cn(
-                "relative isolate flex min-h-11 items-center gap-3 rounded-md px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
-                isActive(href) && "font-medium text-sidebar-accent-foreground",
+                "group relative isolate flex min-h-11 items-center gap-3 rounded-md px-3 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
+                isActive(href) && "font-medium text-foreground",
               )}
             >
-              {isActive(href) && <motion.span layoutId="navigation-active" className="absolute inset-0 -z-10 rounded-md border border-brand/10 bg-sidebar-accent" transition={{ duration: reduce ? 0 : 0.18, ease: [0.2, 0, 0, 1] }} aria-hidden />}
-              <Icon className="size-4" strokeWidth={1.6} aria-hidden />
+              {isActive(href) && <motion.span layoutId="navigation-active" className="nav-active" transition={{ duration: reduce ? 0 : 0.18, ease: [0.2, 0, 0, 1] }} aria-hidden />}
+              <Icon className={cn("size-4", isActive(href) && "text-brand")} strokeWidth={1.6} aria-hidden />
               {t(label)}
             </Link>
           ))}
@@ -107,9 +107,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
-              className={cn("flex flex-1 flex-col items-center gap-1 py-2 text-xs text-muted-foreground", isActive(href) && "bg-brand-soft font-medium text-brand")}
+              className={cn("relative flex min-h-14 flex-1 flex-col items-center justify-center gap-1 py-2 text-xs text-muted-foreground", isActive(href) && "font-medium text-foreground")}
             >
-              <Icon className="size-5" aria-hidden />
+              {isActive(href) && <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-primary" aria-hidden />}
+              <Icon className={cn("size-5", isActive(href) && "text-brand")} strokeWidth={1.6} aria-hidden />
               {t(label)}
             </Link>
           ))}
