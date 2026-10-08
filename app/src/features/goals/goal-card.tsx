@@ -1,8 +1,7 @@
 "use client";
 
-import { ArrowRight, Compass, Trash2, CheckCheck, Target } from "lucide-react";
+import { ArrowRight, Trash2, CheckCheck, Target } from "lucide-react";
 import Link from "next/link";
-import { FeatureIcon } from "@/components/feature-icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -21,13 +20,12 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
   const mastered = targets.filter((s) => s.mastered).length;
   const skills = targets.length;
   return (
-    <div data-testid="goal-card" data-active={active || undefined} className={cn("flex min-w-0 flex-col rounded-xl border bg-card p-6 transition-shadow hover:shadow-sm", active && "border-brand/30")}>
+    <div data-testid="goal-card" data-active={active || undefined} className={cn("flex min-w-0 flex-col rounded-lg border bg-card p-6 transition-shadow hover:shadow-sm", active && "shadow-[inset_0_2px_0_var(--primary)]")}>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3"><FeatureIcon icon={Compass} />
-        <p className="min-w-0 text-xs leading-relaxed text-muted-foreground">
-          {active && <span className="mb-1 block font-medium text-brand">{t("common.active")}</span>}
-          {fmtDate(goal.created_at)}
-        </p></div>
+        <p className="flex min-w-0 flex-wrap items-center gap-x-3 text-xs leading-relaxed text-muted-foreground">
+          {active && <span className="eyebrow text-brand">{t("common.active")}</span>}
+          <span className="num">{fmtDate(goal.created_at)}</span>
+        </p>
         <Dialog>
           <Tooltip><TooltipTrigger asChild><DialogTrigger asChild>
             <Button size="icon-xs" variant="ghost" aria-label={t("goals.deleteGoal")} className="-mt-1 -mr-1 text-muted-foreground">
@@ -50,7 +48,7 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
           </DialogContent>
         </Dialog>
       </div>
-      <h2 className="mt-5 text-lg font-medium leading-snug wrap-anywhere">{goal.learning_goal}</h2>
+      <h2 className="display mt-4 text-lg leading-snug wrap-anywhere">{goal.learning_goal}</h2>
       <div className="mt-6 space-y-3 border-t pt-5">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><CheckCheck className="size-3.5" aria-hidden />{t("goals.sessionsLearned", { n: learned, total: goal.learning_path.length })}</span>
@@ -62,7 +60,7 @@ export function GoalCard({ goal, active }: { goal: Goal; active: boolean }) {
       </div>
       <div className="mt-auto pt-6">
         {active ? (
-          <Button className="min-h-11 w-full justify-between" asChild>
+          <Button className="min-h-11 w-full justify-between rounded-md" asChild>
             <Link href="/learning-path">{t("goals.openPath")}<ArrowRight data-icon="inline-end" aria-hidden /></Link>
           </Button>
         ) : (

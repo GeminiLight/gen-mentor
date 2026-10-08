@@ -35,7 +35,7 @@ export function OnboardingFlow() {
       <div className="entry-intro">
       <div className="entry-heading max-w-(--w-measure)">
         <div className="entry-kicker"><span>{t(started ? "review.eyebrow" : "entry.eyebrow")}</span><span className="num" aria-hidden>0{phase + 1} / 03</span></div>
-        <h1 ref={heading} tabIndex={-1} className="entry-title text-xl font-medium tracking-tight text-balance">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
+        <h1 ref={heading} tabIndex={-1} className="entry-title text-xl text-balance">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
         {started && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(review ? "review.intro" : "review.preparingHelp")}</p>}
       </div>
       <EntryPhases phase={phase} />

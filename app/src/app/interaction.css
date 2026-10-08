@@ -1,10 +1,12 @@
 /* Structural surfaces and interaction feedback. Colors come from globals.css. */
 [data-slot="button"] { transition-property: background-color, color, border-color, box-shadow, transform; transition-duration: var(--dur-base); transition-timing-function: var(--ease-out); }
-[data-slot="button"][data-variant="default"] { box-shadow: var(--shadow-control); }
-[data-slot="button"][data-variant="outline"]:not(.example-choice) { box-shadow: var(--shadow-control); }
 [data-slot="textarea"], [data-slot="input"], [data-slot="select-trigger"] { transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out); }
 [data-slot="tabs-trigger"] { transition: background-color var(--dur-base) var(--ease-out), color var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
 [data-slot="tabs-content"][data-state="active"] { animation: workspace-arrive var(--dur-slow) var(--ease-out) backwards; }
+/* Active navigation: a sheet of paper on the pale-blue rail, with an ink edge. */
+.nav-active { position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-xs); }
+.nav-active::before { content: ""; position: absolute; left: -1px; top: 0.625rem; bottom: 0.625rem; width: 2px; border-radius: 1px; background: var(--primary); }
+.rail-nav a:not([aria-current="page"]):hover { background: color-mix(in oklch, var(--card) 55%, transparent); }
 .surface-enter { animation: surface-arrive var(--dur-slow) var(--ease-out) both; }
 .workspace-route { animation: workspace-arrive var(--dur-slow) var(--ease-out) backwards; }
 @keyframes surface-arrive { from { opacity: 0.55; transform: translateY(5px); } to { opacity: 1; transform: none; } }

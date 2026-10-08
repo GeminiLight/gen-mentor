@@ -3,10 +3,9 @@
 import { LibraryBig } from "lucide-react";
 
 import { useRef, useState } from "react";
-import { FeatureIcon } from "@/components/feature-icon";
 import { LibraryToolbar, type LibraryFilter } from "./library-toolbar";
 import { scoredCount } from "@/lib/quiz";
-import { ArrowUpRight, BookOpen, Search, Clock3, ListChecks, Layers3 } from "lucide-react";
+import { ArrowUpRight, Search, Clock3, ListChecks, Layers3 } from "lucide-react";
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -42,8 +41,8 @@ export function LibraryView() {
     <>
       <PageHeader icon={LibraryBig} title={t("library.title")} description={t("polish.libraryLede")} />
       {docs.length > 0 && <LibraryToolbar inputRef={searchInput} query={query} onQuery={setQuery} filter={filter} onFilter={setFilter} counts={counts} matches={matches.length} />}
-      {docs.length > 0 && matches.length === 0 && <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed px-6 py-12 text-center">
-        <FeatureIcon icon={Search} /><p className="text-sm text-muted-foreground">{t("polish.noSearch")}</p>
+      {docs.length > 0 && matches.length === 0 && <div className="flex flex-col items-center gap-4 rounded-lg border bg-wash px-6 py-12 text-center">
+        <Search className="size-5 text-brand" strokeWidth={1.5} aria-hidden /><p className="text-sm text-muted-foreground">{t("polish.noSearch")}</p>
         <Button variant="outline" onClick={() => { setQuery(""); setFilter("all"); searchInput.current?.focus(); }}>{t("polish.resetFilters")}</Button>
       </div>}
       {docs.length === 0 ? (
@@ -51,14 +50,14 @@ export function LibraryView() {
       ) : (
         <div className="grid gap-4 @2xl/workspace:grid-cols-2 @5xl/workspace:grid-cols-3">
           {matches.map(({ session, index, state }) => (
-            <Link key={index} href={`/session/${index}`} className="interactive-surface group rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+            <Link key={index} href={`/session/${index}`} className="interactive-surface group rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <Card className="h-full border border-border ring-0 shadow-xs transition-[border-color,box-shadow] group-hover:border-brand/30 group-hover:shadow-md [--card-spacing:--spacing(5)]" data-testid="library-card">
                 <CardHeader className="gap-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <FeatureIcon icon={BookOpen} className="size-10 rounded-lg" /> {t("entry.previewLesson", { n: index + 1 })}
+                  <div className="flex items-baseline gap-3 text-xs text-muted-foreground">
+                    <span className="chapter-num text-xl" aria-hidden>{String(index + 1).padStart(2, "0")}</span><span className="sr-only">{t("entry.previewLesson", { n: index + 1 })}</span>
                     {session.if_learned && <Badge className="ml-auto bg-success-soft text-success">{t("common.learned")}</Badge>}
                   </div>
-                  <CardTitle className="text-lg leading-snug">{state!.document!.structure.title}</CardTitle>
+                  <CardTitle className="display font-display text-lg leading-snug">{state!.document!.structure.title}</CardTitle>
                   <CardDescription className="line-clamp-3 leading-relaxed">{state!.document!.structure.overview}</CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-4 text-xs text-muted-foreground">

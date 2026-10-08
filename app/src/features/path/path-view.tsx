@@ -34,7 +34,7 @@ export function PathView() {
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2"><p className="text-sm font-medium">{t("journey.courseProgress")}</p><p className="num text-xs text-muted-foreground">{meta}</p></div>
       <Progress value={(learned / Math.max(1, total)) * 100} className="mb-2 h-1" aria-label={meta} />
       {total > 0 && learned === total && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand/40 bg-brand-soft/40 px-4 py-3 text-sm" data-testid="path-all-done">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-wash px-4 py-3 text-sm" data-testid="path-all-done">
           <div>
             <p className="font-medium">{t("journey.courseDone")}</p>
             <p className="text-muted-foreground">{t("journey.courseDoneBody")}</p>
@@ -46,10 +46,10 @@ export function PathView() {
       )}
       <CurrentSession goal={goal} index={nextIndex} />
       <div className="mt-10 mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div><h2 className="flex items-center gap-2 text-sm font-medium"><Route className="size-4 text-brand" aria-hidden />{t("polish.coursePlan")}</h2><p className="mt-1 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p></div>
+        <div><h2 className="display text-lg">{t("polish.coursePlan")}</h2><p className="mt-1 text-xs text-muted-foreground">{t("polish.coursePlanBody")}</p></div>
         <RescheduleDialog goal={goal} />
       </div>
-      <ol className="space-y-1" data-testid="path-stats">
+      <ol className="border-t" data-testid="path-stats">
         {goal.learning_path.map((s, i) => (
           <SessionRow key={s.id + i} session={s} index={i} isNext={i === nextIndex} state={goal.sessions[sessionUid(goal.id, i)]} minutes={sessionMinutes(goal.sessions[sessionUid(goal.id, i)])} />
         ))}

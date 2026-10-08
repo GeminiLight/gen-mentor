@@ -14,9 +14,9 @@
    foreground, w-(--w-rail), duration-(--dur-base)); gate.sh fails any raw
    value in .ts/.tsx.
 
-   Direction: a quiet study desk. Cool near-neutral greys, hairline borders,
-   a soft-blue action surface with ink-blue progress. Six type
-   sizes, three weights, three durations. Both themes are first-class.
+   Direction: ink and paper. Pale-blue paper surfaces carry identity, deep
+   ink blue carries the one primary action, a display serif carries titles.
+   Six type sizes, three weights. Both themes are first-class.
    ──────────────────────────────────────────────────────────────────────── */
 
 @theme {
@@ -56,7 +56,9 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-heading: var(--font-sans);
-  --font-editorial: "Iowan Old Style", "Palatino Linotype", "Songti SC", "Noto Serif CJK SC", serif;
+  /* Titles only. Source Serif 4 pairs with Source Han / Noto Serif CJK for Chinese. */
+  --font-display: var(--font-source-serif), "Source Han Serif SC", "Noto Serif CJK SC", "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-editorial: var(--font-display);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -94,6 +96,8 @@
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-soft: var(--brand-soft);
+  --color-wash: var(--wash);
+  --color-ink-soft: var(--ink-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
@@ -135,12 +139,14 @@
   --border: oklch(0.895 0.009 245);
   --input: oklch(0.85 0.012 245);
 
-  /* The one signal color: progress and the primary action only */
+  /* Blue family: ink for the primary action, brand for links and progress, pale paper for identity */
   --brand: oklch(0.46 0.105 245);
   --brand-foreground: oklch(0.99 0.005 240);
   --brand-soft: oklch(0.943 0.027 240);
-  --primary: oklch(0.86 0.065 240);
-  --primary-foreground: oklch(0.25 0.05 250);
+  --primary: oklch(0.39 0.09 252);
+  --primary-foreground: oklch(0.985 0.006 240);
+  --wash: oklch(0.958 0.02 238);
+  --ink-soft: oklch(0.5 0.06 248);
   --ring: oklch(0.54 0.115 245);
 
   /* Semantic. Also used as text on the -soft surfaces, so light L stays ≤ 0.5 for 4.5:1. */
@@ -169,7 +175,7 @@
   --chart-4: oklch(0.55 0.15 340);
   --chart-5: oklch(0.55 0.13 120);
 
-  --sidebar: oklch(0.972 0.007 240);
+  --sidebar: oklch(0.962 0.017 238);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-foreground);
@@ -238,6 +244,8 @@
   --brand-soft: oklch(0.29 0.04 245);
   --primary: var(--brand);
   --primary-foreground: var(--brand-foreground);
+  --wash: oklch(0.215 0.028 248);
+  --ink-soft: oklch(0.74 0.045 240);
   --ring: oklch(0.75 0.09 240);
 
   --destructive: oklch(0.7 0.17 25);
@@ -262,7 +270,7 @@
   --chart-4: oklch(0.64 0.15 340);
   --chart-5: oklch(0.64 0.13 120);
 
-  --sidebar: oklch(0.195 0.023 250);
+  --sidebar: oklch(0.2 0.028 248);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-foreground);
@@ -329,10 +337,27 @@
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
   }
-  /* Small uppercase label above a group. */
+  /* Small uppercase label above a group. Wide tracking reads as a label, not a sentence. */
   .eyebrow {
     @apply text-xs font-medium uppercase text-muted-foreground;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.14em;
+  }
+  :lang(zh) .eyebrow { letter-spacing: 0.08em; }
+  /* Display serif for page and section titles. Optical size follows the rendered size. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-medium);
+    font-optical-sizing: auto;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  :lang(zh) .display { letter-spacing: 0.01em; }
+  /* Serif chapter numerals: order, never score. */
+  .chapter-num {
+    font-family: var(--font-display);
+    font-variant-numeric: lining-nums tabular-nums;
+    font-weight: var(--font-weight-normal);
+    color: var(--ink-soft);
   }
   /* Long-form reading: the learning document. */
   .reading {

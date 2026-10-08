@@ -13,7 +13,7 @@ export function ReviewQueue({ goal, compact = false }: { goal: Goal; compact?: b
   const hasQuiz = Object.values(goal.sessions).some((s) => s.quiz_results);
   return <section aria-label={t("coach.reviewTitle")} className="min-w-0" data-testid="review-queue">
     <div className="mb-5 flex items-start justify-between gap-4">
-      <div><p className="eyebrow mb-2">{t("coach.nextFocus")}</p><h2 className="text-lg font-semibold">{t("coach.reviewTitle")}</h2><p className="mt-2 max-w-(--w-measure) text-sm leading-relaxed text-muted-foreground">{t("coach.reviewBody")}</p></div>
+      <div><p className="eyebrow mb-2">{t("coach.nextFocus")}</p><h2 className="display text-lg">{t("coach.reviewTitle")}</h2><p className="mt-2 max-w-(--w-measure) text-sm leading-relaxed text-muted-foreground">{t("coach.reviewBody")}</p></div>
       <RotateCcw className="mt-1 size-5 shrink-0 text-muted-foreground" aria-hidden />
     </div>
     {queue.length ? <>

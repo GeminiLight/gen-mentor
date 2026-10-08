@@ -42,7 +42,7 @@ export function QuizWorkspace({ quiz, results, draft, onDraft, onSubmit, practic
   return <section id="practice" className="space-y-6 scroll-mt-40" aria-label={t("coach.practiceTitle")}>
     <div className="space-y-3 border-b pb-5">
       <Button variant="ghost" size="sm" className="-ml-2" onClick={() => changeMode(false)}><ArrowLeft aria-hidden />{t("coach.original")}</Button>
-      <h2 id="practice-title" tabIndex={-1} className="scroll-mt-40 text-lg font-semibold">{t("coach.practiceTitle")}</h2>
+      <h2 id="practice-title" tabIndex={-1} className="scroll-mt-40 display text-lg">{t("coach.practiceTitle")}</h2>
       <p className="max-w-(--w-measure) text-sm leading-relaxed text-muted-foreground">{t("coach.practiceNote")}</p>
     </div>
     <QuizView key={saved?.results?.submittedAt ?? "practice"} quiz={review.quiz} results={saved?.results} draft={saved?.draft}
