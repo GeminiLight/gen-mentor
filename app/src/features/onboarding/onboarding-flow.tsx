@@ -7,6 +7,7 @@ import { useT } from "@/lib/i18n";
 import { GoalForm } from "./goal-form";
 import { EntryGuide } from "./entry-guide";
 import { EntryPhases } from "./entry-phases";
+import { AutoHeight } from "@/components/auto-height";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOnboarding } from "./use-onboarding";
 import { StartingPointReview } from "./starting-point-review";
@@ -37,14 +38,15 @@ export function OnboardingFlow() {
       </div>
       <EntryPhases phase={started ? building ? 2 : 1 : 0} />
       </div>
-      <div className="entry-surface rounded-xl border bg-card p-5 sm:p-8">
+      <div className="entry-surface rounded-xl border bg-card">
+        <AutoHeight><div key={started ? "analysis" : "details"} className="onboarding-panel p-5 sm:p-8">
         {!started ? (
           <div>
             <GoalForm disabled={running} onSubmit={(v) => void run(v)} />
             <EntryGuide />
           </div>
         ) : (
-          <div className="surface-enter space-y-8">
+          <div className="space-y-8">
             <div className="flex items-center justify-between"><Button variant="ghost" size="sm" onClick={back}><ArrowLeft className="size-4" aria-hidden />{t("review.back")}</Button><span className="text-xs text-muted-foreground">{t("polish.savedDraft")}</span></div>
             <OnboardingProgress status={status} reviewing={!!review} />
             {running && <section className="space-y-3 rounded-lg bg-muted/40 p-5" role="status" data-loading="true">
@@ -70,6 +72,7 @@ export function OnboardingFlow() {
             {review && <ReviewControls review={review} ready={!!preview.gaps} onConfirm={flow.confirm} onExtend={flow.extend} />}
           </div>
         )}
+        </div></AutoHeight>
       </div>
     </div>
   );

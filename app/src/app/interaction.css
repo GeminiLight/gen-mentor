@@ -2,14 +2,9 @@
 .entry-workspace { display: grid; gap: 2rem; align-items: start; }
 .entry-intro { min-width: 0; }
 .entry-title { line-height: 1.14; letter-spacing: -0.045em; }
-.entry-surface { min-width: 0; box-shadow: var(--shadow-workspace); animation: surface-arrive var(--dur-slow) var(--ease-out) both; }
-.entry-phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--border); }
-.phase-indicator { position: absolute; inset: -1px 0 auto; height: 2px; background: var(--brand); }
 .field-index { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted-foreground); transition: color var(--dur-fast) var(--ease-out); }
 .composer-field label { transition: color var(--dur-fast) var(--ease-out); }
 .composer-field:focus-within label, .composer-field:focus-within .field-index { color: var(--brand); }
-.goal-composer [data-slot="textarea"] { box-shadow: inset 0 1px 2px var(--surface-shadow); }
-.goal-composer [data-slot="textarea"]:not([aria-invalid="true"]):focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 12%, transparent); }
 .example-choice { background: transparent; border-color: transparent; box-shadow: none; color: var(--muted-foreground); }
 .example-choice:hover { background: var(--brand-soft); border-color: var(--border); color: var(--brand); }
 [data-slot="button"] { transition-property: background-color, color, border-color, box-shadow, transform; transition-duration: var(--dur-base); transition-timing-function: var(--ease-out); }
@@ -20,25 +15,17 @@
 [data-slot="tabs-content"][data-state="active"] { animation: workspace-arrive var(--dur-slow) var(--ease-out) backwards; }
 .surface-enter { animation: surface-arrive var(--dur-slow) var(--ease-out) both; }
 .workspace-route { animation: workspace-arrive var(--dur-slow) var(--ease-out) backwards; }
-[data-slot="dialog-content"], [data-slot="sheet-content"] { animation-timing-function: var(--ease-out); animation-duration: var(--dur-slow); }
 @keyframes surface-arrive { from { opacity: 0.55; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 @keyframes workspace-arrive { from { opacity: 0.65; } to { opacity: 1; } }
 @media (min-width: 1024px) {
   .entry-workspace { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr); gap: 4rem; }
   .entry-intro { position: sticky; top: 2rem; padding-top: 1.5rem; }
-  .entry-phases { grid-template-columns: 1fr; border-top: 0; border-left: 1px solid var(--border); margin-top: 3rem; }
-  .entry-phases > li { padding-left: 1.25rem; padding-block: 1.25rem; }
-  .phase-indicator { inset: 0 auto 0 -1px; height: auto; width: 2px; }
-}
-@media (max-width: 639px) {
-  .entry-phases > li { flex-direction: column; align-items: flex-start; gap: 0.375rem; padding-inline: 0.25rem; }
 }
 @media (max-width: 1023px) {
   .entry-workspace { max-width: var(--w-entry); margin-inline: auto; }
   .entry-intro > div { margin-bottom: 1.5rem; }
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  [data-slot="button"][data-variant="default"]:not(:disabled):hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
   [data-slot="button"]:not(:disabled):active { transform: translateY(1px); transition-duration: var(--dur-fast); }
   .interactive-surface { transition: transform var(--dur-base) var(--ease-out); }
   .interactive-surface:hover { transform: translateY(-2px); }

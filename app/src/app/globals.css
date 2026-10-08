@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "./interaction.css";
+@import "./motion.css";
+@import "./composer.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,7 +45,7 @@
   --shadow-xs: 0 1px 2px oklch(0.2 0.01 260 / 0.06);
   --shadow-sm: 0 1px 3px oklch(0.2 0.01 260 / 0.08), 0 1px 2px oklch(0.2 0.01 260 / 0.04);
   --shadow-md: 0 6px 16px -6px oklch(0.2 0.01 260 / 0.14), 0 2px 6px -2px oklch(0.2 0.01 260 / 0.06);
-  --shadow-control: inset 0 1px 0 var(--edge-light), 0 1px 2px var(--surface-shadow);
+  --shadow-control: inset 0 1px 0 var(--edge-light), inset 0 -1px 0 var(--surface-shadow), 0 2px 3px -1px var(--surface-shadow);
   --shadow-workspace: 0 1px 3px var(--surface-shadow), 0 20px 60px -28px var(--surface-shadow);
   --shadow-paper: 0 2px 4px oklch(0.28 0.035 250 / 0.03), 0 18px 48px -18px oklch(0.35 0.08 245 / 0.18);
   --shadow-lg: 0 16px 40px -12px oklch(0.2 0.01 260 / 0.22), 0 4px 12px -4px oklch(0.2 0.01 260 / 0.08);
@@ -196,6 +198,9 @@
   --dur-base: 180ms;
   --dur-slow: 240ms;
   --dur-working: 1800ms;
+  --dur-travel: 280ms;
+  --dur-reveal: 420ms;
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -285,6 +290,8 @@
       --dur-fast: 0.01ms;
       --dur-base: 0.01ms;
       --dur-slow: 0.01ms;
+      --dur-travel: 0.01ms;
+      --dur-reveal: 0.01ms;
     }
     *,
     *::before,

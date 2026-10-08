@@ -102,7 +102,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           rows={2}
           className="min-h-24 resize-y bg-background/40 px-4 py-4 text-base leading-relaxed focus:bg-card"
         />
-        {!goal.trim() && <div className="pt-1"><div className="flex flex-wrap gap-1" role="group" aria-label={t("entry.examples")}>{(["data", "agents", "career"] as const).map((key) => <Button key={key} variant="outline" size="sm" type="button" className="example-choice min-h-9" disabled={disabled} onClick={() => { setGoal(t(`entry.${key}Goal`)); goalRef.current?.focus(); }}>{t(`entry.${key}`)}</Button>)}</div></div>}
+        <div className="suggestion-reveal" data-open={!goal.trim()} aria-hidden={!!goal.trim()} inert={!!goal.trim()}><div className="min-h-0 overflow-hidden"><div className="flex flex-wrap gap-1 pt-1" role="group" aria-label={t("entry.examples")}>{(["data", "agents", "career"] as const).map((key) => <Button key={key} variant="outline" size="sm" type="button" className="example-choice min-h-9" disabled={disabled} onClick={() => { setGoal(t(`entry.${key}Goal`)); goalRef.current?.focus(); }}>{t(`entry.${key}`)}</Button>)}</div></div></div>
         {goalInvalid && (
           <p id="goal-error" className="text-xs text-destructive" role="alert">
             {t("onboarding.goalRequired")}
@@ -160,7 +160,7 @@ export function GoalForm({ disabled, onSubmit }: { disabled: boolean; onSubmit: 
           <ModelSettings open={settingsOpen} onOpenChange={setSettingsOpen} trigger={<Button type="button" variant="ghost" size="sm" className="min-h-11"><KeyRound aria-hidden />{t(model.state === "ready" ? "settings.title" : "entry.configure")}</Button>} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">{(goal || info) && <><Check className="size-3" aria-hidden />{t("entry.saved")}</>}</span>
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">{(goal || info) && <><Check className="stage-check size-3" aria-hidden />{t("entry.saved")}</>}</span>
           <Button type="submit" size="lg" className="h-12 w-full px-5 sm:ml-auto sm:w-auto" disabled={disabled || parsing || checking}>
             {checking ? t("entry.modelChecking") : t("entry.analyze")}<ArrowRight data-icon="inline-end" aria-hidden />
           </Button>
