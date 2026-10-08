@@ -4,7 +4,7 @@ import { configurationObject, sameConfiguration } from "./configuration";
 import { emptySelections, judge, questionCount, quizPerformance } from "./quiz";
 import { reviewNeed, reviewQuiz } from "./quiz-review";
 import { ArchiveSchema } from "./schemas/archive";
-import { seedArchive } from "../../../e2e/specs/seed";
+import { seedArchive } from "../../../e2e/fixtures/archive";
 
 export const exercises = {
   ordering_questions: [{ question: "Put the workflow in order", items: ["Publish", "Validate", "Collect"], correct_order: [2, 1, 0], explanation: "Collect before validation; publish last." }],

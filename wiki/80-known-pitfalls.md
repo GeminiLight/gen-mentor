@@ -223,3 +223,13 @@ profiler 这种 3KB system prompt 加 4KB 输出的调用单次超过 3 分钟�
 本机进程采样显示它反复执行 `close`，而启动环境的 `ulimit -n` 为 unlimited。
 解法：在本次验收 shell 中先运行 `ulimit -n 4096`，再执行原来的 `make verify-ui`。
 教训：区分运行环境与产品失败，保留端口检查、测试和截图阈值，不通过修改闸门绕开故障。
+
+
+## 应用单测不能导入 Playwright 运行器辅助模块
+
+现象：本地 build 通过，GitHub Gate 与 Vercel 构建却报 `e2e/specs/seed.ts` 找不到
+`@playwright/test`。原因：应用单测为验证档案兼容性引用 seedArchive，连带导入了浏览器
+运行器类型；本机装有 e2e 依赖掩盖了问题，部署只安装 app 依赖。
+解法：纯档案构造数据独立到 `e2e/fixtures/archive.ts`，单测与浏览器 helper 共用；
+只有浏览器 helper 引用 Page 类型。不排除单测类型检查、不向生产应用添加 Playwright。
+教训：共享测试数据必须与运行器分离，部署构建要用只安装应用依赖的环境验证。
