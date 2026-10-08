@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
 import { GoalForm } from "./goal-form";
 import { EntryGuide } from "./entry-guide";
-import { JourneyArt } from "./journey-art";
+import { LearningBrief } from "./learning-brief";
 import { EntryPhases } from "./entry-phases";
 import { AutoHeight } from "@/components/auto-height";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,10 +35,9 @@ export function OnboardingFlow() {
       <div className="entry-intro">
       <div className="entry-heading max-w-(--w-measure)">
         <div className="entry-kicker"><span>{t(started ? "review.eyebrow" : "entry.eyebrow")}</span><span className="num" aria-hidden>0{phase + 1} / 03</span></div>
-        <h1 ref={heading} tabIndex={-1} className="entry-title text-xl font-medium tracking-tight text-balance lg:text-2xl">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
+        <h1 ref={heading} tabIndex={-1} className="entry-title text-xl font-medium tracking-tight text-balance">{t(started ? review ? "review.title" : "review.preparingTitle" : "onboarding.title")}</h1>
         {started && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(review ? "review.intro" : "review.preparingHelp")}</p>}
       </div>
-      <JourneyArt phase={phase} />
       <EntryPhases phase={phase} />
       </div>
       <div className="entry-surface rounded-xl border bg-card">
@@ -76,6 +75,7 @@ export function OnboardingFlow() {
           </div>
         )}
         </div></AutoHeight>
+        {!started && <LearningBrief />}
       </div>
     </div>
   );

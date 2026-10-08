@@ -1,5 +1,16 @@
 import type { entry as en } from "./en-entry";
 export const entry: Record<keyof typeof en, string> = {
+  "briefTitle": "学习简报",
+  "briefDraft": "草稿",
+  "briefEmpty": "下一程，由你定义。",
+  "briefEmptyBody": "从一个目标，和你的真实经验开始。",
+  "briefBackground": "已有经验",
+  "briefMissing": "尚未填写",
+  "briefNext": "下一步",
+  "briefReview": "确认目标与技能水平",
+  "briefEditGoal": "修改目标",
+  "briefEditInfo": "修改背景",
+  "briefScope": "课程规模",
   "optional": "可选",
   "pageNavigation": "了解 GenMentor",
   "sample": "课程示例",

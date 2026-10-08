@@ -17,7 +17,7 @@ export function EntryGuide() {
       <div><h3 className="text-sm font-medium">{t(`entry.help${kind}`)}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`entry.help${kind}Body`)}</p></div>
     </li>; })}
   </ol>;
-  return <aside className="mt-6 border-t pt-2">
+  return <aside className="entry-guide border-t pt-2">
     <h2>
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls={id} id={id + "-trigger"} className="group flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-md text-left text-xs text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
         <CircleHelp className="size-4" aria-hidden /><span>{t("entry.helpTitle")}</span><ChevronDown className="ml-auto size-4 transition-transform group-aria-expanded:rotate-180 motion-reduce:transition-none" aria-hidden />

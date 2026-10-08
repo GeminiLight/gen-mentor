@@ -14,7 +14,7 @@ export function OnboardingPage() {
   const hasGoals = useArchive((s) => s.hydrated && s.goals.length > 0);
   return (
     <main className="mx-auto w-full max-w-(--w-content) px-5 pb-12 sm:px-6">
-      <header className="mb-8 flex items-center justify-between border-b py-5">
+      <header className="mb-6 flex items-center justify-between border-b py-5">
         <Link href="/" className="text-sm" aria-label={t("common.appName")}>
           <Brand />
         </Link>
@@ -26,7 +26,7 @@ export function OnboardingPage() {
           <ThemeToggle />
         </div>
       </header>
-      <div className="pt-2 sm:pt-5"><OnboardingFlow /></div>
+      <div className="pt-2"><OnboardingFlow /></div>
     </main>
   );
 }
