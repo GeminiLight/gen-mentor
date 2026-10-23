@@ -1,0 +1,3 @@
+app/dist/
+.vercel/
+app/.vercel/
