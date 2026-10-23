@@ -5,7 +5,7 @@
   <p><b>LLM-powered & Goal-oriented Tutoring System</b></p>
   <p>
     <a href="https://genmentor.aurax.live">Live app</a> &nbsp;·&nbsp;
-    <a href="https://www.tianfuwang.tech/gen-mentor">Website</a> &nbsp;·&nbsp;
+    <a href="https://tianfu.wang/gen-mentor">Website</a> &nbsp;·&nbsp;
     <a href="https://arxiv.org/pdf/2501.15749">Paper</a> &nbsp;·&nbsp;
     <a href="https://youtu.be/vTdtGZop-Zc">Video</a>
   </p>
