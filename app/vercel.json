@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "node build.mjs",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/gen-mentor", "destination": "/index.html" },
+    { "source": "/gen-mentor/:path*", "destination": "/:path*" }
+  ]
+}
